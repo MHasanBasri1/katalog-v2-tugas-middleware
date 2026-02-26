@@ -26,9 +26,9 @@
                     <div class="relative">
                         <img :src="slides[currentSlide]" alt="{{ $product->name }}" class="w-full h-[340px] md:h-[540px] object-cover transition-all duration-300">
                         <span class="absolute top-3 right-3 bg-white/95 text-blue-600 text-[11px] md:text-sm font-bold px-3 py-1.5 rounded-full border border-blue-100 flex items-center gap-2 whitespace-nowrap">
-                            <i class="fas fa-star text-blue-500"></i> {{ number_format((float) $product->rating_avg, 1) }} <span class="text-gray-500">({{ number_format($product->rating_count) }})</span>
+                            <span class="inline-flex items-center gap-1"><i class="far fa-eye"></i> {{ $compactViews($product->view_count) }}</span>
                             <span class="text-gray-400">|</span>
-                            <i class="far fa-eye"></i> {{ $compactViews($product->view_count) }}
+                            <span class="inline-flex items-center gap-1"><i class="fas fa-bag-shopping text-[10px]"></i> {{ number_format($product->sold_count) }}</span>
                         </span>
                         @if($isPromo)
                             <span class="absolute top-3 left-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow">
@@ -85,16 +85,15 @@
                 <div class="flex items-start justify-between gap-4 mb-4">
                     <div>
                         <div class="flex items-center justify-between gap-2 mb-3 w-full">
-                            <span class="inline-flex items-center gap-2 bg-primary-light text-primary-dark px-3 py-1 rounded-full text-xs font-semibold">{{ $product->category?->name }} <span class="text-blue-700">|</span> Terjual {{ number_format($product->sold_count) }}</span>
+                            <span class="inline-flex items-center gap-2 bg-primary-light text-primary-dark px-3 py-1 rounded-full text-xs font-semibold">{{ $product->category?->name }} <span class="text-blue-700">|</span> <i class="fas fa-star text-blue-500"></i> {{ number_format((float) $product->rating_avg, 1) }}</span>
                             <button
                                 type="button"
-                                x-data="{ pop: false }"
-                                @click="pop = true; setTimeout(() => pop = false, 220)"
-                                :class="{ 'scale-125': pop }"
-                                class="inline-flex items-center justify-center w-9 h-9 rounded-full border border-blue-100 bg-blue-50 text-blue-600 shrink-0 transform transition"
-                                title="Rating Produk"
+                                wire:click="toggleWishlist({{ $product->id }})"
+                                class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-full border shrink-0 transition text-xs font-semibold {{ in_array($product->id, $wishlistedProductIds, true) ? 'border-blue-600 bg-blue-600 text-white' : 'border-blue-100 bg-blue-50 text-blue-700 hover:bg-blue-100' }}"
+                                title="Tambah Wishlist"
                             >
-                                <i class="fas fa-star text-blue-500 text-sm"></i>
+                                <i class="{{ in_array($product->id, $wishlistedProductIds, true) ? 'fas' : 'far' }} fa-heart"></i>
+                                Wishlist
                             </button>
                         </div>
                         <h1 class="text-xl md:text-3xl font-black text-gray-900 leading-tight">{{ $product->name }}</h1>
@@ -169,7 +168,7 @@
             </h2>
             <span class="text-xs md:text-sm text-gray-500">Kategori {{ $product->category?->name }}</span>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             @forelse($relatedProducts as $item)
                 <a href="{{ route('produk.detail', $item->slug) }}" class="bg-white rounded-xl p-3 md:p-4 border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col">
                     <div class="bg-gray-100 rounded-lg aspect-square w-full overflow-hidden mb-3 relative">
@@ -179,17 +178,15 @@
                             <div class="w-full h-full flex items-center justify-center"><i class="fas fa-box text-4xl text-gray-300"></i></div>
                         @endif
                         <span class="absolute top-2 right-2 bg-white/95 text-blue-600 text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-2">
-                            <i class="fas fa-star text-blue-500"></i> {{ number_format((float) $item->rating_avg, 1) }} <span class="text-gray-500">({{ number_format($item->rating_count) }})</span>
-                            <span class="text-gray-500">|</span>
                             <i class="far fa-eye"></i> {{ $compactViews($item->view_count) }}
                         </span>
                     </div>
-                    <h3 class="font-bold text-gray-800 text-lg md:text-lg leading-snug mb-1.5">{{ $item->name }}</h3>
+                    <h3 class="font-bold text-gray-800 text-sm md:text-lg leading-snug mb-1.5 min-h-[2.5rem] break-words">{{ $item->name }}</h3>
                     <div class="mt-auto">
                         @if($item->original_price)
-                            <p class="text-gray-400 line-through text-sm md:text-sm">Rp {{ number_format((float) $item->original_price, 0, ',', '.') }}</p>
+                            <p class="text-gray-400 line-through text-xs md:text-sm">Rp {{ number_format((float) $item->original_price, 0, ',', '.') }}</p>
                         @endif
-                        <p class="text-primary font-black text-2xl md:text-2xl">Rp {{ number_format((float) $item->price, 0, ',', '.') }}</p>
+                        <p class="text-primary font-black text-base md:text-2xl break-words">Rp {{ number_format((float) $item->price, 0, ',', '.') }}</p>
                     </div>
                 </a>
             @empty
@@ -235,4 +232,3 @@ function productGallery(images) {
 }
 </script>
 @endpush
-

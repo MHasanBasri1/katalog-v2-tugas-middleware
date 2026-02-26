@@ -8,7 +8,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.35.0/tabler-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -21,7 +21,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="h-full antialiased font-['Inter'] bg-white dark:bg-gray-950 selection:bg-indigo-100 dark:selection:bg-indigo-900/30 overflow-x-hidden">
+<body class="h-full antialiased font-['Plus_Jakarta_Sans'] bg-white dark:bg-gray-950 selection:bg-indigo-100 dark:selection:bg-indigo-900/30 overflow-x-hidden">
     <main class="max-w-full overflow-x-hidden">
         @yield('content')
     </main>

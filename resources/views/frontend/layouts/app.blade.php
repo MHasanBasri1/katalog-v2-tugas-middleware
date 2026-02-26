@@ -21,6 +21,9 @@
     <meta name="twitter:title" content="@yield('twitter_title', trim($__env->yieldContent('title', 'Katalog Produk Modern')))">
     <meta name="twitter:description" content="@yield('twitter_description', trim($__env->yieldContent('meta_description', 'VISTORA adalah katalog produk modern dengan pencarian cepat, kategori lengkap, dan detail produk terbaik.')))">
     <meta name="twitter:image" content="@yield('twitter_image', trim($__env->yieldContent('og_image', 'https://picsum.photos/seed/vistora-og/1200/630')))">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script type="application/ld+json">
         {
             "@@context": "https://schema.org",
@@ -126,7 +129,7 @@
     @stack('meta')
     @stack('styles')
 </head>
-<body class="m-0 min-h-screen bg-gray-50 text-gray-800 font-sans antialiased overflow-x-hidden">
+<body class="m-0 min-h-screen bg-gray-50 text-gray-800 font-['Plus_Jakarta_Sans'] antialiased overflow-x-hidden">
     <livewire:public.header />
 
     <main class="pt-[96px] md:pt-[132px] @yield('main_class') max-w-full overflow-x-hidden">

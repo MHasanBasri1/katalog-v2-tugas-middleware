@@ -86,10 +86,26 @@
                 <i class="fas fa-headset text-lg sm:text-xl"></i>
             </button>
             <div class="w-px h-6 bg-gray-300 mx-1 sm:mx-2 hidden md:block"></div>
-            <a href="#" class="hidden lg:flex items-center gap-2.5 bg-primary text-white px-8 py-3 rounded-xl font-bold text-sm leading-none hover:bg-primary-dark transition shadow-sm">
-                <i class="fas fa-download text-xs"></i>
-                <span>Unduh App</span>
-            </a>
+            @auth
+                <div class="hidden lg:flex items-center gap-2">
+                    <a href="{{ route('user.panel') }}" class="inline-flex items-center gap-2.5 bg-primary text-white px-6 py-3 rounded-xl font-bold text-sm leading-none hover:bg-primary-dark transition shadow-sm">
+                        <i class="fas fa-user-circle text-xs"></i>
+                        <span>Profil Saya</span>
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="inline-flex items-center gap-2.5 bg-gray-100 text-gray-700 px-4 py-3 rounded-xl font-bold text-sm leading-none hover:bg-gray-200 transition">
+                            <i class="fas fa-sign-out-alt text-xs"></i>
+                            <span>Logout</span>
+                        </button>
+                    </form>
+                </div>
+            @else
+                <a href="{{ route('user.login') }}" class="hidden lg:flex items-center gap-2.5 bg-primary text-white px-8 py-3 rounded-xl font-bold text-sm leading-none hover:bg-primary-dark transition shadow-sm">
+                    <i class="fas fa-user text-xs"></i>
+                    <span>Daftar/Masuk</span>
+                </a>
+            @endauth
         </div>
     </div>
 
@@ -173,10 +189,24 @@
             </div>
 
             <div class="mt-6 pt-4 border-t border-gray-100">
-                <a href="#" class="w-full inline-flex items-center justify-center gap-2 bg-primary text-white px-4 py-3 rounded-xl font-semibold text-sm hover:bg-primary-dark transition">
-                    <i class="fas fa-download text-xs"></i>
-                    <span>Unduh App</span>
-                </a>
+                @auth
+                    <a href="{{ route('user.panel') }}" class="w-full inline-flex items-center justify-center gap-2 bg-primary text-white px-4 py-3 rounded-xl font-semibold text-sm hover:bg-primary-dark transition">
+                        <i class="fas fa-user-circle text-xs"></i>
+                        <span>Profil Saya</span>
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}" class="mt-2">
+                        @csrf
+                        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-gray-100 text-gray-700 px-4 py-3 rounded-xl font-semibold text-sm hover:bg-gray-200 transition">
+                            <i class="fas fa-sign-out-alt text-xs"></i>
+                            <span>Logout</span>
+                        </button>
+                    </form>
+                @else
+                    <a href="{{ route('user.login') }}" class="w-full inline-flex items-center justify-center gap-2 bg-primary text-white px-4 py-3 rounded-xl font-semibold text-sm hover:bg-primary-dark transition">
+                        <i class="fas fa-user text-xs"></i>
+                        <span>Daftar/Masuk</span>
+                    </a>
+                @endauth
             </div>
         </aside>
     </div>

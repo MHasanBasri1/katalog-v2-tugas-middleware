@@ -9,10 +9,16 @@ class ProductLike extends Model
 {
     protected $fillable = [
         'product_id',
+        'user_id',
         'visitor_token',
         'ip_address',
         'user_agent',
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function product(): BelongsTo
     {

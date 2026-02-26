@@ -7,7 +7,7 @@
     <title>@yield('title', 'Admin') - VISTORA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.35.0/tabler-icons.min.css">
     <script>
         (function () {
@@ -19,7 +19,7 @@
     <style>[x-cloak]{display:none!important}</style>
     @livewireStyles
 </head>
-<body class="h-full bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-['Inter'] antialiased overflow-x-hidden">
+<body class="h-full bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-['Plus_Jakarta_Sans'] antialiased overflow-x-hidden">
     <div class="min-h-screen flex max-w-full overflow-x-hidden" x-data>
         <div
             x-show="$store.sidebar.isMobileOpen"

@@ -3,6 +3,8 @@
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\User\PanelController;
+use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SettingController;
@@ -12,10 +14,18 @@ use App\Http\Controllers\Admin\ProductController;
 Route::middleware('guest')->group(function () {
     Route::get('/admin/login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/admin/login', [AuthenticatedSessionController::class, 'store']);
+    Route::get('/masuk', [UserAuthController::class, 'showLoginForm'])->name('user.login');
+    Route::post('/masuk', [UserAuthController::class, 'login'])->name('user.login.store');
+    Route::get('/daftar', [UserAuthController::class, 'showRegisterForm'])->name('user.register');
+    Route::post('/daftar', [UserAuthController::class, 'register'])->name('user.register.store');
 });
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+    Route::get('/panel-user', [PanelController::class, 'index'])->name('user.panel');
+    Route::put('/panel-user/profil', [PanelController::class, 'updateProfile'])->name('user.profile.update');
+    Route::put('/panel-user/password', [PanelController::class, 'updatePassword'])->name('user.password.update');
+    Route::delete('/panel-user/wishlist/{product}', [PanelController::class, 'destroyWishlist'])->name('user.wishlist.destroy');
 });
 
 Route::get('/', function () {
