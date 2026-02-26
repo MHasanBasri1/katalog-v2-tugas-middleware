@@ -3,63 +3,73 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class SettingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): View
     {
-        return view('admin.settings.index');
+        $setting = Setting::query()->firstOrNew(['id' => 1]);
+
+        return view('admin.settings.index', compact('setting'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function create(): RedirectResponse
     {
-        //
+        return redirect()->route('admin.setting.index');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        //
+        $data = $this->validatePayload($request);
+        Setting::query()->updateOrCreate(['id' => 1], $data);
+
+        return redirect()->route('admin.setting.index')->with('status', 'Setting berhasil disimpan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(string $id): RedirectResponse
     {
-        //
+        return redirect()->route('admin.setting.index');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(string $id): RedirectResponse
     {
-        //
+        return redirect()->route('admin.setting.index');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Setting $setting): RedirectResponse
     {
-        //
+        $data = $this->validatePayload($request);
+        $setting->update($data);
+
+        return redirect()->route('admin.setting.index')->with('status', 'Setting berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(string $id): RedirectResponse
     {
-        //
+        return redirect()->route('admin.setting.index');
+    }
+
+    private function validatePayload(Request $request): array
+    {
+        return $request->validate([
+            'shop_name' => ['required', 'string', 'max:255'],
+            'shop_logo' => ['nullable', 'string', 'max:2048'],
+            'shop_description' => ['nullable', 'string'],
+            'shop_address' => ['nullable', 'string'],
+            'city' => ['nullable', 'string', 'max:255'],
+            'province' => ['nullable', 'string', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'whatsapp' => ['nullable', 'string', 'max:50'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'website' => ['nullable', 'url', 'max:255'],
+            'facebook' => ['nullable', 'url', 'max:255'],
+            'instagram' => ['nullable', 'url', 'max:255'],
+            'footer_text' => ['nullable', 'string', 'max:255'],
+            'favicon' => ['nullable', 'string', 'max:2048'],
+        ]);
     }
 }

@@ -3,11 +3,21 @@
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\MarketplaceLinkController;
+
+Route::middleware('guest')->group(function () {
+    Route::get('/admin/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::post('/admin/login', [AuthenticatedSessionController::class, 'store']);
+});
+
+Route::middleware('auth')->group(function () {
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+});
 
 Route::get('/', function () {
     return view('frontend.home');
@@ -74,9 +84,17 @@ Route::get('/sitemap.xml', function () {
         ->latest('updated_at')
         ->get();
 
+    $siteLastmod = $products
+        ->pluck('updated_at')
+        ->merge($categories->pluck('updated_at'))
+        ->filter()
+        ->max();
+
+    $generatedAt = now();
+
     return response()
-        ->view('frontend.sitemap', compact('products', 'categories'))
-        ->header('Content-Type', 'application/xml');
+        ->view('frontend.sitemap', compact('products', 'categories', 'siteLastmod', 'generatedAt'))
+        ->header('Content-Type', 'application/xml; charset=UTF-8');
 })->name('sitemap');
 
 Route::get('/robots.txt', function () {

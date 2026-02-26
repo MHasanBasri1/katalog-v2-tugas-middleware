@@ -3,63 +3,94 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): View
     {
-        return view('admin.categories.index');
+        $categories = Category::query()->latest('id')->paginate(10);
+
+        return view('admin.categories.index', compact('categories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function create(): View
     {
-        //
+        return view('admin.categories.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        //
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'slug' => ['nullable', 'string', 'max:255', Rule::unique('categories', 'slug')],
+            'description' => ['nullable', 'string'],
+        ]);
+
+        $data['slug'] = $this->makeUniqueSlug($data['slug'] ?: $data['name']);
+
+        Category::query()->create($data);
+
+        return redirect()->route('admin.kategori.index')->with('status', 'Kategori berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Category $kategori): RedirectResponse
     {
-        //
+        return redirect()->route('admin.kategori.edit', $kategori);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(Category $kategori): View
     {
-        //
+        return view('admin.categories.edit', compact('kategori'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Category $kategori): RedirectResponse
     {
-        //
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'slug' => ['nullable', 'string', 'max:255', Rule::unique('categories', 'slug')->ignore($kategori->id)],
+            'description' => ['nullable', 'string'],
+        ]);
+
+        $slugSource = $data['slug'] ?: $data['name'];
+        $data['slug'] = $this->makeUniqueSlug($slugSource, $kategori->id);
+
+        $kategori->update($data);
+
+        return redirect()->route('admin.kategori.index')->with('status', 'Kategori berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Category $kategori): RedirectResponse
     {
-        //
+        if ($kategori->products()->exists()) {
+            return redirect()->route('admin.kategori.index')->with('error', 'Kategori tidak bisa dihapus karena masih dipakai produk.');
+        }
+
+        $kategori->delete();
+
+        return redirect()->route('admin.kategori.index')->with('status', 'Kategori berhasil dihapus.');
+    }
+
+    private function makeUniqueSlug(string $value, ?int $ignoreId = null): string
+    {
+        $base = Str::slug($value) ?: 'kategori';
+        $slug = $base;
+        $counter = 1;
+
+        while (
+            Category::query()
+                ->where('slug', $slug)
+                ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
+                ->exists()
+        ) {
+            $slug = $base.'-'.$counter++;
+        }
+
+        return $slug;
     }
 }

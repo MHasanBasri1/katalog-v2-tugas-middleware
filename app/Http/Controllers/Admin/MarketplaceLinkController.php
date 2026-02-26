@@ -3,63 +3,99 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\MarketplaceLink;
+use App\Models\Product;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 class MarketplaceLinkController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request): View
     {
-        return view('admin.marketplace-links.index');
+        $links = MarketplaceLink::query()
+            ->with('product:id,name')
+            ->latest('id')
+            ->paginate(12);
+
+        $editLink = null;
+        if ($request->filled('edit')) {
+            $editLink = MarketplaceLink::query()->find($request->integer('edit'));
+        }
+
+        return view('admin.marketplace-links.index', [
+            'links' => $links,
+            'editLink' => $editLink,
+            'products' => Product::query()->orderBy('name')->get(['id', 'name']),
+            'marketplaceOptions' => ['Shopee', 'Tokopedia', 'Lazada', 'Blibli'],
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function create(): RedirectResponse
     {
-        //
+        return redirect()->route('admin.marketplace-link.index');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        //
+        $data = $request->validate([
+            'product_id' => ['required', 'integer', 'exists:products,id'],
+            'marketplace' => ['required', 'string', 'max:100'],
+            'url' => ['required', 'url', 'max:2000'],
+        ]);
+
+        $isUnique = MarketplaceLink::query()
+            ->where('product_id', $data['product_id'])
+            ->where('marketplace', $data['marketplace'])
+            ->doesntExist();
+
+        if (! $isUnique) {
+            return back()->withInput()->with('error', 'Marketplace untuk produk ini sudah ada.');
+        }
+
+        MarketplaceLink::query()->create($data);
+
+        return redirect()->route('admin.marketplace-link.index')->with('status', 'Marketplace link berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(MarketplaceLink $marketplaceLink): RedirectResponse
     {
-        //
+        return redirect()->route('admin.marketplace-link.edit', $marketplaceLink);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(MarketplaceLink $marketplaceLink): RedirectResponse
     {
-        //
+        return redirect()->route('admin.marketplace-link.index', ['edit' => $marketplaceLink->id]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, MarketplaceLink $marketplaceLink): RedirectResponse
     {
-        //
+        $data = $request->validate([
+            'product_id' => ['required', 'integer', 'exists:products,id'],
+            'marketplace' => ['required', 'string', 'max:100'],
+            'url' => ['required', 'url', 'max:2000'],
+        ]);
+
+        $isUnique = MarketplaceLink::query()
+            ->where('product_id', $data['product_id'])
+            ->where('marketplace', $data['marketplace'])
+            ->where('id', '!=', $marketplaceLink->id)
+            ->doesntExist();
+
+        if (! $isUnique) {
+            return back()->withInput()->with('error', 'Marketplace untuk produk ini sudah ada.');
+        }
+
+        $marketplaceLink->update($data);
+
+        return redirect()->route('admin.marketplace-link.index')->with('status', 'Marketplace link berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(MarketplaceLink $marketplaceLink): RedirectResponse
     {
-        //
+        $marketplaceLink->delete();
+
+        return redirect()->route('admin.marketplace-link.index')->with('status', 'Marketplace link berhasil dihapus.');
     }
 }
