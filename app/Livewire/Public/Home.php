@@ -3,32 +3,33 @@
 namespace App\Livewire\Public;
 
 use App\Models\Category;
+use App\Models\Banner;
 use App\Models\Product;
-use App\Models\ProductLike;
-use App\Models\ProductView;
+use App\Models\Wishlist;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
 use Livewire\Component;
 
 class Home extends Component
 {
-    public string $visitorToken;
-
-    public bool $hasTrackedViews = false;
-
     public array $wishlistedProductIds = [];
-
-    public function mount(): void
-    {
-        $this->visitorToken = session('visitor_token', (string) Str::uuid());
-        session(['visitor_token' => $this->visitorToken]);
-    }
 
     public function render(): View
     {
+        $heroBanners = Cache::remember(
+            'public.home.hero_banners',
+            now()->addMinutes(10),
+            fn () => Banner::query()
+                ->select('id', 'title', 'subtitle', 'image_url', 'cta_label', 'cta_url')
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->latest('id')
+                ->limit(6)
+                ->get()
+        );
+
         $popularCategories = Cache::remember(
             'public.home.popular_categories',
             now()->addMinutes(10),
@@ -43,41 +44,39 @@ class Home extends Component
         );
 
         $bestSellerProducts = Product::query()
-            ->select('id', 'category_id', 'name', 'slug', 'price', 'original_price', 'sold_count', 'view_count', 'rating_avg', 'rating_count')
+            ->select('id', 'category_id', 'name', 'slug', 'price', 'original_price', 'sold_count', 'rating_avg', 'rating_count')
             ->where('status', true)
             ->with([
                 'category:id,name',
                 'primaryImage:id,product_id,image',
             ])
             ->orderByDesc('sold_count')
-            ->limit(4)
+            ->orderByDesc('id')
+            ->limit(10)
             ->get();
 
         $flashSaleProducts = Product::query()
-            ->select('id', 'category_id', 'name', 'slug', 'price', 'original_price', 'sold_count', 'view_count', 'rating_avg', 'rating_count')
+            ->select('id', 'category_id', 'name', 'slug', 'price', 'original_price', 'sold_count', 'rating_avg', 'rating_count')
             ->where('status', true)
-            ->where(function ($query) {
-                $query->where('is_featured', true)
-                    ->orWhereColumn('original_price', '>', 'price');
-            })
+            ->where('show_in_promo', true)
             ->with([
                 'category:id,name',
                 'primaryImage:id,product_id,image',
             ])
-            ->orderByRaw('(original_price - price) DESC')
             ->orderByDesc('sold_count')
-            ->limit(4)
+            ->orderByDesc('id')
+            ->limit(10)
             ->get();
 
         $newProducts = Product::query()
-            ->select('id', 'category_id', 'name', 'slug', 'price', 'original_price', 'sold_count', 'view_count', 'rating_avg', 'rating_count')
+            ->select('id', 'category_id', 'name', 'slug', 'price', 'original_price', 'sold_count', 'rating_avg', 'rating_count')
             ->where('status', true)
             ->with([
                 'category:id,name',
                 'primaryImage:id,product_id,image',
             ])
             ->latest('id')
-            ->limit(8)
+            ->limit(10)
             ->get();
 
         $displayedProductIds = $bestSellerProducts
@@ -89,30 +88,8 @@ class Home extends Component
 
         $this->syncWishlistState($displayedProductIds);
 
-        if (! $this->hasTrackedViews) {
-            $this->trackProductViews($displayedProductIds);
-            $this->hasTrackedViews = true;
-
-            $bestSellerProducts->each(function (Product $product) use ($displayedProductIds): void {
-                if ($displayedProductIds->contains($product->id)) {
-                    $product->view_count++;
-                }
-            });
-
-            $flashSaleProducts->each(function (Product $product) use ($displayedProductIds): void {
-                if ($displayedProductIds->contains($product->id)) {
-                    $product->view_count++;
-                }
-            });
-
-            $newProducts->each(function (Product $product) use ($displayedProductIds): void {
-                if ($displayedProductIds->contains($product->id)) {
-                    $product->view_count++;
-                }
-            });
-        }
-
         return view('livewire.public.home', [
+            'heroBanners' => $heroBanners,
             'popularCategories' => $popularCategories,
             'bestSellerProducts' => $bestSellerProducts,
             'flashSaleProducts' => $flashSaleProducts,
@@ -122,6 +99,13 @@ class Home extends Component
 
     public function toggleWishlist(int $productId): void
     {
+        if (! Auth::check()) {
+            session()->flash('status', 'Silakan daftar atau masuk terlebih dahulu untuk menggunakan wishlist.');
+            $this->redirectRoute('user.login', navigate: true);
+
+            return;
+        }
+
         $productExists = Product::query()
             ->whereKey($productId)
             ->where('status', true)
@@ -133,21 +117,13 @@ class Home extends Component
 
         $userId = Auth::id();
 
-        $existing = ProductLike::query()
+        $existing = Wishlist::query()
             ->where('product_id', $productId)
-            ->where(function ($query) use ($userId) {
-                if ($userId) {
-                    $query->where('user_id', $userId)
-                        ->orWhere('visitor_token', $this->visitorToken);
-                } else {
-                    $query->where('visitor_token', $this->visitorToken);
-                }
-            })
+            ->where('user_id', $userId)
             ->first();
 
         if ($existing) {
             $existing->delete();
-            Product::query()->whereKey($productId)->where('likes_count', '>', 0)->decrement('likes_count');
 
             $this->wishlistedProductIds = array_values(array_filter(
                 $this->wishlistedProductIds,
@@ -157,82 +133,29 @@ class Home extends Component
             return;
         }
 
-        ProductLike::query()->create([
+        Wishlist::query()->create([
             'product_id' => $productId,
             'user_id' => $userId,
-            'visitor_token' => $this->visitorToken,
-            'ip_address' => request()->ip(),
-            'user_agent' => Str::limit((string) request()->userAgent(), 255, ''),
         ]);
-
-        Product::query()->whereKey($productId)->increment('likes_count');
 
         if (! in_array($productId, $this->wishlistedProductIds, true)) {
             $this->wishlistedProductIds[] = $productId;
         }
     }
 
-    private function trackProductViews(Collection $productIds): void
-    {
-        if ($productIds->isEmpty()) {
-            return;
-        }
-
-        $now = now();
-
-        $existingViews = ProductView::query()
-            ->where('visitor_token', $this->visitorToken)
-            ->whereIn('product_id', $productIds)
-            ->get()
-            ->keyBy('product_id');
-
-        foreach ($productIds as $productId) {
-            $existing = $existingViews->get($productId);
-
-            if ($existing) {
-                $existing->increment('view_count');
-                $existing->update([
-                    'last_viewed_at' => $now,
-                    'ip_address' => request()->ip(),
-                    'user_agent' => Str::limit((string) request()->userAgent(), 255, ''),
-                ]);
-
-                continue;
-            }
-
-            ProductView::query()->create([
-                'product_id' => $productId,
-                'visitor_token' => $this->visitorToken,
-                'view_count' => 1,
-                'last_viewed_at' => $now,
-                'ip_address' => request()->ip(),
-                'user_agent' => Str::limit((string) request()->userAgent(), 255, ''),
-            ]);
-        }
-
-        Product::query()->whereIn('id', $productIds)->increment('view_count');
-    }
-
     private function syncWishlistState(Collection $productIds): void
     {
-        if ($productIds->isEmpty()) {
+        $userId = Auth::id();
+
+        if (! $userId || $productIds->isEmpty()) {
             $this->wishlistedProductIds = [];
 
             return;
         }
 
-        $userId = Auth::id();
-
-        $this->wishlistedProductIds = ProductLike::query()
+        $this->wishlistedProductIds = Wishlist::query()
             ->whereIn('product_id', $productIds)
-            ->where(function ($query) use ($userId) {
-                if ($userId) {
-                    $query->where('user_id', $userId)
-                        ->orWhere('visitor_token', $this->visitorToken);
-                } else {
-                    $query->where('visitor_token', $this->visitorToken);
-                }
-            })
+            ->where('user_id', $userId)
             ->pluck('product_id')
             ->map(fn ($id) => (int) $id)
             ->unique()

@@ -11,18 +11,18 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
         @php
             $icons = ['fa-mobile-screen', 'fa-laptop', 'fa-tv', 'fa-headphones', 'fa-camera', 'fa-gamepad', 'fa-basket-shopping', 'fa-couch'];
         @endphp
         @forelse($categories as $category)
-            <a href="{{ route('kategori.detail', $category->slug) }}" class="bg-white rounded-2xl border border-gray-100 p-4 hover:border-primary hover:shadow-md transition flex flex-col items-center text-center gap-2">
+            <a href="{{ route('kategori.detail', $category->slug) }}" class="bg-white rounded-2xl border border-gray-100 p-3 md:p-4 hover:border-primary hover:shadow-md transition flex flex-col items-center text-center gap-2">
                 <span class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-50 text-blue-600">
                     <i class="fas {{ $icons[$loop->index % count($icons)] }} text-lg"></i>
                 </span>
-                <h3 class="font-bold text-gray-800 text-sm md:text-base">{{ $category->name }}</h3>
+                <h3 class="font-bold text-gray-800 text-xs md:text-base leading-snug">{{ $category->name }}</h3>
                 <p class="text-xs text-gray-500">{{ number_format($category->products_count) }} produk aktif</p>
-                <span class="mt-1 inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 bg-blue-50 px-2 py-1 rounded-full border border-blue-100">
+                <span class="mt-1 inline-flex items-center gap-1 text-[10px] md:text-[11px] font-semibold text-blue-700 bg-blue-50 px-2 py-1 rounded-full border border-blue-100">
                     Lihat Kategori <i class="fas fa-arrow-right text-[10px]"></i>
                 </span>
             </a>
@@ -43,4 +43,3 @@
         </div>
     @endif
 </div>
-

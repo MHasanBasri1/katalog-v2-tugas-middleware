@@ -7,6 +7,10 @@
     <div
         class="space-y-4"
         x-data="{
+            init() {
+                this.toggleBodyLock(this.drawerOpen);
+                this.$watch('drawerOpen', (value) => this.toggleBodyLock(value));
+            },
             drawerOpen: {{ ($editCategory || $errors->any()) ? 'true' : 'false' }},
             isEdit: {{ $editCategory ? 'true' : 'false' }},
             editId: @js(old('edit_id', $editCategory->id ?? null)),
@@ -15,8 +19,58 @@
                 slug: @js(old('slug', $editCategory->slug ?? '')),
                 description: @js(old('description', $editCategory->description ?? '')),
             },
+            currentPageIds: @js($categories->getCollection()->pluck('id')->values()),
+            selectedIds: [],
             storeUrl: @js(route('admin.kategori.store')),
             updateUrlTemplate: @js(route('admin.kategori.update', ['kategori' => '__ID__'])),
+            bulkDeleteUrl: @js(route('admin.kategori.bulk-destroy')),
+            toggleBodyLock(isOpen) {
+                document.documentElement.classList.toggle('overflow-hidden', isOpen);
+                document.body.classList.toggle('overflow-hidden', isOpen);
+                document.body.classList.toggle('drawer-open', isOpen);
+            },
+            toggleRowSelection(id) {
+                const value = Number(id);
+                if (this.selectedIds.includes(value)) {
+                    this.selectedIds = this.selectedIds.filter((item) => item !== value);
+                    return;
+                }
+                this.selectedIds.push(value);
+            },
+            toggleSelectAllOnPage() {
+                const allSelected = this.currentPageIds.length > 0 && this.currentPageIds.every((id) => this.selectedIds.includes(id));
+                if (allSelected) {
+                    this.selectedIds = this.selectedIds.filter((id) => !this.currentPageIds.includes(id));
+                    return;
+                }
+                this.selectedIds = Array.from(new Set([...this.selectedIds, ...this.currentPageIds]));
+            },
+            submitBulkDelete() {
+                if (this.selectedIds.length === 0) return;
+                if (!confirm(`Hapus ${this.selectedIds.length} kategori terpilih?`)) return;
+
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = this.bulkDeleteUrl;
+
+                const csrf = document.querySelector('meta[name=csrf-token]')?.getAttribute('content') ?? '';
+                const tokenInput = document.createElement('input');
+                tokenInput.type = 'hidden';
+                tokenInput.name = '_token';
+                tokenInput.value = csrf;
+                form.appendChild(tokenInput);
+
+                this.selectedIds.forEach((id) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'selected_ids[]';
+                    input.value = String(id);
+                    form.appendChild(input);
+                });
+
+                document.body.appendChild(form);
+                form.submit();
+            },
             openCreate() {
                 this.drawerOpen = true;
                 this.isEdit = false;
@@ -40,8 +94,12 @@
                 return this.isEdit
                     ? this.updateUrlTemplate.replace('__ID__', this.editId)
                     : this.storeUrl;
+            },
+            get isAllOnPageSelected() {
+                return this.currentPageIds.length > 0 && this.currentPageIds.every((id) => this.selectedIds.includes(id));
             }
         }"
+        @keydown.escape.window="if (drawerOpen) closeDrawer()"
     >
         @if (session('status'))
             <div class="rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 px-4 py-3 text-sm font-semibold">
@@ -58,18 +116,34 @@
             <div class="flex items-center justify-between gap-3">
                 <div>
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">Daftar Kategori</h2>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Kelola kategori produk sesuai data seed.</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Kelola kategori produk.</p>
                 </div>
-                <button type="button" @click="openCreate()" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 transition">
-                    <i class="ti ti-plus text-base"></i> Kategori Baru
-                </button>
+                <div class="flex items-center gap-2">
+                    <button
+                        type="button"
+                        x-show="selectedIds.length > 0"
+                        x-cloak
+                        @click="submitBulkDelete()"
+                        class="inline-flex items-center gap-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold px-4 py-2.5 transition"
+                    >
+                        <i class="ti ti-trash text-base"></i>
+                        <span x-text="`Hapus Terpilih (${selectedIds.length})`"></span>
+                    </button>
+                    <button type="button" @click="openCreate()" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 transition">
+                        <i class="ti ti-plus text-base"></i> Tambah
+                    </button>
+                </div>
             </div>
 
             <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
                 <div class="w-full overflow-x-auto">
-                    <table class="w-full min-w-[760px] lg:min-w-0 text-sm">
+                    <table class="w-full min-w-[860px] lg:min-w-0 text-sm">
                         <thead class="bg-gray-50 dark:bg-gray-800/60 text-gray-600 dark:text-gray-300">
                             <tr>
+                                <th class="px-4 py-3 text-center w-12">
+                                    <input type="checkbox" :checked="isAllOnPageSelected" @change="toggleSelectAllOnPage()" class="rounded border-gray-300 text-blue-600">
+                                </th>
+                                <th class="px-4 py-3 text-left">ID</th>
                                 <th class="px-4 py-3 text-left">Nama</th>
                                 <th class="px-4 py-3 text-left">Slug</th>
                                 <th class="px-4 py-3 text-left">Deskripsi</th>
@@ -79,6 +153,10 @@
                         <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                             @forelse ($categories as $category)
                                 <tr>
+                                    <td class="px-4 py-3 text-center">
+                                        <input type="checkbox" :checked="selectedIds.includes({{ $category->id }})" @change="toggleRowSelection({{ $category->id }})" class="rounded border-gray-300 text-blue-600">
+                                    </td>
+                                    <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ $category->id }}</td>
                                     <td class="px-4 py-3 font-semibold text-gray-900 dark:text-gray-100">{{ $category->name }}</td>
                                     <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ $category->slug }}</td>
                                     <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ \Illuminate\Support\Str::limit($category->description, 80) }}</td>
@@ -91,21 +169,25 @@
                                                 data-slug="{{ $category->slug }}"
                                                 data-description="{{ $category->description }}"
                                                 @click="openEdit({ id: Number($el.dataset.id), name: $el.dataset.name, slug: $el.dataset.slug, description: $el.dataset.description })"
-                                                class="inline-flex items-center rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-800"
+                                                class="inline-flex items-center rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                                title="Edit"
+                                                aria-label="Edit"
                                             >
-                                                Edit
+                                                <i class="ti ti-pencil text-base"></i>
                                             </button>
                                             <form method="POST" action="{{ route('admin.kategori.destroy', $category) }}" onsubmit="return confirm('Hapus kategori ini?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="inline-flex items-center rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50">Hapus</button>
+                                                <button type="submit" class="inline-flex items-center rounded-lg border border-rose-200 p-2 text-rose-600 hover:bg-rose-50" title="Hapus" aria-label="Hapus">
+                                                    <i class="ti ti-trash text-base"></i>
+                                                </button>
                                             </form>
                                         </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="px-4 py-10 text-center text-gray-500">Belum ada data kategori.</td>
+                                    <td colspan="6" class="px-4 py-10 text-center text-gray-500">Belum ada data kategori.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -117,17 +199,11 @@
             </div>
         </div>
 
-        <div x-show="drawerOpen" x-cloak x-transition.opacity class="fixed inset-0 bg-black/40 z-40" @click="closeDrawer()"></div>
+        <div x-show="drawerOpen" x-cloak x-transition.opacity class="admin-drawer-overlay fixed -inset-2 bg-black/70 z-[12000]" @click="closeDrawer()"></div>
         <aside
-            class="fixed top-0 right-0 h-screen w-full sm:max-w-md bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 z-50 shadow-2xl overflow-y-auto"
-            x-show="drawerOpen"
+            class="admin-drawer-panel fixed inset-y-0 right-0 h-[100dvh] min-h-[100dvh] w-full sm:max-w-md bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 z-[13000] shadow-2xl transform-gpu will-change-transform overflow-y-auto transition-transform duration-300 ease-out"
+            :class="drawerOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'"
             x-cloak
-            x-transition:enter="transform transition ease-out duration-300"
-            x-transition:enter-start="translate-x-full"
-            x-transition:enter-end="translate-x-0"
-            x-transition:leave="transform transition ease-in duration-200"
-            x-transition:leave-start="translate-x-0"
-            x-transition:leave-end="translate-x-full"
         >
             <div class="p-5">
                 <div class="flex items-center justify-between mb-4">
@@ -178,3 +254,12 @@
         </aside>
     </div>
 @endsection
+
+
+
+
+
+
+
+
+

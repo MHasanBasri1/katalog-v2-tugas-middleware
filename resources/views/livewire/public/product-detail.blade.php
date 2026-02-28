@@ -2,8 +2,19 @@
     @php
         $isPromo = (float) $product->original_price > (float) $product->price;
         $discountPercent = $isPromo ? (int) round((((float) $product->original_price - (float) $product->price) / (float) $product->original_price) * 100) : 0;
-        $compactViews = fn ($value) => $value >= 1000 ? floor($value / 1000) . 'k' : number_format($value);
+        $compactSold = fn ($value) => $value >= 1000 ? floor($value / 1000) . 'k' : number_format($value);
     @endphp
+
+    <div class="overflow-hidden rounded-xl border border-blue-100 bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-sm">
+        <div class="promo-marquee-track py-2.5 text-xs md:text-sm font-semibold tracking-wide whitespace-nowrap">
+            <span class="mx-6 inline-flex items-center gap-2"><i class="fas fa-bolt"></i> Promo spesial minggu ini: diskon hingga 35% untuk produk pilihan.</span>
+            <span class="mx-6 inline-flex items-center gap-2"><i class="fas fa-truck-fast"></i> Gratis ongkir untuk pembelian minimum tertentu.</span>
+            <span class="mx-6 inline-flex items-center gap-2"><i class="fas fa-gift"></i> Klaim voucher tambahan saat checkout sekarang.</span>
+            <span class="mx-6 inline-flex items-center gap-2"><i class="fas fa-bolt"></i> Promo spesial minggu ini: diskon hingga 35% untuk produk pilihan.</span>
+            <span class="mx-6 inline-flex items-center gap-2"><i class="fas fa-truck-fast"></i> Gratis ongkir untuk pembelian minimum tertentu.</span>
+            <span class="mx-6 inline-flex items-center gap-2"><i class="fas fa-gift"></i> Klaim voucher tambahan saat checkout sekarang.</span>
+        </div>
+    </div>
 
     <nav class="text-sm">
         <div class="bg-white border border-gray-200 rounded-xl px-4 py-3">
@@ -26,13 +37,12 @@
                     <div class="relative">
                         <img :src="slides[currentSlide]" alt="{{ $product->name }}" class="w-full h-[340px] md:h-[540px] object-cover transition-all duration-300">
                         <span class="absolute top-3 right-3 bg-white/95 text-blue-600 text-[11px] md:text-sm font-bold px-3 py-1.5 rounded-full border border-blue-100 flex items-center gap-2 whitespace-nowrap">
-                            <span class="inline-flex items-center gap-1"><i class="far fa-eye"></i> {{ $compactViews($product->view_count) }}</span>
-                            <span class="text-gray-400">|</span>
                             <span class="inline-flex items-center gap-1"><i class="fas fa-bag-shopping text-[10px]"></i> {{ number_format($product->sold_count) }}</span>
                         </span>
                         @if($isPromo)
-                            <span class="absolute top-3 left-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow">
-                                PROMO -{{ $discountPercent }}%
+                            <span class="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-blue-600 text-white text-[10px] md:text-xs font-extrabold px-3 py-1.5 rounded-lg shadow-md ring-1 ring-white/70 tracking-wide uppercase">
+                                <i class="fas fa-tag text-[9px] md:text-[10px]"></i>
+                                Promo -{{ $discountPercent }}%
                             </span>
                         @endif
 
@@ -82,22 +92,20 @@
 
         <div class="space-y-5">
             <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 md:p-7">
-                <div class="flex items-start justify-between gap-4 mb-4">
-                    <div>
-                        <div class="flex items-center justify-between gap-2 mb-3 w-full">
-                            <span class="inline-flex items-center gap-2 bg-primary-light text-primary-dark px-3 py-1 rounded-full text-xs font-semibold">{{ $product->category?->name }} <span class="text-blue-700">|</span> <i class="fas fa-star text-blue-500"></i> {{ number_format((float) $product->rating_avg, 1) }}</span>
-                            <button
-                                type="button"
-                                wire:click="toggleWishlist({{ $product->id }})"
-                                class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-full border shrink-0 transition text-xs font-semibold {{ in_array($product->id, $wishlistedProductIds, true) ? 'border-blue-600 bg-blue-600 text-white' : 'border-blue-100 bg-blue-50 text-blue-700 hover:bg-blue-100' }}"
-                                title="Tambah Wishlist"
-                            >
-                                <i class="{{ in_array($product->id, $wishlistedProductIds, true) ? 'fas' : 'far' }} fa-heart"></i>
-                                Wishlist
-                            </button>
-                        </div>
-                        <h1 class="text-xl md:text-3xl font-black text-gray-900 leading-tight">{{ $product->name }}</h1>
+                <div class="mb-4 space-y-3">
+                    <div class="flex items-center justify-between gap-2 w-full">
+                        <span class="inline-flex items-center gap-2 bg-primary-light text-primary-dark px-3 py-1 rounded-full text-xs font-semibold">{{ $product->category?->name }} <span class="text-blue-700">|</span> <i class="fas fa-star text-blue-500"></i> {{ number_format((float) $product->rating_avg, 1) }}</span>
+                        <button
+                            type="button"
+                            wire:click="toggleWishlist({{ $product->id }})"
+                            class="ml-auto inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-full border shrink-0 transition text-xs font-semibold {{ in_array($product->id, $wishlistedProductIds, true) ? 'border-blue-600 bg-blue-600 text-white' : 'border-blue-100 bg-blue-50 text-blue-700 hover:bg-blue-100' }}"
+                            title="Tambah Wishlist"
+                        >
+                            <i class="{{ in_array($product->id, $wishlistedProductIds, true) ? 'fas' : 'far' }} fa-heart"></i>
+                            Wishlist
+                        </button>
                     </div>
+                    <h1 class="text-xl md:text-3xl font-black text-gray-900 leading-tight">{{ $product->name }}</h1>
                 </div>
 
                 <div class="mb-6">
@@ -170,23 +178,34 @@
         </div>
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             @forelse($relatedProducts as $item)
-                <a href="{{ route('produk.detail', $item->slug) }}" class="bg-white rounded-xl p-3 md:p-4 border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col">
+                @php
+                    $relatedDiscount = ($item->original_price && (float) $item->original_price > (float) $item->price)
+                        ? round((((float) $item->original_price - (float) $item->price) / (float) $item->original_price) * 100)
+                        : 0;
+                @endphp
+                <a href="{{ route('produk.detail', $item->slug) }}" class="bg-white rounded-xl p-2.5 md:p-4 border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col">
                     <div class="bg-gray-100 rounded-lg aspect-square w-full overflow-hidden mb-3 relative">
                         @if($item->primaryImage?->image)
                             <img src="{{ $item->primaryImage->image }}" alt="{{ $item->name }}" class="w-full h-full object-cover">
                         @else
                             <div class="w-full h-full flex items-center justify-center"><i class="fas fa-box text-4xl text-gray-300"></i></div>
                         @endif
-                        <span class="absolute top-2 right-2 bg-white/95 text-blue-600 text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-2">
-                            <i class="far fa-eye"></i> {{ $compactViews($item->view_count) }}
-                        </span>
+                        <span class="absolute top-2 left-2 bg-rose-500 text-white text-[9px] md:text-[10px] font-bold px-2 py-1 rounded-full tracking-wide">{{ $relatedDiscount }}%</span>
                     </div>
-                    <h3 class="font-bold text-gray-800 text-sm md:text-lg leading-snug mb-1.5 min-h-[2.5rem] break-words">{{ $item->name }}</h3>
-                    <div class="mt-auto">
+                    <h3 class="font-medium text-gray-800 text-sm md:text-[15px] leading-snug mb-1.5 break-words">{{ $item->name }}</h3>
+                    <div>
+                        <p class="text-primary font-extrabold text-[15px] md:text-lg leading-tight break-words">Rp {{ number_format((float) $item->price, 0, ',', '.') }}</p>
                         @if($item->original_price)
-                            <p class="text-gray-400 line-through text-xs md:text-sm">Rp {{ number_format((float) $item->original_price, 0, ',', '.') }}</p>
+                            <p class="text-gray-400 line-through text-[10px] md:text-xs mt-0.5">Rp {{ number_format((float) $item->original_price, 0, ',', '.') }}</p>
                         @endif
-                        <p class="text-primary font-black text-base md:text-2xl break-words">Rp {{ number_format((float) $item->price, 0, ',', '.') }}</p>
+                    </div>
+                    <div class="mt-auto pt-1.5 flex items-end justify-between gap-2 text-[11px] md:text-xs text-gray-500">
+                        <span class="inline-flex items-center gap-1 text-amber-500 font-semibold">
+                            <i class="fas fa-star text-[10px]"></i> {{ number_format((float) $item->rating_avg, 1) }}
+                        </span>
+                        <span class="inline-flex items-center gap-1 whitespace-nowrap">
+                            <i class="fas fa-bag-shopping text-[10px]"></i> {{ $compactSold($item->sold_count) }}+
+                        </span>
                     </div>
                 </a>
             @empty

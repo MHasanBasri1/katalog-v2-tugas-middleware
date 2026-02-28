@@ -6,8 +6,10 @@ use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Spatie\Permission\Models\Role;
 
 class LoginRequest extends FormRequest
 {
@@ -49,6 +51,28 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        $user = Auth::user();
+
+        if ($user && $user->is_frozen) {
+            Auth::logout();
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => 'Akun Anda sedang dibekukan. Silakan hubungi admin.',
+            ]);
+        }
+
+        $this->syncUserRole($user);
+
+        if ($this->is('admin/*') && $user && ! $user->hasRole('admin')) {
+            Auth::logout();
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => 'Akun ini tidak memiliki akses admin.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 
@@ -81,5 +105,24 @@ class LoginRequest extends FormRequest
     public function throttleKey(): string
     {
         return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+    }
+
+    private function syncUserRole($user): void
+    {
+        if (! $user || ! method_exists($user, 'syncRoles')) {
+            return;
+        }
+
+        if (! Schema::hasTable('roles') || ! Schema::hasTable('model_has_roles')) {
+            return;
+        }
+
+        Role::findOrCreate('admin', 'web');
+        Role::findOrCreate('user', 'web');
+
+        $expectedRole = $user->is_admin ? 'admin' : 'user';
+        if (! $user->hasRole($expectedRole)) {
+            $user->syncRoles([$expectedRole]);
+        }
     }
 }

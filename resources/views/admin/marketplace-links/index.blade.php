@@ -77,11 +77,15 @@
                                 </td>
                                 <td class="px-4 py-3">
                                     <div class="flex justify-end items-center gap-2">
-                                        <a href="{{ route('admin.marketplace-link.index', ['edit' => $link->id]) }}" class="inline-flex items-center rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-1.5 text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-800">Edit</a>
+                                        <a href="{{ route('admin.marketplace-link.index', ['edit' => $link->id]) }}" class="inline-flex items-center rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800" title="Edit" aria-label="Edit">
+                                            <i class="ti ti-pencil text-base"></i>
+                                        </a>
                                         <form method="POST" action="{{ route('admin.marketplace-link.destroy', $link) }}" onsubmit="return confirm('Hapus marketplace link ini?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="inline-flex items-center rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50">Hapus</button>
+                                            <button type="submit" class="inline-flex items-center rounded-lg border border-rose-200 p-2 text-rose-600 hover:bg-rose-50" title="Hapus" aria-label="Hapus">
+                                                <i class="ti ti-trash text-base"></i>
+                                            </button>
                                         </form>
                                     </div>
                                 </td>

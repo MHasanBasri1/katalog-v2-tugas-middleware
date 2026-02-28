@@ -80,6 +80,42 @@ class CategoryController extends Controller
         return redirect()->route('admin.kategori.index')->with('status', 'Kategori berhasil dihapus.');
     }
 
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'selected_ids' => ['required', 'array', 'min:1'],
+            'selected_ids.*' => ['integer', 'distinct', 'exists:categories,id'],
+        ]);
+
+        $categories = Category::query()
+            ->whereIn('id', $validated['selected_ids'])
+            ->get();
+
+        $deleted = 0;
+        $skipped = 0;
+
+        foreach ($categories as $category) {
+            if ($category->products()->exists()) {
+                $skipped++;
+                continue;
+            }
+
+            $category->delete();
+            $deleted++;
+        }
+
+        if ($deleted === 0) {
+            return redirect()->route('admin.kategori.index')->with('error', 'Tidak ada kategori yang dihapus. Pastikan kategori tidak dipakai produk.');
+        }
+
+        $message = "{$deleted} kategori berhasil dihapus.";
+        if ($skipped > 0) {
+            $message .= " {$skipped} kategori dilewati karena masih dipakai produk.";
+        }
+
+        return redirect()->route('admin.kategori.index')->with('status', $message);
+    }
+
     private function makeUniqueSlug(string $value, ?int $ignoreId = null): string
     {
         $base = Str::slug($value) ?: 'kategori';

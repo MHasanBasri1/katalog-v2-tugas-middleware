@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->unsignedInteger('likes_count')->default(0)->after('view_count');
+            $table->unsignedInteger('likes_count')->default(0)->after('sold_count');
             $table->index(['status', 'likes_count']);
         });
     }

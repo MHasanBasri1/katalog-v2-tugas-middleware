@@ -18,6 +18,12 @@
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
+    <url>
+        <loc>{{ route('blog.index') }}</loc>
+        <lastmod>{{ ($siteLastmod ?? $generatedAt)->toAtomString() }}</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
 
     @foreach ($categories as $category)
     <url>
@@ -34,6 +40,24 @@
         <lastmod>{{ ($product->updated_at ?? $generatedAt)->toAtomString() }}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
+    </url>
+    @endforeach
+
+    @foreach ($blogs ?? [] as $blog)
+    <url>
+        <loc>{{ route('blog.detail', $blog->slug) }}</loc>
+        <lastmod>{{ ($blog->updated_at ?? $generatedAt)->toAtomString() }}</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    @endforeach
+
+    @foreach ($staticPages ?? [] as $page)
+    <url>
+        <loc>{{ route('halaman.show', $page->slug) }}</loc>
+        <lastmod>{{ ($page->updated_at ?? $generatedAt)->toAtomString() }}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
     </url>
     @endforeach
 </urlset>

@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
+use Spatie\Permission\Models\Role;
 
 class UserAuthController extends Controller
 {
@@ -24,7 +25,31 @@ class UserAuthController extends Controller
         $request->authenticate();
         $request->session()->regenerate();
 
-        return redirect()->intended(route('user.panel', absolute: false));
+        $user = $request->user();
+        $isAdmin = $user && ($user->is_admin || $user->hasRole('admin'));
+
+        if ($isAdmin) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return back()->withErrors([
+                'email' => 'Akun admin harus login dari halaman /admin/login.',
+            ])->onlyInput('email');
+        }
+
+        $defaultRedirect = $user && ! $user->hasVerifiedEmail()
+            ? route('verification.notice', absolute: false)
+            : route('user.panel', absolute: false);
+
+        $intended = $request->session()->get('url.intended');
+        $intendedPath = is_string($intended) ? (parse_url($intended, PHP_URL_PATH) ?: '') : '';
+
+        if ($user && str_starts_with($intendedPath, '/admin')) {
+            $request->session()->forget('url.intended');
+        }
+
+        return redirect()->intended($defaultRedirect);
     }
 
     public function showRegisterForm(): View
@@ -47,11 +72,18 @@ class UserAuthController extends Controller
         ]);
 
         event(new Registered($user));
+        $this->ensureDefaultUserRole($user);
 
         Auth::login($user);
 
         $request->session()->regenerate();
 
-        return redirect()->route('user.panel')->with('status', 'Pendaftaran berhasil. Selamat datang!');
+        return redirect()->route('verification.notice')->with('status', 'Akun berhasil dibuat. Cek email untuk verifikasi.');
+    }
+
+    private function ensureDefaultUserRole(User $user): void
+    {
+        Role::findOrCreate('user', 'web');
+        $user->syncRoles(['user']);
     }
 }

@@ -20,7 +20,7 @@ class CategoriesPage extends Component
             ])
             ->orderByDesc('products_count')
             ->orderBy('name')
-            ->paginate(8);
+            ->paginate(10);
 
         return view('livewire.public.categories-page', [
             'categories' => $categories,

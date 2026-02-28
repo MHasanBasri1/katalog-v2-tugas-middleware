@@ -69,10 +69,6 @@
             >
                 <i class="fas fa-search text-lg"></i>
             </button>
-            <a href="{{ route('home') }}#flash-sale" class="desktop-only header-icon-btn relative" title="Flash Sale">
-                <i class="fas fa-bolt text-lg sm:text-xl text-blue-600 blink"></i>
-                <span class="icon-dot blink"></span>
-            </a>
             <button wire:click="clearNotifications" class="header-icon-btn relative" title="Notifikasi">
                 <i class="far fa-bell text-lg sm:text-xl"></i>
                 @if($notificationCount > 0)
@@ -82,16 +78,20 @@
             <button @click="mobileMenu = true; mobileSearch = false" class="mobile-only header-icon-btn relative" title="Menu">
                 <i class="fas fa-bars text-lg"></i>
             </button>
-            <button class="desktop-only header-icon-btn relative" title="Customer Service">
-                <i class="fas fa-headset text-lg sm:text-xl"></i>
-            </button>
             <div class="w-px h-6 bg-gray-300 mx-1 sm:mx-2 hidden md:block"></div>
             @auth
                 <div class="hidden lg:flex items-center gap-2">
-                    <a href="{{ route('user.panel') }}" class="inline-flex items-center gap-2.5 bg-primary text-white px-6 py-3 rounded-xl font-bold text-sm leading-none hover:bg-primary-dark transition shadow-sm">
-                        <i class="fas fa-user-circle text-xs"></i>
-                        <span>Profil Saya</span>
-                    </a>
+                    @if(auth()->user()->hasRole('admin'))
+                        <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-2.5 bg-primary text-white px-6 py-3 rounded-xl font-bold text-sm leading-none hover:bg-primary-dark transition shadow-sm">
+                            <i class="fas fa-shield-alt text-xs"></i>
+                            <span>Dashboard Admin</span>
+                        </a>
+                    @else
+                        <a href="{{ auth()->user()->hasVerifiedEmail() ? route('user.panel') : route('verification.notice') }}" class="inline-flex items-center gap-2.5 bg-primary text-white px-6 py-3 rounded-xl font-bold text-sm leading-none hover:bg-primary-dark transition shadow-sm">
+                            <i class="fas {{ auth()->user()->hasVerifiedEmail() ? 'fa-user-circle' : 'fa-envelope-open-text' }} text-xs"></i>
+                            <span>{{ auth()->user()->hasVerifiedEmail() ? 'Profil Saya' : 'Verifikasi Email' }}</span>
+                        </a>
+                    @endif
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="inline-flex items-center gap-2.5 bg-gray-100 text-gray-700 px-4 py-3 rounded-xl font-bold text-sm leading-none hover:bg-gray-200 transition">
@@ -101,10 +101,16 @@
                     </form>
                 </div>
             @else
-                <a href="{{ route('user.login') }}" class="hidden lg:flex items-center gap-2.5 bg-primary text-white px-8 py-3 rounded-xl font-bold text-sm leading-none hover:bg-primary-dark transition shadow-sm">
-                    <i class="fas fa-user text-xs"></i>
-                    <span>Daftar/Masuk</span>
-                </a>
+                <div class="hidden lg:flex items-center gap-2">
+                    <a href="{{ route('user.register') }}" class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 border border-blue-100 px-4 py-3 rounded-xl font-bold text-sm leading-none hover:bg-blue-100 transition">
+                        <i class="fas fa-user-plus text-xs"></i>
+                        <span>Daftar</span>
+                    </a>
+                    <a href="{{ route('user.login') }}" class="inline-flex items-center gap-2 bg-primary text-white px-5 py-3 rounded-xl font-bold text-sm leading-none hover:bg-primary-dark transition shadow-sm">
+                        <i class="fas fa-right-to-bracket text-xs"></i>
+                        <span>Masuk</span>
+                    </a>
+                </div>
             @endauth
         </div>
     </div>
@@ -161,27 +167,12 @@
                 <button @click="mobileMenu = false" class="header-icon-btn !w-9 !h-9"><i class="fas fa-times"></i></button>
             </div>
 
-            <div class="mb-6">
-                <h4 class="text-xs font-bold uppercase text-gray-400 mb-2">Kategori</h4>
-                <div class="grid grid-cols-2 gap-2">
-                    @php
-                        $categoryIcons = ['fa-mobile-screen', 'fa-shirt', 'fa-headphones', 'fa-couch', 'fa-mobile-alt', 'fa-tv', 'fa-gamepad', 'fa-camera'];
-                    @endphp
-                    @foreach($categories as $category)
-                        <a href="{{ route('kategori.detail', $category['slug']) }}" class="flex flex-col items-center justify-center gap-1 px-2 py-3 rounded-xl text-xs text-gray-700 border border-gray-100 bg-gray-50 hover:border-primary hover:bg-primary-light transition text-center">
-                            <i class="fas {{ $categoryIcons[$loop->index % count($categoryIcons)] ?? 'fa-box' }} text-primary text-base"></i>
-                            <span class="font-semibold leading-tight">{{ $category['name'] }}</span>
-                        </a>
-                    @endforeach
-                </div>
-            </div>
-
             <div>
                 <h4 class="text-xs font-bold uppercase text-gray-400 mb-2">Navigasi</h4>
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 gap-2">
                     @foreach($menus as $menu)
-                        <a href="{{ $menu['url'] }}" class="px-2 py-2 rounded-xl text-xs text-center {{ $menu['active'] ? 'text-primary bg-primary-light font-bold border border-primary/20' : 'text-gray-700 border border-gray-100 hover:bg-gray-50' }}">
-                            <i class="fas {{ $menu['icon'] }} block mb-1"></i>
+                        <a href="{{ $menu['url'] }}" class="px-3 py-3 rounded-xl text-sm flex items-center gap-2.5 {{ $menu['active'] ? 'text-primary bg-primary-light font-bold border border-primary/20' : 'text-gray-700 border border-gray-100 hover:bg-gray-50' }}">
+                            <i class="fas {{ $menu['icon'] }} w-4 text-center"></i>
                             <span class="leading-tight inline-block">{{ $menu['label'] }}</span>
                         </a>
                     @endforeach
@@ -190,10 +181,17 @@
 
             <div class="mt-6 pt-4 border-t border-gray-100">
                 @auth
-                    <a href="{{ route('user.panel') }}" class="w-full inline-flex items-center justify-center gap-2 bg-primary text-white px-4 py-3 rounded-xl font-semibold text-sm hover:bg-primary-dark transition">
-                        <i class="fas fa-user-circle text-xs"></i>
-                        <span>Profil Saya</span>
-                    </a>
+                    @if(auth()->user()->hasRole('admin'))
+                        <a href="{{ route('admin.dashboard') }}" class="w-full inline-flex items-center justify-center gap-2 bg-primary text-white px-4 py-3 rounded-xl font-semibold text-sm hover:bg-primary-dark transition">
+                            <i class="fas fa-shield-alt text-xs"></i>
+                            <span>Dashboard Admin</span>
+                        </a>
+                    @else
+                        <a href="{{ auth()->user()->hasVerifiedEmail() ? route('user.panel') : route('verification.notice') }}" class="w-full inline-flex items-center justify-center gap-2 bg-primary text-white px-4 py-3 rounded-xl font-semibold text-sm hover:bg-primary-dark transition">
+                            <i class="fas {{ auth()->user()->hasVerifiedEmail() ? 'fa-user-circle' : 'fa-envelope-open-text' }} text-xs"></i>
+                            <span>{{ auth()->user()->hasVerifiedEmail() ? 'Profil Saya' : 'Verifikasi Email' }}</span>
+                        </a>
+                    @endif
                     <form method="POST" action="{{ route('logout') }}" class="mt-2">
                         @csrf
                         <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-gray-100 text-gray-700 px-4 py-3 rounded-xl font-semibold text-sm hover:bg-gray-200 transition">
@@ -202,10 +200,16 @@
                         </button>
                     </form>
                 @else
-                    <a href="{{ route('user.login') }}" class="w-full inline-flex items-center justify-center gap-2 bg-primary text-white px-4 py-3 rounded-xl font-semibold text-sm hover:bg-primary-dark transition">
-                        <i class="fas fa-user text-xs"></i>
-                        <span>Daftar/Masuk</span>
-                    </a>
+                    <div class="grid grid-cols-1 gap-2">
+                        <a href="{{ route('user.register') }}" class="w-full inline-flex items-center justify-center gap-2 bg-blue-50 text-blue-700 border border-blue-100 px-4 py-3 rounded-xl font-semibold text-sm hover:bg-blue-100 transition">
+                            <i class="fas fa-user-plus text-xs"></i>
+                            <span>Daftar</span>
+                        </a>
+                        <a href="{{ route('user.login') }}" class="w-full inline-flex items-center justify-center gap-2 bg-primary text-white px-4 py-3 rounded-xl font-semibold text-sm hover:bg-primary-dark transition">
+                            <i class="fas fa-right-to-bracket text-xs"></i>
+                            <span>Masuk</span>
+                        </a>
+                    </div>
                 @endauth
             </div>
         </aside>

@@ -18,11 +18,11 @@ class Product extends Model
         'original_price',
         'status',
         'sold_count',
-        'view_count',
         'likes_count',
         'rating_avg',
         'rating_count',
         'is_featured',
+        'show_in_promo',
     ];
 
     protected $casts = [
@@ -30,6 +30,7 @@ class Product extends Model
         'original_price' => 'decimal:2',
         'status' => 'boolean',
         'is_featured' => 'boolean',
+        'show_in_promo' => 'boolean',
         'rating_avg' => 'decimal:1',
     ];
 
@@ -53,14 +54,8 @@ class Product extends Model
         return $this->hasMany(MarketplaceLink::class);
     }
 
-    public function likes(): HasMany
+    public function wishlists(): HasMany
     {
-        return $this->hasMany(ProductLike::class);
-    }
-
-    public function views(): HasMany
-    {
-        return $this->hasMany(ProductView::class);
+        return $this->hasMany(Wishlist::class);
     }
 }
-

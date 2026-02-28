@@ -18,6 +18,7 @@ class Header extends Component
 
     public array $menus = [
         ['label' => 'Beranda', 'icon' => 'fa-home', 'url' => '/', 'route' => 'home'],
+        ['label' => 'Blog', 'icon' => 'fa-newspaper', 'url' => '/blog', 'route' => 'blog.*'],
         ['label' => 'Flash Deals', 'icon' => 'fa-bolt', 'url' => '#', 'route' => null],
         ['label' => 'Track Order', 'icon' => 'fa-box', 'url' => '#', 'route' => null],
         ['label' => 'Return & Refund', 'icon' => 'fa-undo', 'url' => '#', 'route' => null],
@@ -77,7 +78,7 @@ class Header extends Component
                 $builder->where('name', 'like', '%' . $query . '%')
                     ->orWhere('description', 'like', '%' . $query . '%');
             })
-            ->orderByDesc('view_count')
+            ->orderByDesc('sold_count')
             ->limit(8)
             ->get()
             ->map(fn (Product $product) => [

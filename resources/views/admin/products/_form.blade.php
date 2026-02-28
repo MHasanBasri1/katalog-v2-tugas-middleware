@@ -63,14 +63,20 @@
                 <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Featured</span>
             </label>
         </div>
+        <div class="col-span-2">
+            <label class="inline-flex items-center gap-2">
+                <input type="hidden" name="show_in_promo" value="0">
+                <input type="checkbox" name="show_in_promo" value="1" class="rounded border-gray-300 text-blue-600" @checked((string) old('show_in_promo', isset($produk) ? (int) $produk->show_in_promo : 0) === '1')>
+                <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Tampilkan di Produk Promo</span>
+            </label>
+        </div>
     </div>
 
     <div class="grid grid-cols-2 gap-3">
         <div><input type="number" min="0" name="sold_count" placeholder="Sold" value="{{ old('sold_count', $produk->sold_count ?? 0) }}" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100 text-sm"></div>
-        <div><input type="number" min="0" name="view_count" placeholder="Views" value="{{ old('view_count', $produk->view_count ?? 0) }}" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100 text-sm"></div>
         <div><input type="number" min="0" name="likes_count" placeholder="Likes" value="{{ old('likes_count', $produk->likes_count ?? 0) }}" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100 text-sm"></div>
         <div><input type="number" min="0" max="5" step="0.1" name="rating_avg" placeholder="Rating Avg" value="{{ old('rating_avg', isset($produk) ? (float) $produk->rating_avg : 0) }}" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100 text-sm"></div>
-        <div class="col-span-2"><input type="number" min="0" name="rating_count" placeholder="Rating Count" value="{{ old('rating_count', $produk->rating_count ?? 0) }}" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100 text-sm"></div>
+        <div><input type="number" min="0" name="rating_count" placeholder="Rating Count" value="{{ old('rating_count', $produk->rating_count ?? 0) }}" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100 text-sm"></div>
     </div>
 
     <div class="rounded-xl border border-gray-200 dark:border-gray-800 p-3">

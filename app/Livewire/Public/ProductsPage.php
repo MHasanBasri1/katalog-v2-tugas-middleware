@@ -4,12 +4,11 @@ namespace App\Livewire\Public;
 
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductLike;
+use App\Models\Wishlist;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
@@ -24,15 +23,10 @@ class ProductsPage extends Component
     #[Url(as: 'kategori')]
     public ?string $categorySlug = null;
 
-    public string $visitorToken;
-
     public array $wishlistedProductIds = [];
 
     public function mount(): void
     {
-        $this->visitorToken = session('visitor_token', (string) Str::uuid());
-        session(['visitor_token' => $this->visitorToken]);
-
         $this->search = trim((string) request()->query('q', $this->search));
         $this->categorySlug = request()->query('kategori', $this->categorySlug);
     }
@@ -71,7 +65,7 @@ class ProductsPage extends Component
         $selectedCategory = $categories->firstWhere('slug', $this->categorySlug);
 
         $products = Product::query()
-            ->select('id', 'category_id', 'name', 'slug', 'price', 'original_price', 'sold_count', 'view_count', 'rating_avg', 'rating_count')
+            ->select('id', 'category_id', 'name', 'slug', 'price', 'original_price', 'sold_count', 'rating_avg', 'rating_count')
             ->where('status', true)
             ->when($searchTerm !== '', function ($query) use ($searchTerm) {
                 $query->where(function ($subQuery) use ($searchTerm) {
@@ -98,6 +92,13 @@ class ProductsPage extends Component
 
     public function toggleWishlist(int $productId): void
     {
+        if (! Auth::check()) {
+            session()->flash('status', 'Silakan daftar atau masuk terlebih dahulu untuk menggunakan wishlist.');
+            $this->redirectRoute('user.login', navigate: true);
+
+            return;
+        }
+
         $productExists = Product::query()
             ->whereKey($productId)
             ->where('status', true)
@@ -109,21 +110,13 @@ class ProductsPage extends Component
 
         $userId = Auth::id();
 
-        $existing = ProductLike::query()
+        $existing = Wishlist::query()
             ->where('product_id', $productId)
-            ->where(function ($query) use ($userId) {
-                if ($userId) {
-                    $query->where('user_id', $userId)
-                        ->orWhere('visitor_token', $this->visitorToken);
-                } else {
-                    $query->where('visitor_token', $this->visitorToken);
-                }
-            })
+            ->where('user_id', $userId)
             ->first();
 
         if ($existing) {
             $existing->delete();
-            Product::query()->whereKey($productId)->where('likes_count', '>', 0)->decrement('likes_count');
             $this->wishlistedProductIds = array_values(array_filter(
                 $this->wishlistedProductIds,
                 fn ($id) => (int) $id !== $productId
@@ -132,14 +125,10 @@ class ProductsPage extends Component
             return;
         }
 
-        ProductLike::query()->create([
+        Wishlist::query()->create([
             'product_id' => $productId,
             'user_id' => $userId,
-            'visitor_token' => $this->visitorToken,
-            'ip_address' => request()->ip(),
-            'user_agent' => Str::limit((string) request()->userAgent(), 255, ''),
         ]);
-        Product::query()->whereKey($productId)->increment('likes_count');
 
         if (! in_array($productId, $this->wishlistedProductIds, true)) {
             $this->wishlistedProductIds[] = $productId;
@@ -148,24 +137,17 @@ class ProductsPage extends Component
 
     private function syncWishlistState(Collection $productIds): void
     {
-        if ($productIds->isEmpty()) {
+        $userId = Auth::id();
+
+        if (! $userId || $productIds->isEmpty()) {
             $this->wishlistedProductIds = [];
 
             return;
         }
 
-        $userId = Auth::id();
-
-        $this->wishlistedProductIds = ProductLike::query()
+        $this->wishlistedProductIds = Wishlist::query()
             ->whereIn('product_id', $productIds)
-            ->where(function ($query) use ($userId) {
-                if ($userId) {
-                    $query->where('user_id', $userId)
-                        ->orWhere('visitor_token', $this->visitorToken);
-                } else {
-                    $query->where('visitor_token', $this->visitorToken);
-                }
-            })
+            ->where('user_id', $userId)
             ->pluck('product_id')
             ->map(fn ($id) => (int) $id)
             ->unique()

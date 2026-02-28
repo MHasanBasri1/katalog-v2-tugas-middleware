@@ -62,6 +62,11 @@
         }
         [x-cloak] { display: none !important; }
         .slide-transition { transition: transform 0.5s ease-in-out; }
+        .promo-marquee-track {
+            display: inline-block;
+            min-width: max-content;
+            animation: promoMarquee 20s linear infinite;
+        }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .header-icon-btn {
@@ -96,6 +101,10 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.25; }
         }
+        @keyframes promoMarquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
         .nav-icon-circle {
             width: 26px;
             height: 26px;
@@ -122,6 +131,11 @@
             }
             .desktop-only {
                 display: inline-flex !important;
+            }
+        }
+        @media (max-width: 767px) {
+            .promo-marquee-track {
+                animation-duration: 15s;
             }
         }
     </style>

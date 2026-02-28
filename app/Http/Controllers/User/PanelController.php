@@ -4,7 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Models\ProductLike;
+use App\Models\Wishlist;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -15,7 +15,7 @@ class PanelController extends Controller
 {
     public function index(): View
     {
-        $wishlistProducts = ProductLike::query()
+        $wishlistProducts = Wishlist::query()
             ->where('user_id', auth()->id())
             ->with([
                 'product' => fn ($query) => $query
@@ -43,7 +43,9 @@ class PanelController extends Controller
 
         $user->update($validated);
 
-        return back()->with('status', 'Profil berhasil diperbarui.');
+        return back()
+            ->with('status', 'Profil berhasil diperbarui.')
+            ->with('active_tab', 'profil');
     }
 
     public function updatePassword(Request $request): RedirectResponse
@@ -64,18 +66,20 @@ class PanelController extends Controller
             'password' => Hash::make((string) $request->input('password')),
         ]);
 
-        return back()->with('status_password', 'Password berhasil diperbarui.');
+        return back()
+            ->with('status_password', 'Password berhasil diperbarui.')
+            ->with('active_tab', 'profil');
     }
 
     public function destroyWishlist(Request $request, Product $product): RedirectResponse
     {
-        ProductLike::query()
+        Wishlist::query()
             ->where('product_id', $product->id)
             ->where('user_id', $request->user()->id)
             ->delete();
 
-        Product::query()->whereKey($product->id)->where('likes_count', '>', 0)->decrement('likes_count');
-
-        return back()->with('status_wishlist', 'Wishlist diperbarui.');
+        return back()
+            ->with('status_wishlist', 'Wishlist diperbarui.')
+            ->with('active_tab', 'wishlist');
     }
 }
