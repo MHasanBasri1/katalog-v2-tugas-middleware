@@ -1,6 +1,6 @@
 @extends('layouts.auth')
 
-@section('title', 'Login - VISTORA Admin')
+@section('title', 'Reset Password Admin - VISTORA')
 
 @section('content')
 <div class="min-h-screen flex flex-col justify-center items-center p-6 bg-gray-50 dark:bg-gray-950 relative" x-data>
@@ -19,8 +19,8 @@
             <div class="space-y-6">
                 <div class="flex items-start justify-between gap-4">
                     <div>
-                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Selamat Datang Kembali</h2>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Silakan masuk untuk mengakses akun Anda.</p>
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Reset Password Admin</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Buat password baru untuk akun admin Anda.</p>
                     </div>
                     <button
                         type="button"
@@ -32,19 +32,17 @@
                     </button>
                 </div>
 
-                <x-auth-session-status class="mb-2 text-sm text-green-700 dark:text-green-300" :status="session('status')" />
-
-                <form method="POST" action="{{ route('login') }}" class="space-y-5">
+                <form method="POST" action="{{ route('admin.password.store') }}" class="space-y-5">
                     @csrf
+                    <input type="hidden" name="token" value="{{ $request->route('token') }}">
 
                     <div>
-                        <label for="email" class="block text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1.5">Email</label>
+                        <label for="email" class="block text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1.5">Email Admin</label>
                         <input
                             id="email"
                             name="email"
                             type="email"
-                            value="{{ old('email') }}"
-                            placeholder="yourname@example.com"
+                            value="{{ old('email', $request->email) }}"
                             required
                             autofocus
                             autocomplete="username"
@@ -56,47 +54,41 @@
                     </div>
 
                     <div>
-                        <div class="mb-1.5 flex items-center justify-between gap-2">
-                            <label for="password" class="block text-sm font-semibold text-gray-600 dark:text-gray-300">Password</label>
-                        </div>
+                        <label for="password" class="block text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1.5">Password Baru</label>
                         <input
                             id="password"
                             name="password"
                             type="password"
-                            placeholder="Masukkan password"
                             required
-                            autocomplete="current-password"
+                            autocomplete="new-password"
                             class="w-full h-12 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 px-4 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 outline-none transition"
                         >
                         @error('password')
                             <p class="mt-1 text-xs font-semibold text-rose-500">{{ $message }}</p>
                         @enderror
-                        @if (Route::has('admin.password.request'))
-                            <div class="mt-2 flex justify-end">
-                                <a href="{{ route('admin.password.request') }}" class="text-[11px] font-semibold text-blue-600 hover:text-blue-700 uppercase tracking-widest transition-colors">
-                                    Lupa Password?
-                                </a>
-                            </div>
-                        @endif
                     </div>
 
-                    <label class="inline-flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                        <input type="checkbox" name="remember" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                        Ingat Sesi Saya
-                    </label>
-
-                    <div class="space-y-4 pt-2">
-                        <x-button type="submit" variant="primary" class="w-full shadow-indigo-500/20">
-                            Log in
-                        </x-button>
+                    <div>
+                        <label for="password_confirmation" class="block text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1.5">Konfirmasi Password Baru</label>
+                        <input
+                            id="password_confirmation"
+                            name="password_confirmation"
+                            type="password"
+                            required
+                            autocomplete="new-password"
+                            class="w-full h-12 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 px-4 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 outline-none transition"
+                        >
+                        @error('password_confirmation')
+                            <p class="mt-1 text-xs font-semibold text-rose-500">{{ $message }}</p>
+                        @enderror
                     </div>
+
+                    <x-button type="submit" variant="primary" class="w-full shadow-indigo-500/20">
+                        Simpan Password Baru
+                    </x-button>
                 </form>
             </div>
         </x-card>
-
-        <p class="text-center mt-8 text-xs text-gray-400 font-semibold uppercase tracking-widest opacity-60">
-            &copy; {{ date('Y') }} VISTORA. All rights reserved.
-        </p>
     </div>
 </div>
 @endsection

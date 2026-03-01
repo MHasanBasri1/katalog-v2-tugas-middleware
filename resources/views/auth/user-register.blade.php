@@ -91,6 +91,17 @@
                     <i class="fas fa-user-plus text-xs"></i>
                     Daftar
                 </button>
+
+                <div class="flex items-center gap-3">
+                    <div class="h-px flex-1 bg-gray-200"></div>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">atau</span>
+                    <div class="h-px flex-1 bg-gray-200"></div>
+                </div>
+
+                <a href="{{ route('user.google.redirect') }}" class="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition">
+                    <i class="fab fa-google text-[13px] text-rose-500"></i>
+                    Daftar dengan Google
+                </a>
             </form>
 
             <p class="mt-5 text-sm text-center text-gray-500">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -69,6 +70,96 @@ class AuthController extends BaseApiController
         ], 'Login berhasil.');
     }
 
+    public function google(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'id_token' => ['required', 'string'],
+        ]);
+
+        $googleClientId = (string) config('services.google.client_id');
+        if ($googleClientId === '') {
+            return $this->error('Konfigurasi GOOGLE_CLIENT_ID belum diatur pada server.', 500);
+        }
+
+        $payload = $this->verifyGoogleIdToken((string) $validated['id_token']);
+        if (! $payload) {
+            return $this->error('Token Google tidak valid atau sudah kedaluwarsa.', 422);
+        }
+
+        if (($payload['aud'] ?? null) !== $googleClientId) {
+            return $this->error('Token Google tidak cocok dengan aplikasi ini.', 422);
+        }
+
+        $email = isset($payload['email']) ? strtolower((string) $payload['email']) : '';
+        $sub = (string) ($payload['sub'] ?? '');
+        $name = (string) ($payload['name'] ?? 'User');
+        $picture = isset($payload['picture']) ? (string) $payload['picture'] : null;
+        $emailVerified = filter_var($payload['email_verified'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+        if ($email === '' || $sub === '') {
+            return $this->error('Data akun Google tidak lengkap.', 422);
+        }
+
+        if (! $emailVerified) {
+            return $this->error('Email Google belum terverifikasi.', 422);
+        }
+
+        $userByGoogle = User::query()
+            ->where('google_id', $sub)
+            ->first();
+
+        $userByEmail = User::query()
+            ->where('email', $email)
+            ->first();
+
+        if (! $userByGoogle && $userByEmail && ! $userByEmail->google_id) {
+            return $this->error(
+                'Email ini sudah terdaftar dengan metode password. Silakan login pakai email/password.',
+                409
+            );
+        }
+
+        if (! $userByGoogle && $userByEmail && $userByEmail->google_id && $userByEmail->google_id !== $sub) {
+            return $this->error('Email ini sudah terhubung dengan akun Google lain.', 409);
+        }
+
+        $user = $userByGoogle ?? null;
+
+        if ($user && ($user->is_admin || $user->hasRole('admin'))) {
+            return $this->error('Akun admin tidak bisa login melalui API user.', 403);
+        }
+
+        if (! $user) {
+            $user = User::query()->create([
+                'name' => $name,
+                'email' => $email,
+                'password' => Hash::make(Str::random(40)),
+                'google_id' => $sub,
+                'avatar' => $picture,
+                'email_verified_at' => now(),
+                'is_admin' => false,
+                'is_frozen' => false,
+            ]);
+        } else {
+            $user->forceFill([
+                'avatar' => $picture ?: $user->avatar,
+            ])->save();
+        }
+
+        if ($user->is_frozen) {
+            return $this->error('Akun sedang dibekukan. Hubungi admin.', 403);
+        }
+
+        $this->ensureUserRole($user);
+        $token = $this->issueToken($user);
+
+        return $this->success([
+            'token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $this->transformUser($user),
+        ], 'Login Google berhasil.');
+    }
+
     public function me(Request $request): JsonResponse
     {
         return $this->success($this->transformUser($request->user()));
@@ -113,9 +204,28 @@ class AuthController extends BaseApiController
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
+            'avatar' => $user->avatar,
             'email_verified_at' => optional($user->email_verified_at)->toISOString(),
             'is_frozen' => (bool) $user->is_frozen,
             'created_at' => optional($user->created_at)->toISOString(),
         ];
+    }
+
+    private function verifyGoogleIdToken(string $idToken): ?array
+    {
+        try {
+            $response = Http::timeout(10)->get('https://oauth2.googleapis.com/tokeninfo', [
+                'id_token' => $idToken,
+            ]);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if (! $response->successful()) {
+            return null;
+        }
+
+        $payload = $response->json();
+        return is_array($payload) ? $payload : null;
     }
 }

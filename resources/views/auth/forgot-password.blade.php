@@ -1,9 +1,21 @@
 @extends('frontend.layouts.app')
 
-@section('title', 'Lupa Password - VISTORA')
-@section('meta_description', 'Minta link reset password untuk akun VISTORA Anda.')
-@section('canonical', route('password.request'))
-@section('og_url', route('password.request'))
+@php
+    $isAdmin = $isAdmin ?? false;
+    $requestRoute = $isAdmin ? 'admin.password.request' : 'password.request';
+    $emailRoute = $isAdmin ? 'admin.password.email' : 'password.email';
+    $loginRoute = $isAdmin ? 'login' : 'user.login';
+    $accountLabel = $isAdmin ? 'Akun Admin' : 'Akun Pengguna';
+    $title = $isAdmin ? 'Lupa Password Admin - VISTORA' : 'Lupa Password - VISTORA';
+    $description = $isAdmin
+        ? 'Minta link reset password untuk akun admin VISTORA Anda.'
+        : 'Minta link reset password untuk akun VISTORA Anda.';
+@endphp
+
+@section('title', $title)
+@section('meta_description', $description)
+@section('canonical', route($requestRoute))
+@section('og_url', route($requestRoute))
 
 @section('content')
 <section class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
@@ -11,7 +23,7 @@
 
     <div class="relative grid gap-5 md:grid-cols-[1.05fr_1.2fr] items-stretch">
         <div class="rounded-3xl border border-cyan-100 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-500 p-6 sm:p-7 text-white shadow-lg shadow-blue-200/70">
-            <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-cyan-50/90">Akun Pengguna</p>
+            <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-cyan-50/90">{{ $accountLabel }}</p>
             <h1 class="mt-3 text-2xl sm:text-3xl font-black leading-tight">Lupa Password</h1>
             <p class="mt-3 text-sm text-blue-50/95 leading-relaxed">
                 Masukkan email akun Anda. Kami akan kirim link reset password ke email tersebut.
@@ -21,7 +33,7 @@
         <div class="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/60 p-6 sm:p-8">
             <x-auth-session-status class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700" :status="session('status')" />
 
-            <form method="POST" action="{{ route('password.email') }}" class="space-y-5">
+            <form method="POST" action="{{ route($emailRoute) }}" class="space-y-5">
                 @csrf
 
                 <div>
@@ -45,7 +57,7 @@
 
             <p class="mt-5 text-sm text-center text-gray-500">
                 Sudah ingat password?
-                <a href="{{ route('user.login') }}" class="font-semibold text-blue-600 hover:text-blue-700">Masuk di sini</a>
+                <a href="{{ route($loginRoute) }}" class="font-semibold text-blue-600 hover:text-blue-700">Masuk di sini</a>
             </p>
         </div>
     </div>

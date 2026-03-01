@@ -1,7 +1,17 @@
 @extends('frontend.layouts.app')
 
-@section('title', 'Reset Password - VISTORA')
-@section('meta_description', 'Atur ulang password akun VISTORA Anda.')
+@php
+    $isAdmin = $isAdmin ?? false;
+    $storeRoute = $isAdmin ? 'admin.password.store' : 'password.store';
+    $accountLabel = $isAdmin ? 'Akun Admin' : 'Akun Pengguna';
+    $title = $isAdmin ? 'Reset Password Admin - VISTORA' : 'Reset Password - VISTORA';
+    $description = $isAdmin
+        ? 'Atur ulang password akun admin VISTORA Anda.'
+        : 'Atur ulang password akun VISTORA Anda.';
+@endphp
+
+@section('title', $title)
+@section('meta_description', $description)
 @section('canonical', url()->current())
 @section('og_url', url()->current())
 
@@ -11,7 +21,7 @@
 
     <div class="relative grid gap-5 md:grid-cols-[1.05fr_1.2fr] items-stretch">
         <div class="rounded-3xl border border-cyan-100 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-500 p-6 sm:p-7 text-white shadow-lg shadow-blue-200/70">
-            <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-cyan-50/90">Akun Pengguna</p>
+            <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-cyan-50/90">{{ $accountLabel }}</p>
             <h1 class="mt-3 text-2xl sm:text-3xl font-black leading-tight">Reset Password</h1>
             <p class="mt-3 text-sm text-blue-50/95 leading-relaxed">
                 Buat password baru untuk melanjutkan akses ke akun Anda.
@@ -19,7 +29,7 @@
         </div>
 
         <div class="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/60 p-6 sm:p-8">
-            <form method="POST" action="{{ route('password.store') }}" class="space-y-5">
+            <form method="POST" action="{{ route($storeRoute) }}" class="space-y-5">
                 @csrf
                 <input type="hidden" name="token" value="{{ $request->route('token') }}">
 
