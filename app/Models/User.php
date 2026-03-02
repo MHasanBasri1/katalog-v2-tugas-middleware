@@ -3,10 +3,15 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\UserResetPasswordNotification;
+use App\Notifications\UserVerifyEmailNotification;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -24,6 +29,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'google_id',
+        'google_avatar',
         'avatar',
         'email_verified_at',
         'is_admin',
@@ -58,4 +64,52 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new UserVerifyEmailNotification());
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new UserResetPasswordNotification($token));
+    }
+
+    public static function normalizeEmail(?string $email): string
+    {
+        return Str::lower(trim((string) $email));
+    }
+
+    public function setEmailAttribute(?string $value): void
+    {
+        $this->attributes['email'] = static::normalizeEmail($value);
+    }
+
+    public function scopeWhereEmailInsensitive(Builder $query, string $email): Builder
+    {
+        return $query->whereRaw('LOWER(email) = ?', [static::normalizeEmail($email)]);
+    }
+
+    public function hasUploadedAvatar(): bool
+    {
+        $avatar = (string) ($this->avatar ?? '');
+        if ($avatar === '') {
+            return false;
+        }
+
+        return ! Str::startsWith($avatar, ['http://', 'https://']);
+    }
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        $avatar = (string) ($this->avatar ?? '');
+        if ($avatar === '') {
+            return null;
+        }
+
+        if (Str::startsWith($avatar, ['http://', 'https://'])) {
+            return $avatar;
+        }
+
+        return Storage::disk('public')->url($avatar);
+    }
 }

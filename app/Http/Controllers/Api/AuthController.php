@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
@@ -17,13 +19,21 @@ class AuthController extends BaseApiController
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'email' => ['required', 'string', 'email', 'max:255'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
+        $normalizedEmail = User::normalizeEmail((string) $validated['email']);
+
+        if (User::query()->whereEmailInsensitive($normalizedEmail)->exists()) {
+            return $this->error('Email sudah terdaftar.', 422, [
+                'email' => ['Email sudah terdaftar. Silakan gunakan email lain atau login.'],
+            ]);
+        }
+
         $user = User::query()->create([
             'name' => $validated['name'],
-            'email' => $validated['email'],
+            'email' => $normalizedEmail,
             'password' => Hash::make((string) $validated['password']),
             'is_admin' => false,
             'is_frozen' => false,
@@ -46,7 +56,9 @@ class AuthController extends BaseApiController
             'password' => ['required', 'string'],
         ]);
 
-        $user = User::query()->where('email', $validated['email'])->first();
+        $user = User::query()
+            ->whereEmailInsensitive((string) $validated['email'])
+            ->first();
 
         if (! $user || ! Hash::check((string) $validated['password'], (string) $user->password)) {
             return $this->error('Email atau password tidak valid.', 422);
@@ -109,7 +121,7 @@ class AuthController extends BaseApiController
             ->first();
 
         $userByEmail = User::query()
-            ->where('email', $email)
+            ->whereEmailInsensitive($email)
             ->first();
 
         if (! $userByGoogle && $userByEmail && ! $userByEmail->google_id) {
@@ -135,15 +147,32 @@ class AuthController extends BaseApiController
                 'email' => $email,
                 'password' => Hash::make(Str::random(40)),
                 'google_id' => $sub,
+                'google_avatar' => $picture,
                 'avatar' => $picture,
-                'email_verified_at' => now(),
+                'email_verified_at' => null,
                 'is_admin' => false,
                 'is_frozen' => false,
             ]);
+
+            $user->sendEmailVerificationNotification();
         } else {
-            $user->forceFill([
-                'avatar' => $picture ?: $user->avatar,
-            ])->save();
+            $updates = [];
+
+            if ($picture) {
+                $updates['google_avatar'] = $picture;
+
+                if (! $user->hasUploadedAvatar()) {
+                    $updates['avatar'] = $picture;
+                }
+            }
+
+            if (! empty($updates)) {
+                $user->forceFill($updates)->save();
+            }
+
+            if (! $user->hasVerifiedEmail()) {
+                $user->sendEmailVerificationNotification();
+            }
         }
 
         if ($user->is_frozen) {
@@ -163,6 +192,80 @@ class AuthController extends BaseApiController
     public function me(Request $request): JsonResponse
     {
         return $this->success($this->transformUser($request->user()));
+    }
+
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'string', 'email'],
+        ]);
+
+        $email = User::normalizeEmail((string) $validated['email']);
+
+        $user = User::query()
+            ->whereEmailInsensitive($email)
+            ->first();
+
+        if ($user && ($user->is_admin || $user->hasRole('admin'))) {
+            return $this->error('Akun admin tidak bisa reset password dari API user.', 403);
+        }
+
+        $status = Password::sendResetLink([
+            'email' => $email,
+        ]);
+
+        if ($status === Password::RESET_LINK_SENT) {
+            return $this->success(null, 'Link reset password sudah dikirim ke email Anda.');
+        }
+
+        return $this->error('Gagal mengirim link reset password.', 422, [
+            'email' => [__($status)],
+        ]);
+    }
+
+    public function resetPassword(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'token' => ['required', 'string'],
+            'email' => ['required', 'string', 'email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $email = User::normalizeEmail((string) $validated['email']);
+
+        $user = User::query()
+            ->whereEmailInsensitive($email)
+            ->first();
+
+        if ($user && ($user->is_admin || $user->hasRole('admin'))) {
+            return $this->error('Akun admin tidak bisa reset password dari API user.', 403);
+        }
+
+        $status = Password::reset(
+            [
+                'email' => $email,
+                'password' => (string) $validated['password'],
+                'password_confirmation' => (string) $request->input('password_confirmation'),
+                'token' => (string) $validated['token'],
+            ],
+            function (User $user, string $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                    'remember_token' => Str::random(60),
+                    'api_token' => null,
+                ])->save();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        if ($status === Password::PASSWORD_RESET) {
+            return $this->success(null, 'Password berhasil direset. Silakan login ulang.');
+        }
+
+        return $this->error('Reset password gagal.', 422, [
+            'email' => [__($status)],
+        ]);
     }
 
     public function logout(Request $request): JsonResponse
@@ -205,6 +308,8 @@ class AuthController extends BaseApiController
             'name' => $user->name,
             'email' => $user->email,
             'avatar' => $user->avatar,
+            'avatar_url' => $user->avatar_url,
+            'google_avatar' => $user->google_avatar,
             'email_verified_at' => optional($user->email_verified_at)->toISOString(),
             'is_frozen' => (bool) $user->is_frozen,
             'created_at' => optional($user->created_at)->toISOString(),

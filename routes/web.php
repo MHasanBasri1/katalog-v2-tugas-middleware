@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\PanelController;
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Auth\UserGoogleAuthController;
+use App\Http\Controllers\Auth\UserDeviceVerificationController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\AdminNewPasswordController;
 use App\Http\Controllers\Auth\AdminPasswordResetLinkController;
@@ -39,6 +40,9 @@ Route::middleware('guest')->group(function () {
     Route::post('/masuk', [UserAuthController::class, 'login'])->name('user.login.store');
     Route::get('/auth/google/redirect', [UserGoogleAuthController::class, 'redirect'])->name('user.google.redirect');
     Route::get('/auth/google/callback', [UserGoogleAuthController::class, 'callback'])->name('user.google.callback');
+    Route::get('/verifikasi-device/{token}', UserDeviceVerificationController::class)
+        ->middleware('throttle:6,1')
+        ->name('user.device.verify');
     Route::get('/lupa-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
     Route::post('/lupa-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
     Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
@@ -75,6 +79,8 @@ Route::middleware(['auth', 'role:user', 'verified'])->group(function () {
     Route::get('/profil-saya', [PanelController::class, 'index'])->name('user.panel');
     Route::put('/profil-saya/profil', [PanelController::class, 'updateProfile'])->name('user.profile.update');
     Route::put('/profil-saya/password', [PanelController::class, 'updatePassword'])->name('user.password.update');
+    Route::post('/profil-saya/avatar', [PanelController::class, 'updateAvatar'])->name('user.avatar.update');
+    Route::delete('/profil-saya/avatar', [PanelController::class, 'destroyAvatar'])->name('user.avatar.destroy');
     Route::delete('/profil-saya/wishlist/{product}', [PanelController::class, 'destroyWishlist'])->name('user.wishlist.destroy');
 });
 

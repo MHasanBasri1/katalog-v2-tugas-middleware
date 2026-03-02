@@ -38,6 +38,11 @@
                 {{ session('status_wishlist') }}
             </div>
         @endif
+        @if(session('status_avatar'))
+            <div class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+                {{ session('status_avatar') }}
+            </div>
+        @endif
 
         <div class="mt-6 grid w-full max-w-xs grid-cols-2 rounded-xl border border-gray-200 bg-gray-50 p-1">
             <button type="button" @click="tab = 'profil'" :class="tab === 'profil' ? 'bg-white text-blue-700 shadow-sm' : 'text-gray-600 hover:text-gray-800'" class="rounded-lg px-4 py-2 text-sm font-semibold transition">
@@ -51,6 +56,48 @@
         </div>
 
         <div x-show="tab === 'profil'" x-cloak class="mt-6 space-y-6">
+            <div class="rounded-2xl border border-gray-100 p-4 sm:p-5 bg-white shadow-sm">
+                <h2 class="text-base font-bold text-gray-900">Avatar Profil</h2>
+                <p class="mt-1 text-xs text-gray-500">Upload avatar baru (JPG/PNG/WEBP, maks. 2MB) atau hapus untuk kembali ke avatar default Google.</p>
+
+                <div class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="flex items-center gap-3">
+                        @if(auth()->user()->avatar_url)
+                            <img src="{{ auth()->user()->avatar_url }}" alt="Avatar {{ auth()->user()->name }}" class="h-16 w-16 rounded-full object-cover border border-gray-200">
+                        @else
+                            <div class="h-16 w-16 rounded-full border border-gray-200 bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-lg">
+                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                            </div>
+                        @endif
+                        <div>
+                            <p class="text-sm font-semibold text-gray-900">{{ auth()->user()->name }}</p>
+                            <p class="text-xs text-gray-500">{{ auth()->user()->email }}</p>
+                        </div>
+                    </div>
+
+                    <div class="w-full sm:w-auto space-y-2">
+                        <form method="POST" action="{{ route('user.avatar.update') }}" enctype="multipart/form-data" class="flex flex-col gap-2 sm:flex-row sm:items-center">
+                            @csrf
+                            <input type="file" name="avatar" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="w-full sm:w-auto rounded-xl border-gray-200 bg-gray-50 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-blue-600 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:bg-blue-700">
+                            <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 text-white px-4 py-2.5 text-sm font-semibold hover:bg-blue-700 transition">
+                                Simpan Avatar
+                            </button>
+                        </form>
+                        @error('avatar', 'avatarUpdate')
+                            <p class="text-xs text-rose-500">{{ $message }}</p>
+                        @enderror
+
+                        <form method="POST" action="{{ route('user.avatar.destroy') }}">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-100 transition">
+                                Hapus Avatar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="rounded-2xl border border-gray-100 p-4 bg-gray-50">
                     <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Nama</p>

@@ -1,0 +1,223 @@
+API BASE
+- Base URL: /api/v1
+- Content-Type default: application/json
+- Auth endpoint protected: Authorization: Bearer <token>
+
+RESPONSE FORMAT (umum)
+- Success:
+  {
+    "success": true,
+    "message": "OK",
+    "data": ...,
+    "meta": ... (opsional, untuk pagination)
+  }
+- Error:
+  {
+    "success": false,
+    "message": "Pesan error",
+    "errors": ... (opsional)
+  }
+
+==================================================
+PUBLIC ENDPOINTS (tanpa token)
+==================================================
+
+HOME
+1. GET /api/v1/home
+   Query (opsional):
+   - limit (int, default 10, min 1, max 50)
+   Return data:
+   - banners[]
+   - categories[] (maksimum 20 data)
+   - promo_products[]
+   - popular_products[]
+   - best_seller_products[]
+   - latest_products[]
+
+2. GET /api/v1/home/promo-products
+   Query (opsional): limit (int, default 10, min 1, max 50)
+   Return data: products[]
+
+3. GET /api/v1/home/popular-products
+   Query (opsional): limit (int, default 10, min 1, max 50)
+   Return data: products[]
+
+4. GET /api/v1/home/latest-products
+   Query (opsional): limit (int, default 10, min 1, max 50)
+   Return data: products[]
+
+BANNERS
+5. GET /api/v1/banners
+   Query (opsional): limit (int, default 10, min 1, max 50)
+   Return data: banners[] aktif
+
+CATEGORIES
+6. GET /api/v1/categories
+   Query (opsional):
+   - q (string, cari nama kategori)
+   - per_page (int, default 20, min 1, max 50)
+   Return data:
+   - array kategori (id, name, slug, description, products_count)
+   - meta pagination: current_page, last_page, per_page, total
+
+7. GET /api/v1/categories/{slug}
+   Query (opsional):
+   - q (string, cari nama produk dalam kategori)
+   - sort (string: newest | price_asc | price_desc | sold | rating)
+   - per_page (int, default 10, min 1, max 50)
+   Return data:
+   - category {}
+   - products[]
+   - meta pagination
+
+PRODUCTS
+8. GET /api/v1/products
+   Query (opsional):
+   - q (string)
+   - category_id (int)
+   - category_slug (string)
+   - min_price (number)
+   - max_price (number)
+   - promo (boolean: true/false)
+   - featured (boolean: true/false)
+   - sort (string: newest | price_asc | price_desc | sold | rating)
+   - per_page (int, default 12, min 1, max 50)
+   Return data:
+   - products[]
+   - meta pagination
+
+9. GET /api/v1/products/search
+   Query sama seperti GET /products (utama: q)
+
+10. GET /api/v1/products/top-rated
+    Query:
+    - per_page (opsional)
+    - semua filter GET /products juga tetap bisa dipakai
+    Catatan: sort otomatis rating
+
+11. GET /api/v1/products/best-sold
+    Query:
+    - per_page (opsional)
+    - semua filter GET /products juga tetap bisa dipakai
+    Catatan: sort otomatis sold
+
+12. GET /api/v1/products/category/{slug}
+    Query (opsional):
+    - q, sort, min_price, max_price, promo, featured, per_page
+    Return data:
+    - category {}
+    - products[]
+    - meta pagination
+
+13. GET /api/v1/products/detail/{slug}
+14. GET /api/v1/products/{slug}
+    Catatan:
+    - Keduanya return format yang sama:
+      data.product + data.related_products[]
+
+AUTH (PUBLIC)
+15. POST /api/v1/auth/register
+    Body JSON:
+    - name (required, string, max 255)
+    - email (required, email)
+    - password (required, min 8)
+    - password_confirmation (required, harus sama)
+    Return data:
+    - token
+    - token_type (Bearer)
+    - user {}
+
+16. POST /api/v1/auth/login
+    Body JSON:
+    - email (required, email)
+    - password (required)
+    Return data:
+    - token
+    - token_type
+    - user {}
+
+17. POST /api/v1/auth/google
+    Body JSON:
+    - id_token (required, string)
+    Return data:
+    - token
+    - token_type
+    - user {}
+
+18. POST /api/v1/auth/forgot-password
+    Body JSON:
+    - email (required, email)
+
+19. POST /api/v1/auth/reset-password
+    Body JSON:
+    - token (required, string)
+    - email (required, email)
+    - password (required, min 8)
+    - password_confirmation (required, harus sama)
+
+==================================================
+PROTECTED ENDPOINTS (butuh Bearer token)
+==================================================
+
+AUTH (PROTECTED)
+20. GET /api/v1/auth/me
+    Return data: user {}
+
+21. POST /api/v1/auth/logout
+    Return: success message
+
+PROFILE
+22. GET /api/v1/profile
+    Return data:
+    - id, name, email, avatar, avatar_url, google_avatar,
+      email_verified_at, created_at, updated_at
+
+23. PUT /api/v1/profile
+    Body JSON:
+    - name (required, string, max 255)
+    - email (required, email, unique users)
+
+24. PUT /api/v1/profile/password
+    Body JSON:
+    - current_password (required)
+    - password (required, min 8)
+    - password_confirmation (required, harus sama)
+
+25. POST /api/v1/profile/avatar
+    Content-Type: multipart/form-data
+    Body:
+    - avatar (required, image: jpg/jpeg/png/webp, max 2MB)
+
+26. DELETE /api/v1/profile/avatar
+    Menghapus avatar upload user, fallback ke google_avatar jika ada.
+
+WISHLIST
+27. GET /api/v1/wishlist
+    Return data:
+    - array product[] yang sudah di-wishlist user
+
+28. POST /api/v1/wishlist
+    Body JSON:
+    - product_id (required, integer, exists:products,id)
+
+29. DELETE /api/v1/wishlist/{product}
+    Path param:
+    - product (id produk, route model binding)
+
+==================================================
+CATATAN STRUKTUR PRODUCT OBJECT
+==================================================
+Field utama product (dari ProductTransformer):
+- id, category_id, category {id,name,slug}
+- name, slug, description
+- price, original_price, discount_percent
+- status, sold_count, likes_count, rating_avg, rating_count
+- is_featured, show_in_promo
+- image (thumbnail utama)
+- images[] {id, url, is_primary}
+- marketplace_links[] {id, marketplace, url}
+- created_at, updated_at
+
+Catatan penting untuk tombol "Beli di Marketplace":
+- Gunakan field marketplace_links[] pada object product.
+- Tidak perlu endpoint khusus marketplace jika hanya untuk menampilkan link beli.

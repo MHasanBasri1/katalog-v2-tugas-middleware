@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\UserDeviceVerificationNotification;
+use App\Services\TrustedDeviceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +17,11 @@ use Spatie\Permission\Models\Role;
 
 class UserGoogleAuthController extends Controller
 {
+    public function __construct(
+        private readonly TrustedDeviceService $trustedDeviceService
+    ) {
+    }
+
     public function redirect(Request $request): RedirectResponse
     {
         $clientId = (string) config('services.google.client_id');
@@ -104,7 +111,7 @@ class UserGoogleAuthController extends Controller
             ->first();
 
         $userByEmail = User::query()
-            ->where('email', $email)
+            ->whereEmailInsensitive($email)
             ->first();
 
         if (! $userByGoogle && $userByEmail && ! $userByEmail->google_id) {
@@ -133,15 +140,32 @@ class UserGoogleAuthController extends Controller
                 'email' => $email,
                 'password' => Hash::make(Str::random(40)),
                 'google_id' => $sub,
+                'google_avatar' => $picture,
                 'avatar' => $picture,
-                'email_verified_at' => now(),
+                'email_verified_at' => null,
                 'is_admin' => false,
                 'is_frozen' => false,
             ]);
+
+            $user->sendEmailVerificationNotification();
         } else {
-            $user->forceFill([
-                'avatar' => $picture ?: $user->avatar,
-            ])->save();
+            $updates = [];
+
+            if ($picture) {
+                $updates['google_avatar'] = $picture;
+
+                if (! $user->hasUploadedAvatar()) {
+                    $updates['avatar'] = $picture;
+                }
+            }
+
+            if (! empty($updates)) {
+                $user->forceFill($updates)->save();
+            }
+
+            if (! $user->hasVerifiedEmail()) {
+                $user->sendEmailVerificationNotification();
+            }
         }
 
         if ($user->is_frozen) {
@@ -150,10 +174,31 @@ class UserGoogleAuthController extends Controller
             ]);
         }
 
+        if ($user->hasVerifiedEmail()) {
+            $isTrustedDevice = $this->trustedDeviceService->touchIfTrusted($user, $request);
+
+            if (! $isTrustedDevice) {
+                if ($this->trustedDeviceService->hasTrustedDevice($user)) {
+                    $challenge = $this->trustedDeviceService->createChallenge($user, $request, true, route('user.panel', absolute: false));
+                    $verificationUrl = route('user.device.verify', ['token' => $challenge->token]);
+                    $user->notify(new UserDeviceVerificationNotification($verificationUrl));
+
+                    return redirect()->route('user.login')->with('status', 'Login Google dari device baru terdeteksi. Kami sudah kirim link verifikasi ke email Anda.');
+                }
+
+                $this->trustedDeviceService->trustCurrentDevice($user, $request);
+            }
+        }
+
         $this->ensureUserRole($user);
 
         Auth::login($user, true);
         $request->session()->regenerate();
+
+        if (! $user->hasVerifiedEmail()) {
+            return redirect()->route('verification.notice')
+                ->with('status', 'Link verifikasi email sudah dikirim. Silakan cek inbox Anda.');
+        }
 
         $defaultRedirect = route('user.panel', absolute: false);
         return redirect()->intended($defaultRedirect);

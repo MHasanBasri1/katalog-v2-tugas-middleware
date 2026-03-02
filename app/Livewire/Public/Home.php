@@ -31,7 +31,7 @@ class Home extends Component
         );
 
         $popularCategories = Cache::remember(
-            'public.home.popular_categories',
+            'public.home.categories_all',
             now()->addMinutes(10),
             fn () => Category::query()
                 ->select('id', 'name', 'slug')
@@ -39,7 +39,6 @@ class Home extends Component
                     'products as active_products_count' => fn ($query) => $query->where('status', true),
                 ])
                 ->orderByDesc('active_products_count')
-                ->limit(12)
                 ->get()
         );
 

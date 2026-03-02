@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\ProductController;
@@ -10,16 +11,27 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::get('/home', [HomeController::class, 'index']);
+    Route::get('/home/promo-products', [HomeController::class, 'promoProducts']);
+    Route::get('/home/popular-products', [HomeController::class, 'popularProducts']);
+    Route::get('/home/latest-products', [HomeController::class, 'latestProducts']);
+    Route::get('/banners', [BannerController::class, 'index']);
 
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::get('/categories/{slug}', [CategoryController::class, 'show']);
 
     Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/products/search', [ProductController::class, 'search']);
+    Route::get('/products/top-rated', [ProductController::class, 'topRated']);
+    Route::get('/products/best-sold', [ProductController::class, 'bestSold']);
+    Route::get('/products/category/{slug}', [ProductController::class, 'byCategory']);
+    Route::get('/products/detail/{slug}', [ProductController::class, 'detail']);
     Route::get('/products/{slug}', [ProductController::class, 'show']);
 
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/login', [AuthController::class, 'login']);
     Route::post('/auth/google', [AuthController::class, 'google']);
+    Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
 
     Route::middleware('api.token')->group(function () {
         Route::get('/auth/me', [AuthController::class, 'me']);
@@ -28,6 +40,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/profile', [ProfileController::class, 'show']);
         Route::put('/profile', [ProfileController::class, 'update']);
         Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
+        Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar']);
+        Route::delete('/profile/avatar', [ProfileController::class, 'destroyAvatar']);
 
         Route::get('/wishlist', [WishlistController::class, 'index']);
         Route::post('/wishlist', [WishlistController::class, 'store']);

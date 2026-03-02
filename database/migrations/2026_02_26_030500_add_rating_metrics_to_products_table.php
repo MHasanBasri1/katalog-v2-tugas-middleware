@@ -19,7 +19,13 @@ return new class extends Migration
             ->where('likes_count', '>', 0)
             ->update([
                 'rating_count' => DB::raw('likes_count'),
-                'rating_avg' => DB::raw('LEAST(5.0, ROUND(4.0 + (likes_count / 500), 1))'),
+                // SQLite tidak punya fungsi LEAST, jadi gunakan CASE agar lintas database.
+                'rating_avg' => DB::raw(
+                    'CASE
+                        WHEN ROUND(4.0 + (likes_count / 500.0), 1) > 5.0 THEN 5.0
+                        ELSE ROUND(4.0 + (likes_count / 500.0), 1)
+                    END'
+                ),
             ]);
     }
 

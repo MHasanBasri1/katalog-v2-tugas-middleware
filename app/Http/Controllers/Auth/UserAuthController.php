@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Notifications\UserDeviceVerificationNotification;
+use App\Services\TrustedDeviceService;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -15,6 +17,11 @@ use Spatie\Permission\Models\Role;
 
 class UserAuthController extends Controller
 {
+    public function __construct(
+        private readonly TrustedDeviceService $trustedDeviceService
+    ) {
+    }
+
     public function showLoginForm(): View
     {
         return view('auth.user-login');
@@ -36,6 +43,35 @@ class UserAuthController extends Controller
             return back()->withErrors([
                 'email' => 'Akun admin harus login dari halaman /admin/login.',
             ])->onlyInput('email');
+        }
+
+        if ($user && $user->hasVerifiedEmail()) {
+            $isTrustedDevice = $this->trustedDeviceService->touchIfTrusted($user, $request);
+
+            if (! $isTrustedDevice) {
+                if ($this->trustedDeviceService->hasTrustedDevice($user)) {
+                    $intended = $request->session()->get('url.intended');
+                    $intendedPath = is_string($intended) ? (parse_url($intended, PHP_URL_PATH) ?: null) : null;
+
+                    $challenge = $this->trustedDeviceService->createChallenge(
+                        $user,
+                        $request,
+                        $request->boolean('remember'),
+                        $intendedPath
+                    );
+
+                    $verificationUrl = route('user.device.verify', ['token' => $challenge->token]);
+                    $user->notify(new UserDeviceVerificationNotification($verificationUrl));
+
+                    Auth::logout();
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+
+                    return redirect()->route('user.login')->with('status', 'Login dari device baru terdeteksi. Kami sudah kirim link verifikasi ke email Anda.');
+                }
+
+                $this->trustedDeviceService->trustCurrentDevice($user, $request);
+            }
         }
 
         $defaultRedirect = $user && ! $user->hasVerifiedEmail()
@@ -61,13 +97,21 @@ class UserAuthController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'email', 'max:255'],
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
+        $normalizedEmail = User::normalizeEmail((string) $validated['email']);
+
+        if (User::query()->whereEmailInsensitive($normalizedEmail)->exists()) {
+            return back()
+                ->withErrors(['email' => 'Email sudah terdaftar. Silakan gunakan email lain atau login.'])
+                ->withInput();
+        }
+
         $user = User::create([
             'name' => $validated['name'],
-            'email' => $validated['email'],
+            'email' => $normalizedEmail,
             'password' => Hash::make($validated['password']),
         ]);
 

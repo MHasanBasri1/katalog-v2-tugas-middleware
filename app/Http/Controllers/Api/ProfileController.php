@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class ProfileController extends BaseApiController
@@ -17,6 +18,9 @@ class ProfileController extends BaseApiController
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
+            'avatar' => $user->avatar,
+            'avatar_url' => $user->avatar_url,
+            'google_avatar' => $user->google_avatar,
             'email_verified_at' => optional($user->email_verified_at)->toISOString(),
             'created_at' => optional($user->created_at)->toISOString(),
             'updated_at' => optional($user->updated_at)->toISOString(),
@@ -42,9 +46,55 @@ class ProfileController extends BaseApiController
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
+            'avatar' => $user->avatar,
+            'avatar_url' => $user->avatar_url,
+            'google_avatar' => $user->google_avatar,
             'email_verified_at' => optional($user->email_verified_at)->toISOString(),
             'updated_at' => optional($user->updated_at)->toISOString(),
         ], 'Profil berhasil diperbarui.');
+    }
+
+    public function updateAvatar(Request $request): JsonResponse
+    {
+        $request->validate([
+            'avatar' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ]);
+
+        $user = $request->user();
+        $newPath = $request->file('avatar')->store("avatars/users/{$user->id}", 'public');
+
+        if ($user->hasUploadedAvatar()) {
+            Storage::disk('public')->delete((string) $user->avatar);
+        }
+
+        $user->forceFill([
+            'avatar' => $newPath,
+        ])->save();
+
+        return $this->success([
+            'avatar' => $user->avatar,
+            'avatar_url' => $user->avatar_url,
+            'google_avatar' => $user->google_avatar,
+        ], 'Avatar berhasil diperbarui.');
+    }
+
+    public function destroyAvatar(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if ($user->hasUploadedAvatar()) {
+            Storage::disk('public')->delete((string) $user->avatar);
+        }
+
+        $user->forceFill([
+            'avatar' => $user->google_avatar,
+        ])->save();
+
+        return $this->success([
+            'avatar' => $user->avatar,
+            'avatar_url' => $user->avatar_url,
+            'google_avatar' => $user->google_avatar,
+        ], 'Avatar berhasil dihapus.');
     }
 
     public function updatePassword(Request $request): JsonResponse

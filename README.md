@@ -7,6 +7,116 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## API Auth (User Biasa)
+
+Base URL: `/api/v1`
+
+### 1. Register (email/password)
+
+- **POST** `/auth/register`
+- Body JSON:
+
+```json
+{
+  "name": "Nama User",
+  "email": "user@example.com",
+  "password": "password123",
+  "password_confirmation": "password123"
+}
+```
+
+### 2. Login (email/password)
+
+- **POST** `/auth/login`
+- Body JSON:
+
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+### 3. Login SSO Google (ID Token)
+
+- **POST** `/auth/google`
+- Body JSON:
+
+```json
+{
+  "id_token": "GOOGLE_ID_TOKEN_FROM_CLIENT"
+}
+```
+
+### 4. Cek Profil Login
+
+- **GET** `/auth/me`
+- Header:
+  - `Authorization: Bearer {token}`
+
+### 5. Forgot Password
+
+- **POST** `/auth/forgot-password`
+- Body JSON:
+
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+### 6. Reset Password
+
+- **POST** `/auth/reset-password`
+- Body JSON:
+
+```json
+{
+  "token": "RESET_TOKEN_DARI_EMAIL",
+  "email": "user@example.com",
+  "password": "passwordBaru123",
+  "password_confirmation": "passwordBaru123"
+}
+```
+
+### 7. Logout
+
+- **POST** `/auth/logout`
+- Header:
+  - `Authorization: Bearer {token}`
+
+### Format Response Sukses
+
+```json
+{
+  "success": true,
+  "message": "Login berhasil.",
+  "data": {
+    "token": "plain_api_token",
+    "token_type": "Bearer",
+    "user": {
+      "id": 1,
+      "name": "Nama User",
+      "email": "user@example.com",
+      "avatar": null,
+      "email_verified_at": null,
+      "is_frozen": false,
+      "created_at": "2026-03-02T10:00:00.000000Z"
+    }
+  }
+}
+```
+
+### Environment untuk Google
+
+Set di `.env`:
+
+```env
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_REDIRECT_URI=
+```
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
