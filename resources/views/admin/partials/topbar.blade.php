@@ -19,7 +19,7 @@
             </button>
             <div>
                 <h1 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white">@yield('header', 'Dashboard')</h1>
-                <p class="text-xs text-gray-500 dark:text-gray-400">VISTORA Admin Management</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Kataloque Admin Management</p>
             </div>
         </div>
 

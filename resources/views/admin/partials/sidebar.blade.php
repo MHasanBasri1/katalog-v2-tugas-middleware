@@ -9,12 +9,12 @@
 >
     <div class="h-20 px-4 flex items-center border-b border-gray-200 dark:border-gray-800">
         <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 overflow-hidden">
-            <div class="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-600/25">
-                <i class="ti ti-compass text-2xl"></i>
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center shadow-lg shadow-primary/25">
+                <i class="fas fa-cube text-xl"></i>
             </div>
             <div x-show="$store.sidebar.isExpanded" x-cloak>
-                <p class="text-lg font-black text-blue-600 italic leading-none">VISTORA</p>
-                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400">Admin Panel</p>
+                <p class="text-lg font-black text-gray-900 dark:text-white leading-none tracking-tight">Kataloque</p>
+                <p class="text-[10px] uppercase font-black text-gray-400 dark:text-gray-500 tracking-widest mt-1">Admin Panel</p>
             </div>
         </a>
         <button
@@ -174,59 +174,29 @@
         @endif
 
         @if ($canUsers)
-            <button
-                type="button"
-                @click="toggleGroup('openUsers')"
-                class="w-full flex items-center rounded-xl px-3 py-3 text-sm font-semibold transition"
-                :class="$store.sidebar.isExpanded ? '' : 'justify-center'"
-                @class([
-                    'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' => $isUsersActive,
-                    'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900' => ! $isUsersActive,
-                ])
-            >
+            <a href="{{ route('admin.user.index') }}"
+               class="flex items-center rounded-xl px-3 py-3 text-sm font-semibold transition"
+               :class="$store.sidebar.isExpanded ? '' : 'justify-center'"
+               @class([
+                   'bg-blue-600 text-white shadow-md shadow-blue-600/20' => request()->routeIs('admin.user.*'),
+                   'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900' => !request()->routeIs('admin.user.*'),
+               ])>
                 <i class="ti ti-users text-xl"></i>
-                <span x-show="$store.sidebar.isExpanded" x-cloak class="ml-3">Akun</span>
-                <i x-show="$store.sidebar.isExpanded" x-cloak class="ti ti-chevron-down ml-auto transition-transform" :class="openUsers ? 'rotate-180' : ''"></i>
-            </button>
-            <div x-show="$store.sidebar.isExpanded && openUsers" class="space-y-1 pl-3 pr-1">
-                <a href="{{ route('admin.user.index') }}"
-                   class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition"
-                   @class([
-                       'bg-blue-600 text-white shadow-sm shadow-blue-600/20' => request()->routeIs('admin.user.*'),
-                       'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900' => !request()->routeIs('admin.user.*'),
-                   ])>
-                    <i class="ti ti-user-circle text-lg"></i>
-                    <span class="ml-2.5">User</span>
-                </a>
-            </div>
+                <span x-show="$store.sidebar.isExpanded" x-cloak class="ml-3">Pengguna</span>
+            </a>
         @endif
 
         @if ($canSystem)
-            <button
-                type="button"
-                @click="toggleGroup('openSystem')"
-                class="w-full flex items-center rounded-xl px-3 py-3 text-sm font-semibold transition"
-                :class="$store.sidebar.isExpanded ? '' : 'justify-center'"
-                @class([
-                    'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300' => $isSystemActive,
-                    'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900' => ! $isSystemActive,
-                ])
-            >
+            <a href="{{ route('admin.setting.index') }}"
+               class="flex items-center rounded-xl px-3 py-3 text-sm font-semibold transition"
+               :class="$store.sidebar.isExpanded ? '' : 'justify-center'"
+               @class([
+                   'bg-blue-600 text-white shadow-md shadow-blue-600/20' => request()->routeIs('admin.setting.*'),
+                   'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900' => !request()->routeIs('admin.setting.*'),
+               ])>
                 <i class="ti ti-settings text-xl"></i>
-                <span x-show="$store.sidebar.isExpanded" x-cloak class="ml-3">Sistem</span>
-                <i x-show="$store.sidebar.isExpanded" x-cloak class="ti ti-chevron-down ml-auto transition-transform" :class="openSystem ? 'rotate-180' : ''"></i>
-            </button>
-            <div x-show="$store.sidebar.isExpanded && openSystem" class="space-y-1 pl-3 pr-1">
-                <a href="{{ route('admin.setting.index') }}"
-                   class="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition"
-                   @class([
-                       'bg-blue-600 text-white shadow-sm shadow-blue-600/20' => request()->routeIs('admin.setting.*'),
-                       'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900' => !request()->routeIs('admin.setting.*'),
-                   ])>
-                    <i class="ti ti-tool text-lg"></i>
-                    <span class="ml-2.5">Setting</span>
-                </a>
-            </div>
+                <span x-show="$store.sidebar.isExpanded" x-cloak class="ml-3">Pengaturan</span>
+            </a>
         @endif
     </nav>
 

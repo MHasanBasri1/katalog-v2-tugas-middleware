@@ -96,6 +96,25 @@
                     </div>
                 </div>
 
+                <div class="space-y-3">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Pilihan Marketplace</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        @foreach(['Shopee', 'Tokopedia', 'Lazada', 'Blibli', 'Tiktok Shop'] as $marketplace)
+                            <label class="inline-flex items-center gap-2 p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 hover:bg-white dark:hover:bg-gray-900 transition cursor-pointer group">
+                                <input 
+                                    type="checkbox" 
+                                    name="marketplaces[]" 
+                                    value="{{ $marketplace }}" 
+                                    @checked(in_array($marketplace, old('marketplaces', $setting->marketplaces ?? []))) 
+                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                >
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition">{{ $marketplace }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                    <p class="text-[11px] text-gray-500 italic">* Pilih marketplace yang aktif digunakan untuk semua produk.</p>
+                </div>
+
                 <div class="pt-2">
                     <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 transition">
                         <i class="ti ti-device-floppy text-base"></i>

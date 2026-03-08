@@ -3,9 +3,11 @@
 namespace App\Livewire\Public;
 
 use App\Models\Product;
-use App\Models\Wishlist;
+use App\Models\Favorite;
+use App\Models\Setting;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
@@ -22,7 +24,7 @@ class ProductDetail extends Component
 
     public $relatedProducts;
 
-    public array $wishlistedProductIds = [];
+    public array $favoritedProductIds = [];
 
     public function mount(string $slug): void
     {
@@ -53,7 +55,11 @@ class ProductDetail extends Component
             ])
             ->firstOrFail();
 
+        $activeMarketplaces = Setting::query()->first()?->marketplaces ?? ['Shopee', 'Tokopedia', 'Lazada', 'Blibli', 'Tiktok Shop'];
+        $activeLower = array_map(fn($m) => Str::lower($m), $activeMarketplaces);
+
         $this->marketplaceLinks = $this->product->marketplaceLinks
+            ->filter(fn ($item) => in_array(Str::lower($item->marketplace), $activeLower, true))
             ->mapWithKeys(fn ($item) => [Str::lower($item->marketplace) => $item->url])
             ->toArray();
 
@@ -77,7 +83,7 @@ class ProductDetail extends Component
                 ->get()
         );
 
-        $this->syncWishlistState(
+        $this->syncFavoriteState(
             collect([$this->product->id])->merge($this->relatedProducts->pluck('id'))->unique()->values()
         );
     }
@@ -87,62 +93,71 @@ class ProductDetail extends Component
         return view('livewire.public.product-detail');
     }
 
-    public function toggleWishlist(int $productId): void
+    public function toggleFavorite(int $productId): void
     {
         if (! Auth::check()) {
-            session()->flash('status', 'Silakan daftar atau masuk terlebih dahulu untuk menggunakan wishlist.');
+            session()->flash('status', 'Silakan daftar atau masuk terlebih dahulu untuk menambah favorit.');
             $this->redirectRoute('user.login', navigate: true);
 
             return;
         }
 
-        $productExists = Product::query()
-            ->whereKey($productId)
-            ->where('status', true)
-            ->exists();
+        try {
+            $productExists = Product::query()
+                ->whereKey($productId)
+                ->where('status', true)
+                ->exists();
 
-        if (! $productExists) {
-            return;
-        }
+            if (! $productExists) {
+                $this->dispatch('alert', type: 'error', message: 'Produk tidak ditemukan atau tidak aktif.');
+                return;
+            }
 
-        $userId = Auth::id();
+            $userId = Auth::id();
 
-        $existing = Wishlist::query()
-            ->where('product_id', $productId)
-            ->where('user_id', $userId)
-            ->first();
+            $existing = Favorite::query()
+                ->where('product_id', $productId)
+                ->where('user_id', $userId)
+                ->first();
 
-        if ($existing) {
-            $existing->delete();
-            $this->wishlistedProductIds = array_values(array_filter(
-                $this->wishlistedProductIds,
-                fn ($id) => (int) $id !== $productId
-            ));
+            if ($existing) {
+                $existing->delete();
+                $this->favoritedProductIds = array_values(array_filter(
+                    $this->favoritedProductIds,
+                    fn ($id) => (int) $id !== $productId
+                ));
+                
+                $this->dispatch('alert', type: 'success', message: 'Produk dihapus dari favorit.');
+                return;
+            }
 
-            return;
-        }
+            Favorite::query()->create([
+                'product_id' => $productId,
+                'user_id' => $userId,
+            ]);
 
-        Wishlist::query()->create([
-            'product_id' => $productId,
-            'user_id' => $userId,
-        ]);
+            if (! in_array($productId, $this->favoritedProductIds)) {
+                $this->favoritedProductIds[] = $productId;
+            }
 
-        if (! in_array($productId, $this->wishlistedProductIds, true)) {
-            $this->wishlistedProductIds[] = $productId;
+            $this->dispatch('alert', type: 'success', message: 'Produk berhasil ditambahkan ke favorit.');
+            
+        } catch (\Exception $e) {
+            $this->dispatch('alert', type: 'error', message: 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
-    private function syncWishlistState(Collection $productIds): void
+    private function syncFavoriteState(Collection $productIds): void
     {
         $userId = Auth::id();
 
         if (! $userId || $productIds->isEmpty()) {
-            $this->wishlistedProductIds = [];
+            $this->favoritedProductIds = [];
 
             return;
         }
 
-        $this->wishlistedProductIds = Wishlist::query()
+        $this->favoritedProductIds = Favorite::query()
             ->whereIn('product_id', $productIds)
             ->where('user_id', $userId)
             ->pluck('product_id')

@@ -16,7 +16,7 @@ class AdminResetPasswordNotification extends ResetPassword implements ShouldQueu
         $resetUrl = $this->resetUrl($notifiable);
 
         return (new MailMessage)
-            ->subject('Reset Password Admin VISTORA')
+            ->subject('Reset Password Admin Kataloque')
             ->greeting('Halo Admin '.$notifiable->name.'!')
             ->line('Kami menerima permintaan reset password untuk akun admin Anda.')
             ->action('Reset Password Admin', $resetUrl)

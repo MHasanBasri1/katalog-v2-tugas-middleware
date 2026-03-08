@@ -4,10 +4,15 @@
     $isAdmin = $isAdmin ?? false;
     $storeRoute = $isAdmin ? 'admin.password.store' : 'password.store';
     $accountLabel = $isAdmin ? 'Akun Admin' : 'Akun Pengguna';
-    $title = $isAdmin ? 'Reset Password Admin - VISTORA' : 'Reset Password - VISTORA';
+    $title = $isAdmin ? 'Reset Password Admin - Kataloque' : 'Reset Password - Kataloque';
     $description = $isAdmin
-        ? 'Atur ulang password akun admin VISTORA Anda.'
-        : 'Atur ulang password akun VISTORA Anda.';
+        ? 'Atur ulang password akun admin Kataloque Anda.'
+        : 'Atur ulang password akun Kataloque Anda.';
+
+    // Choose gradient based on admin status
+    $gradientColors = $isAdmin 
+        ? 'from-indigo-100 via-blue-100 to-cyan-100'
+        : 'from-blue-100 via-cyan-100 to-indigo-100';
 @endphp
 
 @section('title', $title)
@@ -17,18 +22,18 @@
 
 @section('content')
 <section class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
-    <div class="absolute inset-x-6 top-4 h-44 bg-gradient-to-r from-cyan-100 via-blue-100 to-indigo-100 blur-3xl opacity-70 pointer-events-none"></div>
+    <!-- Gradient Blur Background -->
+    <div class="absolute inset-x-6 top-4 h-44 bg-gradient-to-r {{ $gradientColors }} blur-3xl opacity-70 pointer-events-none"></div>
 
-    <div class="relative grid gap-5 md:grid-cols-[1.05fr_1.2fr] items-stretch">
-        <div class="rounded-3xl border border-cyan-100 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-500 p-6 sm:p-7 text-white shadow-lg shadow-blue-200/70">
-            <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-cyan-50/90">{{ $accountLabel }}</p>
-            <h1 class="mt-3 text-2xl sm:text-3xl font-black leading-tight">Reset Password</h1>
-            <p class="mt-3 text-sm text-blue-50/95 leading-relaxed">
-                Buat password baru untuk melanjutkan akses ke akun Anda.
+    <div class="relative max-w-lg mx-auto">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl sm:text-4xl font-black text-gray-900 leading-tight">Reset Password</h1>
+            <p class="mt-3 text-sm text-gray-500 leading-relaxed max-w-sm mx-auto">
+                Silakan masukkan password baru Anda untuk mengamankan kembali akun {{ $isAdmin ? 'admin' : '' }}.
             </p>
         </div>
 
-        <div class="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/60 p-6 sm:p-8">
+        <div class="bg-white/40 backdrop-blur-xl rounded-3xl border border-white/40 shadow-2xl shadow-gray-200/40 p-6 sm:p-10 relative z-10">
             <form method="POST" action="{{ route($storeRoute) }}" class="space-y-5">
                 @csrf
                 <input type="hidden" name="token" value="{{ $request->route('token') }}">
@@ -39,7 +44,7 @@
                         <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
                             <i class="fas fa-envelope text-xs"></i>
                         </span>
-                        <input id="email" name="email" type="email" value="{{ old('email', $request->email) }}" required autofocus autocomplete="username" class="w-full rounded-xl border-gray-200 bg-gray-50 py-3 pl-9 pr-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500">
+                        <input id="email" name="email" type="email" value="{{ old('email', $request->email) }}" required autofocus autocomplete="username" class="w-full rounded-xl border-gray-200 bg-gray-50 py-3 pl-9 pr-3 text-sm text-gray-800 focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     @error('email')
                         <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
@@ -52,7 +57,7 @@
                         <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
                             <i class="fas fa-lock text-xs"></i>
                         </span>
-                        <input id="password" name="password" :type="showPassword ? 'text' : 'password'" required autocomplete="new-password" class="w-full rounded-xl border-gray-200 bg-gray-50 py-3 pl-9 pr-10 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500">
+                        <input id="password" name="password" :type="showPassword ? 'text' : 'password'" required autocomplete="new-password" class="w-full rounded-xl border-gray-200 bg-gray-50 py-3 pl-9 pr-10 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500" placeholder="Minimal 8 karakter">
                         <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-blue-600 transition" :aria-label="showPassword ? 'Sembunyikan password baru' : 'Tampilkan password baru'">
                             <i class="fas text-xs" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
                         </button>
@@ -68,7 +73,7 @@
                         <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
                             <i class="fas fa-check-double text-xs"></i>
                         </span>
-                        <input id="password_confirmation" name="password_confirmation" :type="showPasswordConfirmation ? 'text' : 'password'" required autocomplete="new-password" class="w-full rounded-xl border-gray-200 bg-gray-50 py-3 pl-9 pr-10 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500">
+                        <input id="password_confirmation" name="password_confirmation" :type="showPasswordConfirmation ? 'text' : 'password'" required autocomplete="new-password" class="w-full rounded-xl border-gray-200 bg-gray-50 py-3 pl-9 pr-10 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500" placeholder="Ulangi password baru">
                         <button type="button" @click="showPasswordConfirmation = !showPasswordConfirmation" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-blue-600 transition" :aria-label="showPasswordConfirmation ? 'Sembunyikan konfirmasi password baru' : 'Tampilkan konfirmasi password baru'">
                             <i class="fas text-xs" :class="showPasswordConfirmation ? 'fa-eye-slash' : 'fa-eye'"></i>
                         </button>

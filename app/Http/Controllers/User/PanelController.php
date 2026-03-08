@@ -4,7 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Models\Wishlist;
+use App\Models\Favorite;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,7 +16,7 @@ class PanelController extends Controller
 {
     public function index(): View
     {
-        $wishlistProducts = Wishlist::query()
+        $favoriteProducts = Favorite::query()
             ->where('user_id', auth()->id())
             ->with([
                 'product' => fn ($query) => $query
@@ -30,7 +30,7 @@ class PanelController extends Controller
             ->unique('id')
             ->values();
 
-        return view('user.panel', compact('wishlistProducts'));
+        return view('user.panel', compact('favoriteProducts'));
     }
 
     public function updateProfile(Request $request): RedirectResponse
@@ -111,15 +111,15 @@ class PanelController extends Controller
             ->with('active_tab', 'profil');
     }
 
-    public function destroyWishlist(Request $request, Product $product): RedirectResponse
+    public function destroyFavorite(Request $request, Product $product): RedirectResponse
     {
-        Wishlist::query()
+        Favorite::query()
             ->where('product_id', $product->id)
             ->where('user_id', $request->user()->id)
             ->delete();
 
         return back()
-            ->with('status_wishlist', 'Wishlist diperbarui.')
-            ->with('active_tab', 'wishlist');
+            ->with('status_favorite', 'Favorit diperbarui.')
+            ->with('active_tab', 'favorit');
     }
 }

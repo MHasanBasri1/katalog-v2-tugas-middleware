@@ -70,6 +70,7 @@ class SettingController extends Controller
             'instagram' => ['nullable', 'url', 'max:255'],
             'footer_text' => ['nullable', 'string', 'max:255'],
             'favicon' => ['nullable', 'string', 'max:2048'],
+            'marketplaces' => ['nullable', 'array'],
         ]);
     }
 }

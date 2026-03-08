@@ -16,9 +16,9 @@ class UserVerifyEmailNotification extends VerifyEmail implements ShouldQueue
         $verificationUrl = $this->verificationUrl($notifiable);
 
         return (new MailMessage)
-            ->subject('Verifikasi Email Akun VISTORA')
+            ->subject('Verifikasi Email Akun Kataloque')
             ->greeting('Halo '.$notifiable->name.'!')
-            ->line('Terima kasih sudah mendaftar di VISTORA.')
+            ->line('Terima kasih sudah mendaftar di Kataloque.')
             ->line('Klik tombol di bawah untuk verifikasi email Anda.')
             ->action('Verifikasi Email', $verificationUrl)
             ->line('Link verifikasi ini akan kedaluwarsa dalam 60 menit.')

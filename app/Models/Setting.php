@@ -21,5 +21,10 @@ class Setting extends Model
         'instagram',
         'footer_text',
         'favicon',
+        'marketplaces',
+    ];
+
+    protected $casts = [
+        'marketplaces' => 'array',
     ];
 }

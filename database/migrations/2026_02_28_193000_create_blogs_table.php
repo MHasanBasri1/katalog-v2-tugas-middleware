@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('excerpt', 300)->nullable();
             $table->longText('content');
             $table->string('cover_image')->nullable();
-            $table->string('author_name')->default('Tim VISTORA');
+            $table->string('author_name')->default('Tim Kataloque');
             $table->boolean('is_published')->default(true);
             $table->timestamp('published_at')->nullable();
             $table->timestamps();

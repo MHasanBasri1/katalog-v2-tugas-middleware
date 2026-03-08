@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\MarketplaceLink;
 use App\Models\Product;
+use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -30,7 +31,7 @@ class ProductController extends Controller
             ->withQueryString();
 
         $categories = Category::query()->orderBy('name')->get(['id', 'name']);
-        $marketplaceOptions = ['Shopee', 'Tokopedia', 'Lazada', 'Blibli'];
+        $marketplaceOptions = Setting::query()->first()?->marketplaces ?? ['Shopee', 'Tokopedia', 'Lazada', 'Blibli', 'Tiktok Shop'];
         $editProduct = null;
 
         if ($request->filled('edit')) {
@@ -246,6 +247,7 @@ class ProductController extends Controller
             'tokopedia_url',
             'lazada_url',
             'blibli_url',
+            'tiktok_shop_url',
         ];
 
         $example = [
@@ -266,6 +268,7 @@ class ProductController extends Controller
             '1',
             'https://shopee.co.id/example',
             'https://tokopedia.com/example',
+            '',
             '',
             '',
         ];
@@ -476,6 +479,7 @@ class ProductController extends Controller
             'Tokopedia' => trim((string) ($row['tokopedia_url'] ?? '')),
             'Lazada' => trim((string) ($row['lazada_url'] ?? '')),
             'Blibli' => trim((string) ($row['blibli_url'] ?? '')),
+            'Tiktok Shop' => trim((string) ($row['tiktok_shop_url'] ?? '')),
         ];
 
         return collect($map)

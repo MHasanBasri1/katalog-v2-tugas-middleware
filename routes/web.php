@@ -81,7 +81,7 @@ Route::middleware(['auth', 'role:user', 'verified'])->group(function () {
     Route::put('/profil-saya/password', [PanelController::class, 'updatePassword'])->name('user.password.update');
     Route::post('/profil-saya/avatar', [PanelController::class, 'updateAvatar'])->name('user.avatar.update');
     Route::delete('/profil-saya/avatar', [PanelController::class, 'destroyAvatar'])->name('user.avatar.destroy');
-    Route::delete('/profil-saya/wishlist/{product}', [PanelController::class, 'destroyWishlist'])->name('user.wishlist.destroy');
+    Route::delete('/profil-saya/favorit/{product}', [PanelController::class, 'destroyFavorite'])->name('user.favorite.destroy');
 });
 
 Route::get('/', function () {
@@ -99,16 +99,16 @@ Route::get('/kategori/{slug}', function ($slug) {
         ->firstOrFail();
 
     $canonical = route('kategori.detail', $category->slug);
-    $seoTitle = "{$category->name} - Kategori Produk VISTORA";
+    $seoTitle = "{$category->name} - Kategori Produk Kataloque";
     $seoDescription = $category->description
-        ?: "Lihat daftar produk kategori {$category->name} di VISTORA dengan update produk terbaru.";
+        ?: "Lihat daftar produk kategori {$category->name} di Kataloque dengan update produk terbaru.";
     $ogImage = Product::query()
         ->where('status', true)
         ->where('category_id', $category->id)
         ->with('primaryImage:id,product_id,image')
         ->latest('id')
         ->first()?->primaryImage?->image
-        ?: 'https://picsum.photos/seed/vistora-kategori/1200/630';
+        ?: 'https://picsum.photos/seed/kataloque-kategori/1200/630';
 
     return view('frontend.kategori-detail', compact('slug', 'seoTitle', 'seoDescription', 'canonical', 'ogImage'));
 })->name('kategori.detail');
@@ -128,19 +128,19 @@ Route::get('/produk/{slug}', function ($slug) {
         ->firstOrFail();
 
     $canonical = route('produk.detail', $product->slug);
-    $seoTitle = "{$product->name} - VISTORA";
+    $seoTitle = "{$product->name} - Kataloque";
     $seoDescription = $product->description
         ? str($product->description)->limit(155)->toString()
-        : "Lihat detail {$product->name} di VISTORA, mulai dari harga, spesifikasi, dan link marketplace resmi.";
-    $ogImage = $product->primaryImage?->image ?: 'https://picsum.photos/seed/vistora-produk/1200/630';
+        : "Lihat detail {$product->name} di Kataloque, mulai dari harga, spesifikasi, dan link marketplace resmi.";
+    $ogImage = $product->primaryImage?->image ?: 'https://picsum.photos/seed/kataloque-produk/1200/630';
 
     return view('frontend.detail', compact('slug', 'seoTitle', 'seoDescription', 'canonical', 'ogImage'));
 })->name('produk.detail');
 
 Route::get('/blog', function (Request $request) {
     $canonical = route('blog.index');
-    $seoTitle = 'Blog - VISTORA';
-    $seoDescription = 'Artikel terbaru VISTORA seputar tips belanja online, gadget, dan rekomendasi produk.';
+    $seoTitle = 'Blog - Kataloque';
+    $seoDescription = 'Artikel terbaru Kataloque seputar tips belanja online, gadget, dan rekomendasi produk.';
     $selectedCategory = (string) $request->query('kategori', '');
     $selectedTag = (string) $request->query('tag', '');
 
@@ -158,7 +158,7 @@ Route::get('/blog', function (Request $request) {
 
     $ogImage = (clone $postQuery)
         ->orderByDesc('published_at')
-        ->value('cover_image') ?: 'https://picsum.photos/seed/vistora-blog/1200/630';
+        ->value('cover_image') ?: 'https://picsum.photos/seed/kataloque-blog/1200/630';
 
     $posts = $postQuery
         ->orderByDesc('published_at')
@@ -189,7 +189,7 @@ Route::get('/blog/{slug}', function (string $slug) {
         ->firstOrFail();
 
     $canonical = route('blog.detail', $post->slug);
-    $seoTitle = "{$post->title} - Blog VISTORA";
+    $seoTitle = "{$post->title} - Blog Kataloque";
     $seoDescription = $post->excerpt;
     $ogImage = $post->cover_image;
 
@@ -207,20 +207,6 @@ Route::get('/blog/{slug}', function (string $slug) {
 
     return view('frontend.blog-detail', compact('post', 'relatedPosts', 'canonical', 'seoTitle', 'seoDescription', 'ogImage'));
 })->name('blog.detail');
-
-Route::get('/halaman/{slug}', function (string $slug) {
-    $page = StaticPage::query()
-        ->where('slug', $slug)
-        ->where('is_published', true)
-        ->firstOrFail();
-
-    $canonical = route('halaman.show', $page->slug);
-    $seoTitle = "{$page->title} - VISTORA";
-    $seoDescription = $page->excerpt ?: str($page->content)->limit(155)->toString();
-    $ogImage = 'https://picsum.photos/seed/vistora-static-page/1200/630';
-
-    return view('frontend.static-page', compact('page', 'canonical', 'seoTitle', 'seoDescription', 'ogImage'));
-})->name('halaman.show');
 
 Route::get('/sitemap.xml', function () {
     $products = Product::query()
@@ -268,6 +254,20 @@ Route::get('/robots.txt', function () {
         'Content-Type' => 'text/plain; charset=UTF-8',
     ]);
 });
+
+Route::get('/{slug}', function (string $slug) {
+    $page = StaticPage::query()
+        ->where('slug', $slug)
+        ->where('is_published', true)
+        ->firstOrFail();
+
+    $canonical = route('halaman.show', $page->slug);
+    $seoTitle = "{$page->title} - Kataloque";
+    $seoDescription = $page->excerpt ?: str($page->content)->limit(155)->toString();
+    $ogImage = 'https://picsum.photos/seed/kataloque-static-page/1200/630';
+
+    return view('frontend.static-page', compact('page', 'canonical', 'seoTitle', 'seoDescription', 'ogImage'));
+})->name('halaman.show');
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])

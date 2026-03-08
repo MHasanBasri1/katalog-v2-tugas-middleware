@@ -4,7 +4,7 @@ namespace App\Livewire\Public;
 
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Wishlist;
+use App\Models\Favorite;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +23,7 @@ class ProductsPage extends Component
     #[Url(as: 'kategori')]
     public ?string $categorySlug = null;
 
-    public array $wishlistedProductIds = [];
+    public array $favoritedProductIds = [];
 
     public function mount(): void
     {
@@ -81,7 +81,7 @@ class ProductsPage extends Component
             ->orderByDesc('id')
             ->paginate(8);
 
-        $this->syncWishlistState(collect($products->items())->pluck('id')->values());
+        $this->syncFavoriteState(collect($products->items())->pluck('id')->values());
 
         return view('livewire.public.products-page', [
             'products' => $products,
@@ -90,62 +90,71 @@ class ProductsPage extends Component
         ]);
     }
 
-    public function toggleWishlist(int $productId): void
+    public function toggleFavorite(int $productId): void
     {
         if (! Auth::check()) {
-            session()->flash('status', 'Silakan daftar atau masuk terlebih dahulu untuk menggunakan wishlist.');
+            $this->dispatch('alert', type: 'info', message: 'Silakan masuk terlebih dahulu untuk menambah favorit.');
             $this->redirectRoute('user.login', navigate: true);
 
             return;
         }
 
-        $productExists = Product::query()
-            ->whereKey($productId)
-            ->where('status', true)
-            ->exists();
+        try {
+            $productExists = Product::query()
+                ->whereKey($productId)
+                ->where('status', true)
+                ->exists();
 
-        if (! $productExists) {
-            return;
-        }
+            if (! $productExists) {
+                $this->dispatch('alert', type: 'error', message: 'Produk tidak ditemukan atau tidak aktif.');
+                return;
+            }
 
-        $userId = Auth::id();
+            $userId = Auth::id();
 
-        $existing = Wishlist::query()
-            ->where('product_id', $productId)
-            ->where('user_id', $userId)
-            ->first();
+            $existing = Favorite::query()
+                ->where('product_id', $productId)
+                ->where('user_id', $userId)
+                ->first();
 
-        if ($existing) {
-            $existing->delete();
-            $this->wishlistedProductIds = array_values(array_filter(
-                $this->wishlistedProductIds,
-                fn ($id) => (int) $id !== $productId
-            ));
+            if ($existing) {
+                $existing->delete();
+                $this->favoritedProductIds = array_values(array_filter(
+                    $this->favoritedProductIds,
+                    fn ($id) => (int) $id !== $productId
+                ));
 
-            return;
-        }
+                $this->dispatch('alert', type: 'success', message: 'Dihapus dari favorit.');
+                return;
+            }
 
-        Wishlist::query()->create([
-            'product_id' => $productId,
-            'user_id' => $userId,
-        ]);
+            Favorite::query()->create([
+                'product_id' => $productId,
+                'user_id' => $userId,
+            ]);
 
-        if (! in_array($productId, $this->wishlistedProductIds, true)) {
-            $this->wishlistedProductIds[] = $productId;
+            if (! in_array($productId, $this->favoritedProductIds)) {
+                $this->favoritedProductIds[] = $productId;
+            }
+
+            $this->dispatch('alert', type: 'success', message: 'Berhasil ditambah ke favorit.');
+
+        } catch (\Exception $e) {
+            $this->dispatch('alert', type: 'error', message: 'Gagal memproses favorit: ' . $e->getMessage());
         }
     }
 
-    private function syncWishlistState(Collection $productIds): void
+    private function syncFavoriteState(Collection $productIds): void
     {
         $userId = Auth::id();
 
         if (! $userId || $productIds->isEmpty()) {
-            $this->wishlistedProductIds = [];
+            $this->favoritedProductIds = [];
 
             return;
         }
 
-        $this->wishlistedProductIds = Wishlist::query()
+        $this->favoritedProductIds = Favorite::query()
             ->whereIn('product_id', $productIds)
             ->where('user_id', $userId)
             ->pluck('product_id')

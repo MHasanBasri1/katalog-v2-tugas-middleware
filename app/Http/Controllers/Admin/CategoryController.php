@@ -33,8 +33,15 @@ class CategoryController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', Rule::unique('categories', 'slug')],
+            'icon' => ['nullable', 'string', 'max:255'],
+            'color' => ['nullable', 'string', 'max:255'],
+            'text_color' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
         ]);
+
+        $data['icon'] = $data['icon'] ?: 'fa-layer-group';
+        $data['color'] = $data['color'] ?: 'bg-blue-50';
+        $data['text_color'] = $data['text_color'] ?: 'text-blue-500';
 
         $data['slug'] = $this->makeUniqueSlug($data['slug'] ?: $data['name']);
 
@@ -58,8 +65,15 @@ class CategoryController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', Rule::unique('categories', 'slug')->ignore($kategori->id)],
+            'icon' => ['nullable', 'string', 'max:255'],
+            'color' => ['nullable', 'string', 'max:255'],
+            'text_color' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
         ]);
+
+        $data['icon'] = $data['icon'] ?: 'fa-layer-group';
+        $data['color'] = $data['color'] ?: 'bg-blue-50';
+        $data['text_color'] = $data['text_color'] ?: 'text-blue-500';
 
         $slugSource = $data['slug'] ?: $data['name'];
         $data['slug'] = $this->makeUniqueSlug($slugSource, $kategori->id);

@@ -24,7 +24,7 @@ class UserDeviceVerificationNotification extends Notification implements ShouldQ
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Verifikasi Login Device Baru - VISTORA')
+            ->subject('Verifikasi Login Device Baru - Kataloque')
             ->greeting('Halo '.$notifiable->name.'!')
             ->line('Kami mendeteksi login dari device atau browser baru.')
             ->line('Untuk melanjutkan login, verifikasi device ini lewat tombol berikut.')

@@ -54,7 +54,7 @@
 
     <div>
         <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Author</label>
-        <input type="text" name="author_name" value="{{ old('author_name', $blog->author_name ?? 'Tim VISTORA') }}" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
+        <input type="text" name="author_name" value="{{ old('author_name', $blog->author_name ?? 'Tim Kataloque') }}" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">

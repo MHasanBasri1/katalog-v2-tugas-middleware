@@ -1,66 +1,129 @@
 @extends('frontend.layouts.app')
 
-@section('title', $seoTitle ?? 'Detail Blog - VISTORA')
-@section('meta_description', $seoDescription ?? 'Artikel VISTORA.')
+@section('title', $seoTitle ?? 'Detail Blog - Kataloque')
+@section('meta_description', $seoDescription ?? 'Artikel Kataloque.')
 @section('canonical', $canonical ?? route('blog.index'))
 @section('og_url', $canonical ?? route('blog.index'))
-@section('og_image', $ogImage ?? 'https://picsum.photos/seed/vistora-blog/1200/630')
+@section('og_image', $ogImage ?? 'https://picsum.photos/seed/kataloque-blog/1200/630')
 @section('og_type', 'article')
 @section('main_class', '')
 
 @section('content')
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         <nav class="text-sm">
-            <div class="bg-white border border-gray-200 rounded-xl px-4 py-3">
-                <div class="flex flex-wrap items-center gap-2 text-gray-500">
-                    <a href="{{ route('home') }}" class="font-semibold text-gray-600 hover:text-primary transition">Beranda</a>
-                    <span class="text-gray-300">/</span>
-                    <a href="{{ route('blog.index') }}" class="font-semibold text-gray-600 hover:text-primary transition">Blog</a>
-                    <span class="text-gray-300">/</span>
-                    <span class="font-semibold text-primary">{{ $post->title }}</span>
+            <div class="bg-white/80 backdrop-blur-md border border-gray-100 shadow-sm rounded-2xl px-5 py-3">
+                <div class="flex flex-wrap items-center gap-2 text-gray-500 font-medium">
+                    <a href="{{ route('home') }}" class="text-gray-500 hover:text-primary transition-colors flex items-center gap-1.5"><i class="fas fa-home text-xs"></i> Beranda</a>
+                    <span class="text-gray-300"><i class="fas fa-chevron-right text-[10px]"></i></span>
+                    <a href="{{ route('blog.index') }}" class="text-gray-500 hover:text-primary transition-colors">Blog</a>
+                    <span class="text-gray-300"><i class="fas fa-chevron-right text-[10px]"></i></span>
+                    <span class="font-bold text-primary">{{ $post->title }}</span>
                 </div>
             </div>
         </nav>
 
-        <article class="bg-white border border-gray-100 rounded-3xl shadow-sm overflow-hidden">
-            <img src="{{ $post->cover_image }}" alt="{{ $post->title }}" class="w-full aspect-[16/8] object-cover">
-            <div class="p-5 md:p-8">
-                <div class="flex flex-wrap items-center gap-2 text-xs md:text-sm text-gray-500">
-                    <span>{{ optional($post->published_at)->translatedFormat('d M Y') }}</span>
-                    <span>&bull;</span>
-                    <span>{{ $post->author_name }}</span>
-                    @if ($post->category)
-                        <span>&bull;</span>
-                        <span class="font-semibold text-blue-700">{{ $post->category->name }}</span>
-                    @endif
-                </div>
-                <h1 class="text-2xl md:text-4xl font-black text-gray-900 mt-2 leading-tight">{{ $post->title }}</h1>
-
-                @if ($post->tags->isNotEmpty())
-                    <div class="mt-4 flex flex-wrap gap-2">
-                        @foreach ($post->tags as $tag)
-                            <span class="text-[11px] font-semibold text-gray-700 bg-gray-100 border border-gray-200 rounded-full px-2.5 py-1">#{{ $tag->name }}</span>
-                        @endforeach
+        <article class="bg-white border border-gray-100 rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.03)] overflow-hidden">
+            <!-- Blog Header -->
+            <div class="p-6 md:p-12 pb-8">
+                @if ($post->category)
+                    <div class="mb-4">
+                        <span class="inline-flex items-center gap-1.5 bg-primary/10 text-primary text-[10px] md:text-xs font-black px-4 py-2 rounded-xl uppercase tracking-[0.2em]">
+                            <i class="fas fa-folder-open text-primary/60"></i> {{ $post->category->name }}
+                        </span>
                     </div>
                 @endif
+                
+                <h1 class="text-3xl md:text-4xl lg:text-5xl font-black text-gray-900 leading-[1.15] tracking-tight mb-8">{{ $post->title }}</h1>
+                
+                <!-- Metadata Section -->
+                <div class="flex flex-col sm:flex-row sm:items-center gap-4 py-6 border-y border-gray-50">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center text-primary">
+                            <i class="fas fa-user-edit text-sm"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] uppercase text-gray-400 font-black tracking-widest leading-none mb-1">Dibuat Oleh</span>
+                            <span class="text-sm font-bold text-gray-800">{{ $post->author_name }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="hidden sm:block w-px h-8 bg-gray-100 mx-2"></div>
+                    
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-500">
+                            <i class="far fa-calendar-alt text-sm"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] uppercase text-gray-400 font-black tracking-widest leading-none mb-1">Dipublikasi</span>
+                            <span class="text-sm font-bold text-gray-800">{{ optional($post->published_at)->translatedFormat('d F Y') }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                <p class="text-base text-gray-700 leading-relaxed mt-5">{{ $post->content }}</p>
+            <!-- Featured Image -->
+            <div class="px-4 md:px-12">
+                <div class="rounded-3xl overflow-hidden shadow-2xl shadow-gray-200/50 aspect-[16/9] md:aspect-[21/9]">
+                    <img src="{{ $post->cover_image }}" alt="{{ $post->title }}" class="w-full h-full object-cover">
+                </div>
+            </div>
+
+            <!-- Content Section -->
+            <div class="p-6 md:p-12">
+                <div class="prose prose-sm md:prose-base lg:prose-lg max-w-none text-gray-700 leading-relaxed font-medium prose-p:mb-6 prose-headings:font-black prose-headings:text-gray-900 prose-img:rounded-3xl">
+                    {!! nl2br(e($post->content)) !!}
+                </div>
+                
+                <!-- Bottom Tags & Share -->
+                <div class="mt-16 pt-8 border-t border-gray-100 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                    @if ($post->tags->isNotEmpty())
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-xs font-black text-gray-400 uppercase tracking-widest mr-2">Tags:</span>
+                            @foreach ($post->tags as $tag)
+                                <span class="text-xs font-bold text-primary bg-primary/5 hover:bg-primary hover:text-white transition-all rounded-xl px-4 py-2 cursor-pointer border border-primary/10">#{{ $tag->name }}</span>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-4 lg:ml-auto">
+                        <span class="text-xs font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">Bagikan:</span>
+                        <div class="flex gap-2">
+                            <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('blog.detail', $post->slug)) }}&text={{ urlencode($post->title) }}" target="_blank" class="w-11 h-11 rounded-2xl bg-[#1DA1F2]/10 text-[#1DA1F2] flex items-center justify-center hover:bg-[#1DA1F2] hover:text-white transition-all transform hover:-translate-y-1 shadow-sm"><i class="fab fa-twitter text-lg"></i></a>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('blog.detail', $post->slug)) }}" target="_blank" class="w-11 h-11 rounded-2xl bg-[#1877F2]/10 text-[#1877F2] flex items-center justify-center hover:bg-[#1877F2] hover:text-white transition-all transform hover:-translate-y-1 shadow-sm"><i class="fab fa-facebook-f text-lg"></i></a>
+                            <a href="https://wa.me/?text={{ urlencode($post->title . ' ' . route('blog.detail', $post->slug)) }}" target="_blank" class="w-11 h-11 rounded-2xl bg-[#25D366]/10 text-[#25D366] flex items-center justify-center hover:bg-[#25D366] hover:text-white transition-all transform hover:-translate-y-1 shadow-sm"><i class="fab fa-whatsapp text-lg"></i></a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </article>
 
-        <section class="space-y-4">
-            <h2 class="text-xl md:text-2xl font-bold text-gray-800">Artikel Lainnya</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <section class="space-y-6 mt-12 mb-8">
+            <div class="flex items-center gap-3">
+                <div class="h-8 w-1.5 bg-primary rounded-full"></div>
+                <h2 class="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">Artikel Terkait</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 @forelse($relatedPosts as $item)
-                    <a href="{{ route('blog.detail', $item->slug) }}" class="bg-white border border-gray-100 rounded-2xl p-4 hover:border-blue-200 hover:shadow-sm transition">
-                        <p class="text-xs text-gray-500 mb-2">{{ optional($item->published_at)->translatedFormat('d M Y') }}</p>
-                        <h3 class="text-sm font-bold text-gray-800 leading-snug">{{ $item->title }}</h3>
+                    <a href="{{ route('blog.detail', $item->slug) }}" class="group bg-white border border-gray-100 rounded-3xl p-5 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 hover:border-primary/20 transition-all duration-300 flex flex-col h-full">
+                        <div class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">
+                            <span class="inline-flex items-center gap-1.5"><i class="far fa-calendar-alt text-gray-300"></i> {{ optional($item->published_at)->translatedFormat('d M Y') }}</span>
+                        </div>
+                        
+                        <h3 class="text-base font-black text-gray-800 leading-snug group-hover:text-primary transition-colors line-clamp-2 mb-4">{{ $item->title }}</h3>
+                        
                         @if ($item->category)
-                            <p class="text-[11px] font-semibold text-blue-700 mt-2">{{ $item->category->name }}</p>
+                            <div class="mt-auto pt-4 border-t border-gray-50">
+                                <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-primary bg-primary/10 rounded-lg px-2.5 py-1">
+                                    <i class="fas fa-folder text-primary/70"></i> {{ $item->category->name }}
+                                </span>
+                            </div>
                         @endif
                     </a>
                 @empty
-                    <div class="text-sm text-gray-500">Belum ada artikel lain.</div>
+                    <div class="col-span-full py-12 text-center bg-gray-50 rounded-3xl border border-gray-100">
+                        <p class="text-gray-500 font-medium">Belum ada artikel terkait.</p>
+                    </div>
                 @endforelse
             </div>
         </section>

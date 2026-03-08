@@ -9,8 +9,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (! Schema::hasTable('wishlists')) {
-            Schema::create('wishlists', function (Blueprint $table): void {
+        if (! Schema::hasTable('favorites')) {
+            Schema::create('favorites', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('user_id')
                     ->constrained('users')
@@ -36,7 +36,7 @@ return new class extends Migration
                 ->distinct()
                 ->get()
                 ->each(function ($row) use ($timestamp): void {
-                    DB::table('wishlists')->updateOrInsert(
+                    DB::table('favorites')->updateOrInsert(
                         [
                             'user_id' => $row->user_id,
                             'product_id' => $row->product_id,
@@ -82,8 +82,8 @@ return new class extends Migration
             });
         }
 
-        if (Schema::hasTable('wishlists')) {
-            Schema::drop('wishlists');
+        if (Schema::hasTable('favorites')) {
+            Schema::drop('favorites');
         }
 
         if (! Schema::hasColumn('products', 'view_count')) {

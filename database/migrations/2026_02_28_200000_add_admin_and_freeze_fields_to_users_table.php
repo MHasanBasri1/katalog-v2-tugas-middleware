@@ -18,7 +18,7 @@ return new class extends Migration
             $table->index(['is_admin', 'is_frozen']);
         });
 
-        $adminEmail = env('ADMIN_EMAIL', 'admin@vistora.local');
+        $adminEmail = env('ADMIN_EMAIL', 'admin@kataloque.local');
 
         DB::table('users')
             ->where('email', $adminEmail)

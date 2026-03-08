@@ -191,17 +191,20 @@ PROFILE
 26. DELETE /api/v1/profile/avatar
     Menghapus avatar upload user, fallback ke google_avatar jika ada.
 
-WISHLIST
-27. GET /api/v1/wishlist
-    Return data:
-    - array product[] yang sudah di-wishlist user
+=======================================
+FAVORIT
+=======================================
+27. GET /api/v1/favorit
+    - Method: GET
+    - Deskripsi: Mendapatkan daftar product yang sudah di-favorit user.
+    - array product[] yang sudah di-favorit user
 
-28. POST /api/v1/wishlist
-    Body JSON:
-    - product_id (required, integer, exists:products,id)
+28. POST /api/v1/favorit
+    - Method: POST
+    - Payload: { product_id: 2 }
 
-29. DELETE /api/v1/wishlist/{product}
-    Path param:
+29. DELETE /api/v1/favorit/{product}
+    - Method: DELETEparam:
     - product (id produk, route model binding)
 
 ==================================================

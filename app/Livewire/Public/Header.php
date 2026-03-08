@@ -19,10 +19,10 @@ class Header extends Component
     public array $menus = [
         ['label' => 'Beranda', 'icon' => 'fa-home', 'url' => '/', 'route' => 'home'],
         ['label' => 'Blog', 'icon' => 'fa-newspaper', 'url' => '/blog', 'route' => 'blog.*'],
-        ['label' => 'Flash Deals', 'icon' => 'fa-bolt', 'url' => '#', 'route' => null],
-        ['label' => 'Track Order', 'icon' => 'fa-box', 'url' => '#', 'route' => null],
-        ['label' => 'Return & Refund', 'icon' => 'fa-undo', 'url' => '#', 'route' => null],
-        ['label' => 'Shipping Info', 'icon' => 'fa-truck', 'url' => '#', 'route' => null],
+        ['label' => 'Tentang Kami', 'icon' => 'fa-store', 'url' => '/tentang-kami', 'route' => null],
+        ['label' => 'Cara Pesan', 'icon' => 'fa-cart-arrow-down', 'url' => '/cara-pesan', 'route' => null],
+        ['label' => 'Pembayaran', 'icon' => 'fa-credit-card', 'url' => '/pembayaran', 'route' => null],
+        ['label' => 'Lokasi Toko', 'icon' => 'fa-map-marker-alt', 'url' => '/lokasi-toko', 'route' => null],
     ];
 
     public function mount(): void
@@ -31,7 +31,7 @@ class Header extends Component
             'public.header.categories',
             now()->addMinutes(10),
             fn () => Category::query()
-                ->select('id', 'name', 'slug')
+                ->select('id', 'name', 'slug', 'icon', 'color', 'text_color')
                 ->orderBy('name')
                 ->limit(12)
                 ->get()
@@ -39,6 +39,9 @@ class Header extends Component
                     'id' => $category->id,
                     'name' => $category->name,
                     'slug' => $category->slug,
+                    'icon' => $category->icon ?? 'fa-tag',
+                    'color' => $category->color ?? 'primary',
+                    'text_color' => $category->text_color ?? 'text-primary',
                 ])
                 ->all()
         );

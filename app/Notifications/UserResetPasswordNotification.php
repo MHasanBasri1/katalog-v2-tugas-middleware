@@ -16,7 +16,7 @@ class UserResetPasswordNotification extends ResetPassword implements ShouldQueue
         $resetUrl = $this->resetUrl($notifiable);
 
         return (new MailMessage)
-            ->subject('Reset Password Akun VISTORA')
+            ->subject('Reset Password Akun Kataloque')
             ->greeting('Halo '.$notifiable->name.'!')
             ->line('Kami menerima permintaan reset password untuk akun Anda.')
             ->action('Reset Password', $resetUrl)

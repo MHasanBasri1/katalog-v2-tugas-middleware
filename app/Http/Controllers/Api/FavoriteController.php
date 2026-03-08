@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Product;
-use App\Models\Wishlist;
+use App\Models\Favorite;
 use App\Support\Api\ProductTransformer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class WishlistController extends BaseApiController
+class FavoriteController extends BaseApiController
 {
     public function index(Request $request): JsonResponse
     {
-        $wishlists = Wishlist::query()
+        $favorites = Favorite::query()
             ->where('user_id', $request->user()->id)
             ->with([
                 'product' => fn ($query) => $query
@@ -22,7 +22,7 @@ class WishlistController extends BaseApiController
             ->latest('id')
             ->get();
 
-        $products = $wishlists
+        $products = $favorites
             ->pluck('product')
             ->filter()
             ->unique('id')
@@ -47,21 +47,21 @@ class WishlistController extends BaseApiController
             return $this->error('Produk tidak tersedia.', 404);
         }
 
-        Wishlist::query()->firstOrCreate([
+        Favorite::query()->firstOrCreate([
             'user_id' => $request->user()->id,
             'product_id' => $product->id,
         ]);
 
-        return $this->success(null, 'Produk ditambahkan ke wishlist.', 201);
+        return $this->success(null, 'Produk ditambahkan ke favorit.', 201);
     }
 
     public function destroy(Request $request, Product $product): JsonResponse
     {
-        Wishlist::query()
+        Favorite::query()
             ->where('user_id', $request->user()->id)
             ->where('product_id', $product->id)
             ->delete();
 
-        return $this->success(null, 'Produk dihapus dari wishlist.');
+        return $this->success(null, 'Produk dihapus dari favorit.');
     }
 }

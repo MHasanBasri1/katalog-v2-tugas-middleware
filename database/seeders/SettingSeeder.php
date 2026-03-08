@@ -12,17 +12,17 @@ class SettingSeeder extends Seeder
         Setting::query()->updateOrCreate(
             ['id' => 1],
             [
-                'shop_name' => 'VISTORA',
+                'shop_name' => 'Kataloque',
                 'shop_description' => 'Katalog produk modern, cepat, dan terpercaya.',
                 'shop_address' => 'Jl. Sudirman No. 1',
                 'city' => 'Jakarta',
                 'province' => 'DKI Jakarta',
                 'phone' => '+62 21 5555 8888',
                 'whatsapp' => '+62 812 3456 7890',
-                'email' => 'cs@vistora.id',
-                'website' => 'https://vistora.id',
-                'facebook' => 'https://facebook.com/vistora.id',
-                'instagram' => 'https://instagram.com/vistora.id',
+                'email' => 'cs@kataloque.id',
+                'website' => 'https://kataloque.id',
+                'facebook' => 'https://facebook.com/kataloque.id',
+                'instagram' => 'https://instagram.com/kataloque.id',
                 'footer_text' => 'Build with Love in Sidoarjo.',
             ]
         );

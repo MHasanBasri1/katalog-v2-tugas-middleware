@@ -11,13 +11,16 @@
                 this.toggleBodyLock(this.drawerOpen);
                 this.$watch('drawerOpen', (value) => this.toggleBodyLock(value));
             },
-            drawerOpen: {{ ($editCategory || $errors->any()) ? 'true' : 'false' }},
-            isEdit: {{ $editCategory ? 'true' : 'false' }},
-            editId: @js(old('edit_id', $editCategory->id ?? null)),
+            drawerOpen: {{ (request()->has('edit') || $errors->any()) ? 'true' : 'false' }},
+            isEdit: {{ (isset($editCategory) && $editCategory) ? 'true' : 'false' }},
+            editId: @js(old('edit_id', (isset($editCategory) && $editCategory) ? $editCategory->id : null)),
             form: {
-                name: @js(old('name', $editCategory->name ?? '')),
-                slug: @js(old('slug', $editCategory->slug ?? '')),
-                description: @js(old('description', $editCategory->description ?? '')),
+                name: @js(old('name', (isset($editCategory) && $editCategory) ? $editCategory->name : '')),
+                slug: @js(old('slug', (isset($editCategory) && $editCategory) ? $editCategory->slug : '')),
+                icon: @js(old('icon', (isset($editCategory) && $editCategory) ? $editCategory->icon : '')),
+                color: @js(old('color', (isset($editCategory) && $editCategory) ? $editCategory->color : '')),
+                text_color: @js(old('text_color', (isset($editCategory) && $editCategory) ? $editCategory->text_color : '')),
+                description: @js(old('description', (isset($editCategory) && $editCategory) ? $editCategory->description : '')),
             },
             currentPageIds: @js($categories->getCollection()->pluck('id')->values()),
             selectedIds: [],
@@ -75,7 +78,7 @@
                 this.drawerOpen = true;
                 this.isEdit = false;
                 this.editId = null;
-                this.form = { name: '', slug: '', description: '' };
+                this.form = { name: '', slug: '', icon: 'fa-layer-group', color: 'bg-blue-50', text_color: 'text-blue-500', description: '' };
             },
             openEdit(item) {
                 this.drawerOpen = true;
@@ -84,6 +87,9 @@
                 this.form = {
                     name: item.name ?? '',
                     slug: item.slug ?? '',
+                    icon: item.icon ?? 'fa-layer-group',
+                    color: item.color ?? 'bg-blue-50',
+                    text_color: item.text_color ?? 'text-blue-500',
                     description: item.description ?? '',
                 };
             },
@@ -144,6 +150,7 @@
                                     <input type="checkbox" :checked="isAllOnPageSelected" @change="toggleSelectAllOnPage()" class="rounded border-gray-300 text-blue-600">
                                 </th>
                                 <th class="px-4 py-3 text-left">ID</th>
+                                <th class="px-4 py-3 text-left">Icon</th>
                                 <th class="px-4 py-3 text-left">Nama</th>
                                 <th class="px-4 py-3 text-left">Slug</th>
                                 <th class="px-4 py-3 text-left">Deskripsi</th>
@@ -157,6 +164,13 @@
                                         <input type="checkbox" :checked="selectedIds.includes({{ $category->id }})" @change="toggleRowSelection({{ $category->id }})" class="rounded border-gray-300 text-blue-600">
                                     </td>
                                     <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ $category->id }}</td>
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-xl flex items-center justify-center {{ $category->color ?: 'bg-blue-50' }}">
+                                                <i class="fas {{ $category->icon ?: 'fa-layer-group' }} {{ $category->text_color ?: 'text-blue-500' }}"></i>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td class="px-4 py-3 font-semibold text-gray-900 dark:text-gray-100">{{ $category->name }}</td>
                                     <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ $category->slug }}</td>
                                     <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ \Illuminate\Support\Str::limit($category->description, 80) }}</td>
@@ -167,8 +181,11 @@
                                                 data-id="{{ $category->id }}"
                                                 data-name="{{ $category->name }}"
                                                 data-slug="{{ $category->slug }}"
+                                                data-icon="{{ $category->icon }}"
+                                                data-color="{{ $category->color }}"
+                                                data-text_color="{{ $category->text_color }}"
                                                 data-description="{{ $category->description }}"
-                                                @click="openEdit({ id: Number($el.dataset.id), name: $el.dataset.name, slug: $el.dataset.slug, description: $el.dataset.description })"
+                                                @click="openEdit({ id: Number($el.dataset.id), name: $el.dataset.name, slug: $el.dataset.slug, icon: $el.dataset.icon, color: $el.dataset.color, text_color: $el.dataset.text_color, description: $el.dataset.description })"
                                                 class="inline-flex items-center rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                                                 title="Edit"
                                                 aria-label="Edit"
@@ -229,6 +246,21 @@
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Slug</label>
                             <input type="text" name="slug" x-model="form.slug" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Icon (FontAwesome)</label>
+                                <input type="text" name="icon" x-model="form.icon" placeholder="fa-layer-group" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Icon Color (Tailwind)</label>
+                                <input type="text" name="text_color" x-model="form.text_color" placeholder="text-blue-500" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">BG Color (Tailwind)</label>
+                            <input type="text" name="color" x-model="form.color" placeholder="bg-blue-50" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
+                            <p class="text-[10px] text-gray-500 mt-1 italic">* Contoh: fa-laptop (icon), text-blue-500 (warna icon), bg-blue-50 (latar).</p>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Deskripsi</label>

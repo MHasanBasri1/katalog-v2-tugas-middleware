@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
-@section('title', 'Verifikasi Email - VISTORA')
-@section('meta_description', 'Verifikasi email akun VISTORA Anda untuk mengaktifkan fitur pengguna.')
+@section('title', 'Verifikasi Email - Kataloque')
+@section('meta_description', 'Verifikasi email akun Kataloque Anda untuk mengaktifkan fitur pengguna.')
 @section('canonical', route('verification.notice'))
 @section('og_url', route('verification.notice'))
 
@@ -17,7 +17,7 @@
 
         <h1 class="mt-4 text-2xl sm:text-3xl font-black text-gray-900">Cek Email Anda</h1>
         <p class="mt-3 text-sm sm:text-base text-gray-600 leading-relaxed max-w-2xl">
-            Kami sudah mengirim link verifikasi ke email akun Anda. Klik link tersebut untuk mengaktifkan fitur akun user seperti profil dan wishlist.
+            Kami sudah mengirim link verifikasi ke email akun Anda. Klik link tersebut untuk mengaktifkan fitur akun user seperti profil dan favorit.
         </p>
 
         @if (session('status') === 'verification-link-sent')

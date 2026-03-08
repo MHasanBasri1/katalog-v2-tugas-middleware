@@ -5,7 +5,7 @@ namespace App\Livewire\Public;
 use App\Models\Category;
 use App\Models\Banner;
 use App\Models\Product;
-use App\Models\Wishlist;
+use App\Models\Favorite;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +14,7 @@ use Livewire\Component;
 
 class Home extends Component
 {
-    public array $wishlistedProductIds = [];
+    public array $favoritedProductIds = [];
 
     public function render(): View
     {
@@ -34,7 +34,7 @@ class Home extends Component
             'public.home.categories_all',
             now()->addMinutes(10),
             fn () => Category::query()
-                ->select('id', 'name', 'slug')
+                ->select('id', 'name', 'slug', 'icon', 'color')
                 ->withCount([
                     'products as active_products_count' => fn ($query) => $query->where('status', true),
                 ])
@@ -85,7 +85,7 @@ class Home extends Component
             ->unique()
             ->values();
 
-        $this->syncWishlistState($displayedProductIds);
+        $this->syncFavoriteState($displayedProductIds);
 
         return view('livewire.public.home', [
             'heroBanners' => $heroBanners,
@@ -96,10 +96,10 @@ class Home extends Component
         ]);
     }
 
-    public function toggleWishlist(int $productId): void
+    public function toggleFavorite(int $productId): void
     {
         if (! Auth::check()) {
-            session()->flash('status', 'Silakan daftar atau masuk terlebih dahulu untuk menggunakan wishlist.');
+            session()->flash('status', 'Silakan daftar atau masuk terlebih dahulu untuk menambah atribut favorit.');
             $this->redirectRoute('user.login', navigate: true);
 
             return;
@@ -116,7 +116,7 @@ class Home extends Component
 
         $userId = Auth::id();
 
-        $existing = Wishlist::query()
+        $existing = Favorite::query()
             ->where('product_id', $productId)
             ->where('user_id', $userId)
             ->first();
@@ -124,35 +124,35 @@ class Home extends Component
         if ($existing) {
             $existing->delete();
 
-            $this->wishlistedProductIds = array_values(array_filter(
-                $this->wishlistedProductIds,
+            $this->favoritedProductIds = array_values(array_filter(
+                $this->favoritedProductIds,
                 fn ($id) => (int) $id !== $productId
             ));
 
             return;
         }
 
-        Wishlist::query()->create([
+        Favorite::query()->create([
             'product_id' => $productId,
             'user_id' => $userId,
         ]);
 
-        if (! in_array($productId, $this->wishlistedProductIds, true)) {
-            $this->wishlistedProductIds[] = $productId;
+        if (! in_array($productId, $this->favoritedProductIds, true)) {
+            $this->favoritedProductIds[] = $productId;
         }
     }
 
-    private function syncWishlistState(Collection $productIds): void
+    private function syncFavoriteState(Collection $productIds): void
     {
         $userId = Auth::id();
 
         if (! $userId || $productIds->isEmpty()) {
-            $this->wishlistedProductIds = [];
+            $this->favoritedProductIds = [];
 
             return;
         }
 
-        $this->wishlistedProductIds = Wishlist::query()
+        $this->favoritedProductIds = Favorite::query()
             ->whereIn('product_id', $productIds)
             ->where('user_id', $userId)
             ->pluck('product_id')

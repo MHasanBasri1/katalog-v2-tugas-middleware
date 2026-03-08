@@ -54,8 +54,8 @@ class Product extends Model
         return $this->hasMany(MarketplaceLink::class);
     }
 
-    public function wishlists(): HasMany
+    public function favorites(): HasMany
     {
-        return $this->hasMany(Wishlist::class);
+        return $this->hasMany(Favorite::class);
     }
 }

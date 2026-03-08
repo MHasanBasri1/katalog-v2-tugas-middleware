@@ -19,7 +19,7 @@
 
     @if ($withText)
         <h1 class="{{ $current['text'] }} font-black italic text-blue-600 tracking-tight leading-none">
-            VISTORA
+            Kataloque
         </h1>
     @endif
 </div>

@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
-@section('title', 'Profil Saya - VISTORA')
-@section('meta_description', 'Profil pengguna VISTORA untuk mengelola data akun dan wishlist.')
+@section('title', 'Profil Saya - Kataloque')
+@section('meta_description', 'Profil pengguna Kataloque untuk mengelola data akun dan favorit.')
 @section('canonical', route('user.panel'))
 @section('og_url', route('user.panel'))
 
@@ -9,17 +9,20 @@
 <section class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
     <div class="absolute inset-x-6 top-4 h-48 bg-gradient-to-r from-sky-100 via-blue-100 to-cyan-100 blur-3xl opacity-70 pointer-events-none"></div>
 
-    <div class="relative bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/70 p-6 sm:p-8 md:p-9" x-data="{ tab: '{{ session('active_tab', 'profil') }}' }">
+    @php
+        $activeTab = request()->query('tab', session('active_tab', 'profil'));
+    @endphp
+    <div class="relative bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/70 p-6 sm:p-8 md:p-9" x-data="{ tab: '{{ $activeTab }}' }">
         <div class="grid gap-4 md:grid-cols-[1.6fr_1fr] md:items-end">
             <div>
                 <p class="text-xs font-bold uppercase tracking-[0.2em] text-primary">Profil Saya</p>
                 <h1 class="mt-2 text-2xl sm:text-3xl font-black text-gray-900">Halo, {{ auth()->user()->name }}</h1>
-                <p class="mt-2 text-sm text-gray-500">Kelola data akun dan wishlist Anda dari satu halaman.</p>
+                <p class="mt-2 text-sm text-gray-500">Kelola data akun dan favorit Anda dari satu halaman.</p>
             </div>
             <div class="rounded-2xl border border-blue-100 bg-blue-50/70 px-4 py-3">
                 <p class="text-[11px] uppercase tracking-wider font-bold text-blue-700">Status Akun</p>
                 <p class="mt-1 text-sm font-semibold text-gray-800">{{ auth()->user()->email }}</p>
-                <p class="mt-1 text-xs text-gray-500">Terdaftar sebagai pengguna VISTORA</p>
+                <p class="mt-1 text-xs text-gray-500">Terdaftar sebagai pengguna Kataloque</p>
             </div>
         </div>
 
@@ -33,9 +36,9 @@
                 {{ session('status_password') }}
             </div>
         @endif
-        @if(session('status_wishlist'))
+        @if(session('status_favorite'))
             <div class="mt-4 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-700">
-                {{ session('status_wishlist') }}
+                {{ session('status_favorite') }}
             </div>
         @endif
         @if(session('status_avatar'))
@@ -49,9 +52,9 @@
                 <i class="fas fa-user-circle mr-1.5 text-xs"></i>
                 Profil
             </button>
-            <button type="button" @click="tab = 'wishlist'" :class="tab === 'wishlist' ? 'bg-white text-blue-700 shadow-sm' : 'text-gray-600 hover:text-gray-800'" class="rounded-lg px-4 py-2 text-sm font-semibold transition">
+            <button type="button" @click="tab = 'favorit'" :class="tab === 'favorit' ? 'bg-white text-blue-700 shadow-sm' : 'text-gray-600 hover:text-gray-800'" class="rounded-lg px-4 py-2 text-sm font-semibold transition">
                 <i class="fas fa-heart mr-1.5 text-xs"></i>
-                Wishlist
+                Favorit
             </button>
         </div>
 
@@ -196,13 +199,13 @@
             </div>
         </div>
 
-        <div x-show="tab === 'wishlist'" x-cloak class="mt-6">
+        <div x-show="tab === 'favorit'" x-cloak class="mt-6">
             <div class="flex items-center justify-between mb-3">
-                <h2 class="text-lg font-bold text-gray-900">Wishlist Saya</h2>
-                <span class="text-xs font-semibold text-gray-500">{{ $wishlistProducts->count() }} produk</span>
+                <h2 class="text-lg font-bold text-gray-900">Favorit Saya</h2>
+                <span class="text-xs font-semibold text-gray-500">{{ $favoriteProducts->count() }} produk</span>
             </div>
             <div class="grid grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-4 gap-3">
-                @forelse($wishlistProducts as $product)
+                @forelse($favoriteProducts as $product)
                     <div class="rounded-2xl border border-gray-100 p-3 hover:border-blue-200 transition">
                         <div class="aspect-square w-full bg-gray-100 rounded-xl overflow-hidden">
                             <a href="{{ route('produk.detail', $product->slug) }}">
@@ -219,18 +222,18 @@
                             <a href="{{ route('produk.detail', $product->slug) }}">{{ $product->name }}</a>
                         </p>
                         <p class="text-sm font-bold text-primary mt-1">Rp {{ number_format((float) $product->price, 0, ',', '.') }}</p>
-                        <form method="POST" action="{{ route('user.wishlist.destroy', $product) }}" class="mt-2">
+                        <form method="POST" action="{{ route('user.favorite.destroy', $product) }}" class="mt-2">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-100 transition">
                                 <i class="fas fa-trash text-[10px]"></i>
-                                Hapus Wishlist
+                                Hapus Favorit
                             </button>
                         </form>
                     </div>
                 @empty
                     <div class="col-span-full rounded-2xl border border-dashed border-gray-200 p-4 text-sm text-gray-500">
-                        Belum ada produk di wishlist.
+                        Belum ada produk di favorit.
                     </div>
                 @endforelse
             </div>

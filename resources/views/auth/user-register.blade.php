@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
-@section('title', 'Daftar - VISTORA')
-@section('meta_description', 'Daftar akun VISTORA untuk menyimpan wishlist dan mengelola profil pengguna.')
+@section('title', 'Daftar - Kataloque')
+@section('meta_description', 'Daftar akun Kataloque untuk menyimpan favorit dan mengelola profil pengguna.')
 @section('canonical', route('user.register'))
 @section('og_url', route('user.register'))
 
@@ -9,26 +9,15 @@
 <section class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
     <div class="absolute inset-x-6 top-4 h-44 bg-gradient-to-r from-cyan-100 via-blue-100 to-indigo-100 blur-3xl opacity-70 pointer-events-none"></div>
 
-    <div class="relative grid gap-5 md:grid-cols-[1.1fr_1.25fr] items-stretch">
-        <div class="rounded-3xl border border-cyan-100 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-500 p-6 sm:p-7 text-white shadow-lg shadow-blue-200/70">
-            <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-cyan-50/90">Akun Pengguna</p>
-            <h1 class="mt-3 text-2xl sm:text-3xl font-black leading-tight">Buat Akun Baru</h1>
-            <p class="mt-3 text-sm text-blue-50/95 leading-relaxed">
-                Daftar sekali untuk simpan wishlist, kelola profil, dan akses pengalaman belanja yang lebih personal.
+    <div class="relative max-w-lg mx-auto">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl sm:text-4xl font-black text-gray-900 leading-tight">Buat Akun Baru</h1>
+            <p class="mt-3 text-sm text-gray-500 leading-relaxed max-w-md mx-auto">
+                Daftar sekali untuk simpan favorit, kelola profil, dan akses pengalaman belanja yang lebih personal.
             </p>
-            <div class="mt-6 space-y-3 text-sm">
-                <div class="inline-flex items-center gap-2 rounded-xl bg-white/15 px-3 py-2 backdrop-blur-sm">
-                    <i class="fas fa-bolt text-xs"></i>
-                    Proses registrasi cepat
-                </div>
-                <div class="inline-flex items-center gap-2 rounded-xl bg-white/15 px-3 py-2 backdrop-blur-sm">
-                    <i class="fas fa-user-shield text-xs"></i>
-                    Privasi akun terlindungi
-                </div>
-            </div>
         </div>
 
-        <div class="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/60 p-6 sm:p-8">
+        <div class="bg-white/40 backdrop-blur-xl rounded-3xl border border-white/40 shadow-2xl shadow-gray-200/40 p-6 sm:p-10 relative z-10">
             <form method="POST" action="{{ route('user.register.store') }}" class="space-y-5">
                 @csrf
 
