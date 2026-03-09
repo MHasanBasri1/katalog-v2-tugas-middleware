@@ -11,14 +11,14 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            ['name' => 'Elektronik', 'icon' => 'fa-laptop', 'color' => 'bg-blue-50', 'description' => 'Gadget dan elektronik.'],
-            ['name' => 'Fashion', 'icon' => 'fa-tshirt', 'color' => 'bg-indigo-50', 'description' => 'Pakaian dan aksesoris.'],
-            ['name' => 'Kesehatan', 'icon' => 'fa-heartbeat', 'color' => 'bg-rose-50', 'description' => 'Produk kesehatan.'],
-            ['name' => 'Kecantikan', 'icon' => 'fa-magic', 'color' => 'bg-pink-50', 'description' => 'Perawatan tubuh dan makeup.'],
-            ['name' => 'Rumah Tangga', 'icon' => 'fa-home', 'color' => 'bg-amber-50', 'description' => 'Kebutuhan rumah.'],
-            ['name' => 'Olahraga', 'icon' => 'fa-running', 'color' => 'bg-orange-50', 'description' => 'Alat dan perlengkapan olahraga.'],
-            ['name' => 'Otomotif', 'icon' => 'fa-car', 'color' => 'bg-emerald-50', 'description' => 'Aksesoris kendaraan.'],
-            ['name' => 'Hobi', 'icon' => 'fa-gamepad', 'color' => 'bg-purple-50', 'description' => 'Mainan dan koleksi.'],
+            ['name' => 'Elektronik', 'icon' => 'fa-laptop', 'color' => 'bg-blue-50', 'text_color' => 'text-blue-600', 'description' => 'Gadget dan elektronik.'],
+            ['name' => 'Fashion', 'icon' => 'fa-tshirt', 'color' => 'bg-indigo-50', 'text_color' => 'text-indigo-600', 'description' => 'Pakaian dan aksesoris.'],
+            ['name' => 'Kesehatan', 'icon' => 'fa-heart-pulse', 'color' => 'bg-rose-50', 'text_color' => 'text-rose-600', 'description' => 'Produk kesehatan.'],
+            ['name' => 'Kecantikan', 'icon' => 'fa-sparkles', 'color' => 'bg-pink-50', 'text_color' => 'text-pink-600', 'description' => 'Perawatan tubuh dan makeup.'],
+            ['name' => 'Rumah Tangga', 'icon' => 'fa-house-user', 'color' => 'bg-amber-50', 'text_color' => 'text-amber-600', 'description' => 'Kebutuhan rumah.'],
+            ['name' => 'Olahraga', 'icon' => 'fa-dumbbell', 'color' => 'bg-orange-50', 'text_color' => 'text-orange-600', 'description' => 'Alat dan perlengkapan olahraga.'],
+            ['name' => 'Otomotif', 'icon' => 'fa-car-side', 'color' => 'bg-emerald-50', 'text_color' => 'text-emerald-600', 'description' => 'Aksesoris kendaraan.'],
+            ['name' => 'Hobi', 'icon' => 'fa-puzzle-piece', 'color' => 'bg-purple-50', 'text_color' => 'text-purple-600', 'description' => 'Mainan dan koleksi.'],
         ];
 
         foreach ($categories as $category) {
@@ -29,9 +29,13 @@ class CategorySeeder extends Seeder
                     'slug' => Str::slug($category['name']),
                     'icon' => $category['icon'],
                     'color' => $category['color'],
+                    'text_color' => $category['text_color'],
                     'description' => $category['description'],
                 ]
             );
         }
+
+        // Clear public header cache to show new data
+        \Illuminate\Support\Facades\Cache::forget('public.header.categories');
     }
 }

@@ -64,4 +64,33 @@ class FavoriteController extends BaseApiController
 
         return $this->success(null, 'Produk dihapus dari favorit.');
     }
+
+    public function toggle(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'product_id' => ['required', 'integer', 'exists:products,id'],
+        ]);
+
+        $product = Product::query()
+            ->where('id', $validated['product_id'])
+            ->where('status', true)
+            ->firstOrFail();
+
+        $favorite = Favorite::query()
+            ->where('user_id', $request->user()->id)
+            ->where('product_id', $product->id)
+            ->first();
+
+        if ($favorite) {
+            $favorite->delete();
+            return $this->success(['is_favorite' => false], 'Produk dihapus dari favorit.');
+        }
+
+        Favorite::query()->create([
+            'user_id' => $request->user()->id,
+            'product_id' => $product->id,
+        ]);
+
+        return $this->success(['is_favorite' => true], 'Produk ditambahkan ke favorit.', 201);
+    }
 }

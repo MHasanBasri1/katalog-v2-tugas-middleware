@@ -81,7 +81,7 @@ Route::middleware(['auth', 'role:user', 'verified'])->group(function () {
     Route::put('/profil-saya/password', [PanelController::class, 'updatePassword'])->name('user.password.update');
     Route::post('/profil-saya/avatar', [PanelController::class, 'updateAvatar'])->name('user.avatar.update');
     Route::delete('/profil-saya/avatar', [PanelController::class, 'destroyAvatar'])->name('user.avatar.destroy');
-    Route::delete('/profil-saya/favorit/{product}', [PanelController::class, 'destroyFavorite'])->name('user.favorite.destroy');
+    Route::delete('/profil-saya/favorit/{productId}', [PanelController::class, 'destroyFavorite'])->name('user.favorite.destroy');
 });
 
 Route::get('/', function () {

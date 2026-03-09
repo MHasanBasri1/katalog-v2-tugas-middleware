@@ -199,12 +199,63 @@
         </div>
     </div>
 
+    <!-- Custom Toast Notification -->
+    <div 
+        x-data="{ 
+            show: false, 
+            message: '', 
+            type: 'success',
+            timeout: null,
+            init() {
+                this.$nextTick(() => {
+                    if (typeof window.Livewire !== 'undefined') {
+                        window.Livewire.on('alert', (event) => {
+                            // Livewire v3 returns an array of arguments, take the first one
+                            const data = Array.isArray(event) ? event[0] : event;
+                            this.message = data.message;
+                            this.type = data.type || 'success';
+                            this.show = true;
+                            
+                            if(this.timeout) clearTimeout(this.timeout);
+                            this.timeout = setTimeout(() => { this.show = false }, 3000);
+                        });
+                    }
+                });
+            }
+        }"
+        x-show="show"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 -translate-y-4"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 translate-y-0"
+        x-transition:leave-end="opacity-0 -translate-y-4"
+        class="fixed top-24 left-1/2 -translate-x-1/2 z-[200] w-[90%] max-w-sm pointer-events-none"
+        x-cloak
+    >
+        <div 
+            :class="{
+                'bg-emerald-500 shadow-emerald-500/20': type === 'success',
+                'bg-rose-500 shadow-rose-500/20': type === 'error',
+                'bg-blue-500 shadow-blue-500/20': type === 'info',
+                'bg-amber-500 shadow-amber-500/20': type === 'warning'
+            }"
+            class="p-4 rounded-2xl shadow-2xl flex items-center gap-3 pointer-events-auto border border-white/20 backdrop-blur-md"
+        >
+            <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                <template x-if="type === 'success'"><i class="fas fa-check-circle text-white"></i></template>
+                <template x-if="type === 'error'"><i class="fas fa-times-circle text-white"></i></template>
+                <template x-if="type === 'info'"><i class="fas fa-info-circle text-white"></i></template>
+                <template x-if="type === 'warning'"><i class="fas fa-exclamation-triangle text-white"></i></template>
+            </div>
+            <p class="text-white text-xs font-bold leading-tight" x-text="message"></p>
+            <button @click="show = false" class="ml-auto text-white/60 hover:text-white transition-colors">
+                <i class="fas fa-times text-xs"></i>
+            </button>
+        </div>
+    </div>
+
     @livewireScripts
     @stack('scripts')
-    <script>
-        window.addEventListener('alert', event => {
-            alert(event.detail.message);
-        });
-    </script>
 </body>
 </html>

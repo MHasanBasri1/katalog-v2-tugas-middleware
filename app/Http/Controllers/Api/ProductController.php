@@ -79,6 +79,31 @@ class ProductController extends BaseApiController
         ]);
     }
 
+    public function related(Request $request, string $slug): JsonResponse
+    {
+        $product = Product::query()
+            ->where('slug', $slug)
+            ->where('status', true)
+            ->firstOrFail();
+
+        $limit = (int) $request->integer('limit', 10);
+        $limit = max(1, min(50, $limit));
+
+        $related = Product::query()
+            ->where('status', true)
+            ->where('id', '!=', $product->id)
+            ->where('category_id', $product->category_id)
+            ->with($this->withRelations())
+            ->orderByDesc('sold_count')
+            ->orderByDesc('id')
+            ->limit($limit)
+            ->get();
+
+        return $this->success([
+            'products' => $related->map(fn ($item) => ProductTransformer::transform($item))->values(),
+        ], 'Produk terkait.');
+    }
+
     private function listProducts(
         Request $request,
         ?callable $extraConstraint = null,

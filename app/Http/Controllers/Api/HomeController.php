@@ -34,14 +34,23 @@ class HomeController extends BaseApiController
         return $this->success([
             'banners' => $banners,
             'categories' => $categories,
+            'flashsale_products' => $promoProducts->map(fn ($product) => ProductTransformer::transform($product))->values(),
+            'terlaris_products' => $popularProducts->map(fn ($product) => ProductTransformer::transform($product))->values(),
+            'best_seller_products' => $popularProducts->map(fn ($product) => ProductTransformer::transform($product))->values(),
+            'terbaru_products' => $latestProducts->map(fn ($product) => ProductTransformer::transform($product))->values(),
+            // Keep original keys for compatibility
             'promo_products' => $promoProducts->map(fn ($product) => ProductTransformer::transform($product))->values(),
             'popular_products' => $popularProducts->map(fn ($product) => ProductTransformer::transform($product))->values(),
-            'best_seller_products' => $popularProducts->map(fn ($product) => ProductTransformer::transform($product))->values(),
             'latest_products' => $latestProducts->map(fn ($product) => ProductTransformer::transform($product))->values(),
         ]);
     }
 
     public function promoProducts(Request $request): JsonResponse
+    {
+        return $this->flashSale($request);
+    }
+
+    public function flashSale(Request $request): JsonResponse
     {
         $limit = (int) $request->integer('limit', 10);
         $limit = max(1, min(50, $limit));
@@ -55,6 +64,11 @@ class HomeController extends BaseApiController
 
     public function popularProducts(Request $request): JsonResponse
     {
+        return $this->terlaris($request);
+    }
+
+    public function terlaris(Request $request): JsonResponse
+    {
         $limit = (int) $request->integer('limit', 10);
         $limit = max(1, min(50, $limit));
 
@@ -66,6 +80,11 @@ class HomeController extends BaseApiController
     }
 
     public function latestProducts(Request $request): JsonResponse
+    {
+        return $this->terbaru($request);
+    }
+
+    public function terbaru(Request $request): JsonResponse
     {
         $limit = (int) $request->integer('limit', 10);
         $limit = max(1, min(50, $limit));

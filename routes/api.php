@@ -14,6 +14,12 @@ Route::prefix('v1')->group(function () {
     Route::get('/home/promo-products', [HomeController::class, 'promoProducts']);
     Route::get('/home/popular-products', [HomeController::class, 'popularProducts']);
     Route::get('/home/latest-products', [HomeController::class, 'latestProducts']);
+    
+    // Indonesian Aliases for Home Section (Flutter Recomended)
+    Route::get('/home/flashsale', [HomeController::class, 'flashSale']);
+    Route::get('/home/terlaris', [HomeController::class, 'terlaris']);
+    Route::get('/home/terbaru', [HomeController::class, 'terbaru']);
+    
     Route::get('/banners', [BannerController::class, 'index']);
 
     Route::get('/categories', [CategoryController::class, 'index']);
@@ -25,6 +31,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/products/best-sold', [ProductController::class, 'bestSold']);
     Route::get('/products/category/{slug}', [ProductController::class, 'byCategory']);
     Route::get('/products/detail/{slug}', [ProductController::class, 'detail']);
+    Route::get('/products/{slug}/related', [ProductController::class, 'related']);
     Route::get('/products/{slug}', [ProductController::class, 'show']);
 
     Route::post('/auth/register', [AuthController::class, 'register']);
@@ -45,6 +52,7 @@ Route::prefix('v1')->group(function () {
 
         Route::get('/favorit', [FavoriteController::class, 'index']);
         Route::post('/favorit', [FavoriteController::class, 'store']);
+        Route::post('/favorit/toggle', [FavoriteController::class, 'toggle']);
         Route::delete('/favorit/{product}', [FavoriteController::class, 'destroy']);
     });
 });

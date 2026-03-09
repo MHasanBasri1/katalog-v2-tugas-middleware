@@ -207,6 +207,7 @@
                 </span>
             </a>
         @endforeach
+    </div>
     </header>
 
     <!-- Mobile Sidebar Menu -->

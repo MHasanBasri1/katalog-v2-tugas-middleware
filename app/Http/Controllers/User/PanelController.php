@@ -111,10 +111,10 @@ class PanelController extends Controller
             ->with('active_tab', 'profil');
     }
 
-    public function destroyFavorite(Request $request, Product $product): RedirectResponse
+    public function destroyFavorite(Request $request, $productId): RedirectResponse
     {
         Favorite::query()
-            ->where('product_id', $product->id)
+            ->where('product_id', $productId)
             ->where('user_id', $request->user()->id)
             ->delete();
 
