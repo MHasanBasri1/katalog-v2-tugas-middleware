@@ -13,8 +13,8 @@ class AdminUserSeeder extends Seeder
     public function run(): void
     {
         $name = env('ADMIN_NAME', 'Admin Kataloque');
-        $email = env('ADMIN_EMAIL', 'admin@kataloque.local');
-        $password = env('ADMIN_PASSWORD', 'Admin12345!');
+        $email = env('ADMIN_EMAIL', 'jayanuxid@gmail.com');
+        $password = env('ADMIN_PASSWORD', 'admin12345');
 
         $user = User::updateOrCreate(
             ['email' => $email],

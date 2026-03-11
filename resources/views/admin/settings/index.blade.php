@@ -12,7 +12,7 @@
         @endif
 
         <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
-            <form method="POST" action="{{ $setting->exists ? route('admin.setting.update', $setting) : route('admin.setting.store') }}" class="space-y-5">
+            <form method="POST" action="{{ $setting->exists ? route('admin.setting.update', $setting) : route('admin.setting.store') }}" enctype="multipart/form-data" class="space-y-5">
                 @csrf
                 @if ($setting->exists)
                     @method('PUT')
@@ -47,9 +47,28 @@
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Website</label>
                         <input type="url" name="website" value="{{ old('website', $setting->website) }}" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
                     </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Logo URL</label>
-                        <input type="text" name="shop_logo" value="{{ old('shop_logo', $setting->shop_logo) }}" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
+                    <div x-data="{ photoName: null, photoPreview: null }">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Logo URL / Upload Logo</label>
+                        <input type="file" name="shop_logo" class="hidden" x-ref="photo" x-on:change="
+                                photoName = $refs.photo.files[0].name;
+                                const reader = new FileReader();
+                                reader.onload = (e) => {
+                                    photoPreview = e.target.result;
+                                };
+                                reader.readAsDataURL($refs.photo.files[0]);
+                        " accept="image/*">
+
+                        <div class="mt-2 flex items-center gap-4">
+                            <div class="shrink-0">
+                                <span class="block w-16 h-16 rounded-lg bg-cover bg-center bg-no-repeat border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900" 
+                                    x-bind:style="'background-image: url(\'' + (photoPreview ?? '{{ $setting->shop_logo ?: 'https://ui-avatars.com/api/?name=Logo&color=7F9CF5&background=EBF4FF' }}') + '\');'"
+                                ></span>
+                            </div>
+                            <button type="button" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-semibold" x-on:click.prevent="$refs.photo.click()">
+                                Upload Logo Baru
+                            </button>
+                        </div>
+                        @error('shop_logo') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
@@ -90,9 +109,28 @@
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Footer Text</label>
                         <input type="text" name="footer_text" value="{{ old('footer_text', $setting->footer_text) }}" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
                     </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Favicon URL</label>
-                        <input type="text" name="favicon" value="{{ old('favicon', $setting->favicon) }}" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
+                    <div x-data="{ favName: null, favPreview: null }">
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Favicon URL / Upload Favicon</label>
+                        <input type="file" name="favicon" class="hidden" x-ref="favicon_photo" x-on:change="
+                                favName = $refs.favicon_photo.files[0].name;
+                                const reader = new FileReader();
+                                reader.onload = (e) => {
+                                    favPreview = e.target.result;
+                                };
+                                reader.readAsDataURL($refs.favicon_photo.files[0]);
+                        " accept="image/*">
+
+                        <div class="mt-2 flex items-center gap-4">
+                            <div class="shrink-0">
+                                <span class="block w-16 h-16 rounded-lg bg-cover bg-center bg-no-repeat border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900" 
+                                    x-bind:style="'background-image: url(\'' + (favPreview ?? '{{ $setting->favicon ?: 'https://ui-avatars.com/api/?name=Fv&color=34D399&background=D1FAE5' }}') + '\');'"
+                                ></span>
+                            </div>
+                            <button type="button" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-semibold" x-on:click.prevent="$refs.favicon_photo.click()">
+                                Upload Favicon Baru
+                            </button>
+                        </div>
+                        @error('favicon') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
                     </div>
                 </div>
 

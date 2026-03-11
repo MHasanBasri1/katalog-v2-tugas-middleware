@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RolePermissionSeeder extends Seeder
 {
@@ -21,6 +22,8 @@ class RolePermissionSeeder extends Seeder
             return;
         }
 
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
         $permissions = [
             'dashboard.view',
             'settings.manage',
@@ -33,11 +36,17 @@ class RolePermissionSeeder extends Seeder
         ];
 
         foreach ($permissions as $permissionName) {
-            Permission::findOrCreate($permissionName, 'web');
+            Permission::query()->updateOrCreate(
+                ['name' => $permissionName, 'guard_name' => 'web']
+            );
         }
 
-        $adminRole = Role::findOrCreate('admin', 'web');
-        $userRole = Role::findOrCreate('user', 'web');
+        $adminRole = Role::query()->updateOrCreate(
+            ['name' => 'admin', 'guard_name' => 'web']
+        );
+        $userRole = Role::query()->updateOrCreate(
+            ['name' => 'user', 'guard_name' => 'web']
+        );
 
         $adminRole->syncPermissions($permissions);
         $userRole->syncPermissions([]);

@@ -7,6 +7,7 @@ use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
 {
@@ -25,6 +26,8 @@ class SettingController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validatePayload($request);
+        $data = $this->handleFiles($request, $data);
+        
         Setting::query()->updateOrCreate(['id' => 1], $data);
 
         return redirect()->route('admin.setting.index')->with('status', 'Setting berhasil disimpan.');
@@ -43,6 +46,8 @@ class SettingController extends Controller
     public function update(Request $request, Setting $setting): RedirectResponse
     {
         $data = $this->validatePayload($request);
+        $data = $this->handleFiles($request, $data, $setting);
+        
         $setting->update($data);
 
         return redirect()->route('admin.setting.index')->with('status', 'Setting berhasil diperbarui.');
@@ -57,7 +62,7 @@ class SettingController extends Controller
     {
         return $request->validate([
             'shop_name' => ['required', 'string', 'max:255'],
-            'shop_logo' => ['nullable', 'string', 'max:2048'],
+            'shop_logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,svg,webp', 'max:2048'],
             'shop_description' => ['nullable', 'string'],
             'shop_address' => ['nullable', 'string'],
             'city' => ['nullable', 'string', 'max:255'],
@@ -69,8 +74,29 @@ class SettingController extends Controller
             'facebook' => ['nullable', 'url', 'max:255'],
             'instagram' => ['nullable', 'url', 'max:255'],
             'footer_text' => ['nullable', 'string', 'max:255'],
-            'favicon' => ['nullable', 'string', 'max:2048'],
+            'favicon' => ['nullable', 'image', 'mimes:jpeg,png,jpg,svg,ico,webp', 'max:1024'],
             'marketplaces' => ['nullable', 'array'],
         ]);
+    }
+
+    private function handleFiles(Request $request, array $data, ?Setting $setting = null): array
+    {
+        if ($request->hasFile('shop_logo')) {
+            if ($setting && $setting->shop_logo && !str_starts_with($setting->shop_logo, 'http')) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $setting->shop_logo));
+            }
+            $path = $request->file('shop_logo')->store('settings', 'public');
+            $data['shop_logo'] = '/storage/' . $path;
+        }
+
+        if ($request->hasFile('favicon')) {
+            if ($setting && $setting->favicon && !str_starts_with($setting->favicon, 'http')) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $setting->favicon));
+            }
+            $path = $request->file('favicon')->store('settings', 'public');
+            $data['favicon'] = '/storage/' . $path;
+        }
+
+        return $data;
     }
 }

@@ -208,19 +208,28 @@
             timeout: null,
             init() {
                 this.$nextTick(() => {
+                    // Handle Livewire 3 events
                     if (typeof window.Livewire !== 'undefined') {
                         window.Livewire.on('alert', (event) => {
-                            // Livewire v3 returns an array of arguments, take the first one
                             const data = Array.isArray(event) ? event[0] : event;
-                            this.message = data.message;
-                            this.type = data.type || 'success';
-                            this.show = true;
-                            
-                            if(this.timeout) clearTimeout(this.timeout);
-                            this.timeout = setTimeout(() => { this.show = false }, 3000);
+                            this.showAlert(data);
                         });
                     }
+                    
+                    // Handle standard JS CustomEvents
+                    window.addEventListener('alert', (event) => {
+                        const data = Array.isArray(event.detail) ? event.detail[0] : event.detail;
+                        this.showAlert(data);
+                    });
                 });
+            },
+            showAlert(data) {
+                this.message = data.message;
+                this.type = data.type || 'success';
+                this.show = true;
+                
+                if(this.timeout) clearTimeout(this.timeout);
+                this.timeout = setTimeout(() => { this.show = false }, 3000);
             }
         }"
         x-show="show"

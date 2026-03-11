@@ -100,7 +100,7 @@
             </div>
         </div>
         @if($popularCategories->isNotEmpty())
-            <div class="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen px-4 sm:px-6 lg:px-8">
+            <div class="relative w-full">
                 <div
                     x-ref="categoryTrack"
                     class="grid grid-flow-col grid-rows-1 auto-cols-[minmax(10.5rem,10.5rem)] md:auto-cols-[minmax(12rem,12rem)] gap-4 md:gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-6 pt-2 hide-scrollbar px-1"
@@ -172,7 +172,7 @@
                 </button>
             </div>
         </div>
-        <div class="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen px-4 sm:px-6 lg:px-8">
+        <div class="relative w-full">
             <div x-ref="track" class="grid grid-flow-col auto-cols-[minmax(11rem,11rem)] md:auto-cols-[minmax(14rem,14rem)] gap-4 md:gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-8 pt-2 hide-scrollbar px-1">
                 @forelse($flashSaleProducts as $product)
                     @php
@@ -259,7 +259,7 @@
                 </button>
             </div>
         </div>
-        <div class="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen px-4 sm:px-6 lg:px-8">
+        <div class="relative w-full">
             <div x-ref="track" class="grid grid-flow-col auto-cols-[minmax(11rem,11rem)] md:auto-cols-[minmax(14rem,14rem)] gap-4 md:gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-8 pt-2 hide-scrollbar px-1">
                 @forelse($bestSellerProducts as $product)
                     @php
@@ -427,11 +427,10 @@
             @endforelse
         </div>
         
-        <div class="sm:hidden text-center mt-6">
-            <a href="{{ route('katalog') }}" class="inline-flex items-center justify-center gap-2 bg-gray-50 border border-gray-200 text-gray-700 font-bold px-8 py-3 rounded-full text-sm hover:bg-gray-100 transition-colors inline-block">
+        <div class="sm:hidden text-center mt-6 w-full">
+            <a href="{{ route('katalog') }}" class="flex w-full items-center justify-center gap-2 bg-gray-50 border border-gray-200 text-gray-700 font-bold px-8 py-3 rounded-2xl text-sm hover:bg-gray-100 transition-colors">
                 Lihat Semua Katalog <i class="fas fa-arrow-right text-xs"></i>
             </a>
-        </div>
         </div>
     </section>
     
@@ -446,8 +445,8 @@
                     <h3 class="text-2xl md:text-3xl font-black text-white mb-2 tracking-tight">Belanja Lebih Mudah & Cepat</h3>
                     <p class="text-blue-100 text-base md:text-lg font-medium opacity-90">Temukan ribuan produk pilihan dengan harga terbaik hanya di Kataloque.</p>
                 </div>
-                <div>
-                    <a href="{{ route('katalog') }}" class="inline-flex items-center gap-2 bg-white text-blue-700 font-bold px-6 py-3 rounded-full text-sm hover:bg-gray-50 hover:-translate-y-1 hover:shadow-xl hover:shadow-white/20 transition-all duration-300 group">
+                <div class="w-full md:w-auto">
+                    <a href="{{ route('katalog') }}" class="flex md:inline-flex w-full justify-center items-center gap-2 bg-white text-blue-700 font-bold px-6 py-3 rounded-2xl text-sm hover:bg-gray-50 hover:-translate-y-1 hover:shadow-xl hover:shadow-white/20 transition-all duration-300 group">
                         Mulai Belanja Sekarang
                         <span class="bg-blue-50 text-blue-600 rounded-full w-7 h-7 flex items-center justify-center group-hover:translate-x-1 transition-transform">
                             <i class="fas fa-arrow-right text-[10px]"></i>

@@ -58,27 +58,13 @@
                 </template>
             </div>
 
-            <div class="hidden lg:block bg-white rounded-3xl border border-gray-100 shadow-sm p-5 md:p-7">
-                <h3 class="text-base md:text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
-                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-blue-100 text-blue-600"><i class="fas fa-share-nodes text-xs"></i></span>
-                    Share Produk
+            <div class="hidden lg:block bg-white rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 md:p-8">
+                <h3 class="text-lg font-black text-gray-900 mb-4 flex items-center gap-3">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-gray-50 text-gray-600 border border-gray-100 shadow-sm"><i class="fas fa-align-left text-sm"></i></span>
+                    Deskripsi Lengkap
                 </h3>
-                <div class="grid grid-cols-2 gap-3">
-                    <a href="https://wa.me/?text={{ urlencode(route('produk.detail', $product->slug)) }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-sm bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition">
-                        <i class="fab fa-whatsapp"></i> WhatsApp
-                    </a>
-                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('produk.detail', $product->slug)) }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-sm bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition">
-                        <i class="fab fa-facebook-f"></i> Facebook
-                    </a>
-                    <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('produk.detail', $product->slug)) }}&text={{ urlencode($product->name) }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-sm bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition">
-                        <i class="fab fa-twitter"></i> X / Twitter
-                    </a>
-                    <button type="button" 
-                        onclick="navigator.clipboard.writeText('{{ route('produk.detail', $product->slug) }}').then(() => alert('Link produk berhasil disalin!'))" 
-                        class="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-sm bg-blue-600 text-white hover:bg-blue-700 transition shadow-md shadow-blue-200"
-                    >
-                        <i class="fas fa-link"></i> Copy Link
-                    </button>
+                <div class="prose prose-sm md:prose-base max-w-none text-gray-600 font-medium leading-relaxed">
+                    <p>{{ $product->description ?: 'Belum ada deskripsi spesifik untuk produk ini.' }}</p>
                 </div>
             </div>
         </div>
@@ -188,7 +174,31 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 md:p-8">
+            <div class="hidden lg:block bg-white rounded-3xl border border-gray-100 shadow-sm p-5 md:p-7">
+                <h3 class="text-base md:text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-blue-100 text-blue-600"><i class="fas fa-share-nodes text-xs"></i></span>
+                    Share Produk
+                </h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <a href="https://wa.me/?text={{ urlencode(route('produk.detail', $product->slug)) }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-sm bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition">
+                        <i class="fab fa-whatsapp"></i> WhatsApp
+                    </a>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('produk.detail', $product->slug)) }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-sm bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition">
+                        <i class="fab fa-facebook-f"></i> Facebook
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('produk.detail', $product->slug)) }}&text={{ urlencode($product->name) }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-sm bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition">
+                        <i class="fab fa-twitter"></i> X / Twitter
+                    </a>
+                    <button type="button" 
+                        onclick="navigator.clipboard.writeText('{{ route('produk.detail', $product->slug) }}').then(() => window.dispatchEvent(new CustomEvent('alert', { detail: [{ type: 'success', message: 'Link produk berhasil disalin!' }] })))" 
+                        class="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-sm bg-blue-600 text-white hover:bg-blue-700 transition shadow-md shadow-blue-200"
+                    >
+                        <i class="fas fa-link"></i> Copy Link
+                    </button>
+                </div>
+            </div>
+
+            <div class="lg:hidden bg-white rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 md:p-8">
                 <h3 class="text-lg font-black text-gray-900 mb-4 flex items-center gap-3">
                     <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-gray-50 text-gray-600 border border-gray-100 shadow-sm"><i class="fas fa-align-left text-sm"></i></span>
                     Deskripsi Lengkap
@@ -214,7 +224,7 @@
                         <i class="fab fa-twitter"></i> X / Twitter
                     </a>
                     <button type="button" 
-                        onclick="navigator.clipboard.writeText('{{ route('produk.detail', $product->slug) }}').then(() => alert('Link produk berhasil disalin!'))" 
+                        onclick="navigator.clipboard.writeText('{{ route('produk.detail', $product->slug) }}').then(() => window.dispatchEvent(new CustomEvent('alert', { detail: [{ type: 'success', message: 'Link produk berhasil disalin!' }] })))" 
                         class="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold text-sm bg-blue-600 text-white hover:bg-blue-700 transition shadow-md shadow-blue-200"
                     >
                         <i class="fas fa-link"></i> Copy Link
