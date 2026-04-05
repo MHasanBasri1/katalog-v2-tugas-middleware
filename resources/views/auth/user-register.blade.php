@@ -6,18 +6,16 @@
 @section('og_url', route('user.register'))
 
 @section('content')
-<section class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
-    <div class="absolute inset-x-6 top-4 h-44 bg-gradient-to-r from-cyan-100 via-blue-100 to-indigo-100 blur-3xl opacity-70 pointer-events-none"></div>
-
+<section class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
     <div class="relative max-w-lg mx-auto">
         <div class="text-center mb-10">
-            <h1 class="text-3xl sm:text-4xl font-black text-gray-900 leading-tight">Buat Akun Baru</h1>
-            <p class="mt-3 text-sm text-gray-500 leading-relaxed max-w-md mx-auto">
-                Daftar sekali untuk simpan favorit, kelola profil, dan akses pengalaman belanja yang lebih personal.
+            <h1 class="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">Daftar Akun</h1>
+            <p class="mt-3 text-sm text-gray-500 font-medium">
+                Simpan favorit dan akses fitur personal lainnya.
             </p>
         </div>
 
-        <div class="bg-white/40 backdrop-blur-xl rounded-3xl border border-white/40 shadow-2xl shadow-gray-200/40 p-6 sm:p-10 relative z-10">
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sm:p-10 relative z-10">
             <form method="POST" action="{{ route('user.register.store') }}" class="space-y-5">
                 @csrf
 
@@ -27,7 +25,7 @@
                         <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
                             <i class="fas fa-user text-xs"></i>
                         </span>
-                        <input id="name" name="name" type="text" value="{{ old('name') }}" required autofocus autocomplete="name" class="w-full rounded-xl border-gray-200 bg-gray-50 py-3 pl-9 pr-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500" placeholder="Nama lengkap">
+                        <input id="name" name="name" type="text" value="{{ old('name') }}" required autofocus autocomplete="name" class="w-full rounded-xl border border-gray-200 bg-gray-50/50 py-3 pl-9 pr-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none" placeholder="Nama lengkap">
                     </div>
                     @error('name')
                         <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
@@ -40,7 +38,7 @@
                         <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
                             <i class="fas fa-envelope text-xs"></i>
                         </span>
-                        <input id="email" name="email" type="email" value="{{ old('email') }}" required autocomplete="username" class="w-full rounded-xl border-gray-200 bg-gray-50 py-3 pl-9 pr-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500" placeholder="yourname@example.com">
+                        <input id="email" name="email" type="email" value="{{ old('email') }}" required autocomplete="username" class="w-full rounded-xl border border-gray-200 bg-gray-50/50 py-3 pl-9 pr-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none" placeholder="yourname@example.com">
                     </div>
                     @error('email')
                         <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
@@ -53,7 +51,7 @@
                         <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
                             <i class="fas fa-lock text-xs"></i>
                         </span>
-                        <input id="password" name="password" :type="showPassword ? 'text' : 'password'" required autocomplete="new-password" class="w-full rounded-xl border-gray-200 bg-gray-50 py-3 pl-9 pr-10 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500" placeholder="Minimal 8 karakter">
+                        <input id="password" name="password" :type="showPassword ? 'text' : 'password'" required autocomplete="new-password" class="w-full rounded-xl border border-gray-200 bg-gray-50/50 py-3 pl-9 pr-10 text-sm text-gray-800 placeholder:text-gray-400 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none" placeholder="Minimal 8 karakter">
                         <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-blue-600 transition" :aria-label="showPassword ? 'Sembunyikan password' : 'Tampilkan password'">
                             <i class="fas text-xs" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
                         </button>
@@ -69,14 +67,14 @@
                         <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
                             <i class="fas fa-check-double text-xs"></i>
                         </span>
-                        <input id="password_confirmation" name="password_confirmation" :type="showPasswordConfirmation ? 'text' : 'password'" required autocomplete="new-password" class="w-full rounded-xl border-gray-200 bg-gray-50 py-3 pl-9 pr-10 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500" placeholder="Ulangi password">
+                        <input id="password_confirmation" name="password_confirmation" :type="showPasswordConfirmation ? 'text' : 'password'" required autocomplete="new-password" class="w-full rounded-xl border border-gray-200 bg-gray-50/50 py-3 pl-9 pr-10 text-sm text-gray-800 placeholder:text-gray-400 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none" placeholder="Ulangi password">
                         <button type="button" @click="showPasswordConfirmation = !showPasswordConfirmation" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-blue-600 transition" :aria-label="showPasswordConfirmation ? 'Sembunyikan konfirmasi password' : 'Tampilkan konfirmasi password'">
                             <i class="fas text-xs" :class="showPasswordConfirmation ? 'fa-eye-slash' : 'fa-eye'"></i>
                         </button>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition shadow-lg shadow-blue-500/20">
+                <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 text-sm font-bold text-white hover:bg-primary-dark transition shadow-lg shadow-primary/20 hover:-translate-y-0.5">
                     <i class="fas fa-user-plus text-xs"></i>
                     Daftar
                 </button>

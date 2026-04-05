@@ -11,7 +11,7 @@
 @section('content')
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         <nav class="text-sm">
-            <div class="bg-white/80 backdrop-blur-md border border-gray-100 shadow-sm rounded-2xl px-5 py-3">
+            <div class="bg-white border border-gray-200 shadow-sm rounded-xl px-5 py-3">
                 <div class="flex flex-wrap items-center gap-2 text-gray-500 font-medium">
                     <a href="{{ route('home') }}" class="text-gray-500 hover:text-primary transition-colors flex items-center gap-1.5"><i class="fas fa-home text-xs"></i> Beranda</a>
                     <span class="text-gray-300"><i class="fas fa-chevron-right text-[10px]"></i></span>
@@ -22,12 +22,12 @@
             </div>
         </nav>
 
-        <article class="bg-white border border-gray-100 rounded-[2.5rem] shadow-[0_8px_40px_rgb(0,0,0,0.03)] overflow-hidden">
+        <article class="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden">
             <!-- Blog Header -->
             <div class="p-6 md:p-12 pb-8">
                 @if ($post->category)
                     <div class="mb-4">
-                        <span class="inline-flex items-center gap-1.5 bg-primary/10 text-primary text-[10px] md:text-xs font-black px-4 py-2 rounded-xl uppercase tracking-[0.2em]">
+                        <span class="inline-flex items-center gap-1.5 bg-gray-50 text-primary text-[10px] md:text-xs font-black px-4 py-2 rounded-xl border border-gray-200 uppercase tracking-widest">
                             <i class="fas fa-folder-open text-primary/60"></i> {{ $post->category->name }}
                         </span>
                     </div>
@@ -63,7 +63,7 @@
 
             <!-- Featured Image -->
             <div class="px-4 md:px-12">
-                <div class="rounded-3xl overflow-hidden shadow-2xl shadow-gray-200/50 aspect-[16/9] md:aspect-[21/9]">
+                <div class="rounded-2xl overflow-hidden border border-gray-200 aspect-[16/9] md:aspect-[21/9]">
                     <img src="{{ $post->cover_image }}" alt="{{ $post->title }}" class="w-full h-full object-cover">
                 </div>
             </div>
@@ -88,9 +88,9 @@
                     <div class="flex flex-col sm:flex-row sm:items-center gap-4 lg:ml-auto">
                         <span class="text-xs font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">Bagikan:</span>
                         <div class="flex gap-2">
-                            <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('blog.detail', $post->slug)) }}&text={{ urlencode($post->title) }}" target="_blank" class="w-11 h-11 rounded-2xl bg-[#1DA1F2]/10 text-[#1DA1F2] flex items-center justify-center hover:bg-[#1DA1F2] hover:text-white transition-all transform hover:-translate-y-1 shadow-sm"><i class="fab fa-twitter text-lg"></i></a>
-                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('blog.detail', $post->slug)) }}" target="_blank" class="w-11 h-11 rounded-2xl bg-[#1877F2]/10 text-[#1877F2] flex items-center justify-center hover:bg-[#1877F2] hover:text-white transition-all transform hover:-translate-y-1 shadow-sm"><i class="fab fa-facebook-f text-lg"></i></a>
-                            <a href="https://wa.me/?text={{ urlencode($post->title . ' ' . route('blog.detail', $post->slug)) }}" target="_blank" class="w-11 h-11 rounded-2xl bg-[#25D366]/10 text-[#25D366] flex items-center justify-center hover:bg-[#25D366] hover:text-white transition-all transform hover:-translate-y-1 shadow-sm"><i class="fab fa-whatsapp text-lg"></i></a>
+                            <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('blog.detail', $post->slug)) }}&text={{ urlencode($post->title) }}" target="_blank" class="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-600 flex items-center justify-center hover:bg-primary hover:text-white transition-all transform hover:-translate-y-1 shadow-sm"><i class="fab fa-twitter text-base"></i></a>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('blog.detail', $post->slug)) }}" target="_blank" class="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-600 flex items-center justify-center hover:bg-primary hover:text-white transition-all transform hover:-translate-y-1 shadow-sm"><i class="fab fa-facebook-f text-base"></i></a>
+                            <a href="https://wa.me/?text={{ urlencode($post->title . ' ' . route('blog.detail', $post->slug)) }}" target="_blank" class="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-600 flex items-center justify-center hover:bg-primary hover:text-white transition-all transform hover:-translate-y-1 shadow-sm"><i class="fab fa-whatsapp text-base"></i></a>
                         </div>
                     </div>
                 </div>
@@ -99,13 +99,13 @@
 
         <section class="space-y-6 mt-12 mb-8">
             <div class="flex items-center gap-3">
-                <div class="h-8 w-1.5 bg-primary rounded-full"></div>
-                <h2 class="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">Artikel Terkait</h2>
+                <div class="h-8 w-1.5 bg-blue-600 rounded-full"></div>
+                <h2 class="text-xl md:text-2xl font-black text-gray-900 tracking-tight uppercase">Artikel Terkait</h2>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 @forelse($relatedPosts as $item)
-                    <a href="{{ route('blog.detail', $item->slug) }}" class="group bg-white border border-gray-100 rounded-3xl p-5 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 hover:border-primary/20 transition-all duration-300 flex flex-col h-full">
+                    <a href="{{ route('blog.detail', $item->slug) }}" class="group bg-white border border-gray-200 rounded-2xl p-5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
                         <div class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">
                             <span class="inline-flex items-center gap-1.5"><i class="far fa-calendar-alt text-gray-300"></i> {{ optional($item->published_at)->translatedFormat('d M Y') }}</span>
                         </div>

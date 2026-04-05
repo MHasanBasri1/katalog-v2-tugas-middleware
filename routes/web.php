@@ -84,34 +84,10 @@ Route::middleware(['auth', 'role:user', 'verified'])->group(function () {
     Route::delete('/profil-saya/favorit/{productId}', [PanelController::class, 'destroyFavorite'])->name('user.favorite.destroy');
 });
 
-Route::get('/', function () {
-    return view('frontend.home');
-})->name('home');
+Route::get('/', [App\Http\Controllers\Public\HomeController::class, 'index'])->name('home');
 
-Route::get('/kategori', function () {
-    return view('frontend.kategori');
-})->name('kategori');
-
-Route::get('/kategori/{slug}', function ($slug) {
-    $category = Category::query()
-        ->select('id', 'name', 'slug', 'description')
-        ->where('slug', $slug)
-        ->firstOrFail();
-
-    $canonical = route('kategori.detail', $category->slug);
-    $seoTitle = "{$category->name} - Kategori Produk Kataloque";
-    $seoDescription = $category->description
-        ?: "Lihat daftar produk kategori {$category->name} di Kataloque dengan update produk terbaru.";
-    $ogImage = Product::query()
-        ->where('status', true)
-        ->where('category_id', $category->id)
-        ->with('primaryImage:id,product_id,image')
-        ->latest('id')
-        ->first()?->primaryImage?->image
-        ?: 'https://picsum.photos/seed/kataloque-kategori/1200/630';
-
-    return view('frontend.kategori-detail', compact('slug', 'seoTitle', 'seoDescription', 'canonical', 'ogImage'));
-})->name('kategori.detail');
+Route::get('/kategori', [App\Http\Controllers\Public\CategoryController::class, 'index'])->name('kategori');
+Route::get('/kategori/{slug}', [App\Http\Controllers\Public\CategoryController::class, 'show'])->name('kategori.detail');
 
 Route::get('/produk', function () {
     return view('frontend.produk');
@@ -119,23 +95,7 @@ Route::get('/produk', function () {
 
 Route::redirect('/katalog', '/produk', 301);
 
-Route::get('/produk/{slug}', function ($slug) {
-    $product = Product::query()
-        ->select('id', 'name', 'slug', 'description', 'price')
-        ->where('slug', $slug)
-        ->where('status', true)
-        ->with('primaryImage:id,product_id,image')
-        ->firstOrFail();
-
-    $canonical = route('produk.detail', $product->slug);
-    $seoTitle = "{$product->name} - Kataloque";
-    $seoDescription = $product->description
-        ? str($product->description)->limit(155)->toString()
-        : "Lihat detail {$product->name} di Kataloque, mulai dari harga, spesifikasi, dan link marketplace resmi.";
-    $ogImage = $product->primaryImage?->image ?: 'https://picsum.photos/seed/kataloque-produk/1200/630';
-
-    return view('frontend.detail', compact('slug', 'seoTitle', 'seoDescription', 'canonical', 'ogImage'));
-})->name('produk.detail');
+Route::get('/produk/{slug}', [App\Http\Controllers\Public\ProductController::class, 'show'])->name('produk.detail');
 
 Route::get('/blog', function (Request $request) {
     $canonical = route('blog.index');

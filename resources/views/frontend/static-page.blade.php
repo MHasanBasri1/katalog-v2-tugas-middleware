@@ -23,17 +23,13 @@
             <!-- Decorative shape -->
             <div class="absolute -right-20 -top-20 w-48 h-48 rounded-full bg-primary/5 blur-3xl -z-10"></div>
             
-            <div class="mb-10 text-center">
-                <h1 class="text-3xl md:text-5xl font-black text-gray-900 leading-tight tracking-tight">{{ $page->title }}</h1>
-                <div class="w-16 h-1.5 bg-primary rounded-full mx-auto mt-6"></div>
-                
-                @if($page->excerpt)
-                    <p class="text-base md:text-lg text-gray-500 mt-6 max-w-2xl mx-auto font-medium">{{ $page->excerpt }}</p>
-                @endif
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-1.5 h-8 bg-blue-600 rounded-full"></div>
+                <h1 class="text-xl md:text-2xl font-black text-gray-900 tracking-tight uppercase">{{ $page->title }}</h1>
             </div>
 
             <div class="prose prose-sm md:prose-base lg:prose-lg max-w-none text-gray-600 leading-relaxed">
-                <div class="mt-6 whitespace-pre-line prose-headings:font-black prose-headings:text-gray-900 prose-a:text-primary hover:prose-a:text-primary-dark prose-p:mb-5 prose-ul:my-5 prose-li:my-2">{{ $page->content }}</div>
+                <div class="mt-2 whitespace-pre-line prose-headings:font-black prose-headings:text-gray-900 prose-a:text-primary hover:prose-a:text-primary-dark prose-p:mb-5 prose-ul:my-5 prose-li:my-2">{{ $page->content }}</div>
             </div>
         </article>
     </div>

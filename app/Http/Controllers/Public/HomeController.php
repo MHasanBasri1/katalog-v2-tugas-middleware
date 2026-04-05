@@ -1,22 +1,17 @@
 <?php
 
-namespace App\Livewire\Public;
+namespace App\Http\Controllers\Public;
 
+use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Banner;
 use App\Models\Product;
-use App\Models\Favorite;
-use Illuminate\Contracts\View\View;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Livewire\Component;
 
-class Home extends Component
+class HomeController extends Controller
 {
-    public array $favoritedProductIds = [];
-
-    public function render(): View
+    public function index()
     {
         $heroBanners = Cache::remember(
             'public.home.hero_banners',
@@ -50,7 +45,7 @@ class Home extends Component
                 'primaryImage:id,product_id,image',
             ])
             ->orderByDesc('sold_count')
-            ->orderByDesc('id')
+            ->latest('id')
             ->limit(10)
             ->get();
 
@@ -63,7 +58,7 @@ class Home extends Component
                 'primaryImage:id,product_id,image',
             ])
             ->orderByDesc('sold_count')
-            ->orderByDesc('id')
+            ->latest('id')
             ->limit(10)
             ->get();
 
@@ -78,87 +73,12 @@ class Home extends Component
             ->limit(10)
             ->get();
 
-        $displayedProductIds = $bestSellerProducts
-            ->pluck('id')
-            ->merge($flashSaleProducts->pluck('id'))
-            ->merge($newProducts->pluck('id'))
-            ->unique()
-            ->values();
-
-        $this->syncFavoriteState($displayedProductIds);
-
-        return view('livewire.public.home', [
+        return view('frontend.home', [
             'heroBanners' => $heroBanners,
             'popularCategories' => $popularCategories,
             'bestSellerProducts' => $bestSellerProducts,
             'flashSaleProducts' => $flashSaleProducts,
             'newProducts' => $newProducts,
         ]);
-    }
-
-    public function toggleFavorite(int $productId): void
-    {
-        if (! Auth::check()) {
-            session()->flash('status', 'Silakan daftar atau masuk terlebih dahulu untuk menambah atribut favorit.');
-            $this->redirectRoute('user.login', navigate: true);
-
-            return;
-        }
-
-        $productExists = Product::query()
-            ->whereKey($productId)
-            ->where('status', true)
-            ->exists();
-
-        if (! $productExists) {
-            return;
-        }
-
-        $userId = Auth::id();
-
-        $existing = Favorite::query()
-            ->where('product_id', $productId)
-            ->where('user_id', $userId)
-            ->first();
-
-        if ($existing) {
-            $existing->delete();
-
-            $this->favoritedProductIds = array_values(array_filter(
-                $this->favoritedProductIds,
-                fn ($id) => (int) $id !== $productId
-            ));
-
-            return;
-        }
-
-        Favorite::query()->create([
-            'product_id' => $productId,
-            'user_id' => $userId,
-        ]);
-
-        if (! in_array($productId, $this->favoritedProductIds, true)) {
-            $this->favoritedProductIds[] = $productId;
-        }
-    }
-
-    private function syncFavoriteState(Collection $productIds): void
-    {
-        $userId = Auth::id();
-
-        if (! $userId || $productIds->isEmpty()) {
-            $this->favoritedProductIds = [];
-
-            return;
-        }
-
-        $this->favoritedProductIds = Favorite::query()
-            ->whereIn('product_id', $productIds)
-            ->where('user_id', $userId)
-            ->pluck('product_id')
-            ->map(fn ($id) => (int) $id)
-            ->unique()
-            ->values()
-            ->all();
     }
 }

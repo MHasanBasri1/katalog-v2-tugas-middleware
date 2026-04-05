@@ -8,12 +8,18 @@ export default {
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
+        './app/Livewire/**/*.php',
     ],
 
     theme: {
         extend: {
+            colors: {
+                primary: '#2563eb',
+                'primary-light': '#eff6ff',
+                'primary-dark': '#1e40af'
+            },
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Plus Jakarta Sans', ...defaultTheme.fontFamily.sans],
             },
         },
     },
