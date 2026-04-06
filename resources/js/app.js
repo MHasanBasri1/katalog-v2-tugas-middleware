@@ -1,9 +1,5 @@
 import './bootstrap';
 
-import Alpine from 'alpinejs';
-
-window.Alpine = Alpine;
-
 function applyTheme(theme) {
     document.documentElement.classList.toggle('dark', theme === 'dark');
 }
@@ -32,4 +28,3 @@ document.addEventListener('alpine:init', () => {
 
 applyTheme(localStorage.getItem('theme') || 'light');
 
-Alpine.start();
