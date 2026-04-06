@@ -110,6 +110,6 @@ class User extends Authenticatable implements MustVerifyEmail
             return $avatar;
         }
 
-        return Storage::disk('public')->url($avatar);
+        return asset('storage/' . $avatar);
     }
 }

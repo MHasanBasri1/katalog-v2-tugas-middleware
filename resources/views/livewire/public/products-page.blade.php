@@ -12,25 +12,29 @@
             <div class="md:col-span-2">
                 <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Pencarian Produk</label>
                 <div class="relative group">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-hover:text-primary transition-colors">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center text-gray-400 group-focus-within:text-primary transition-colors" style="width: 44px;">
                         <i class="fas fa-search text-xs"></i>
                     </div>
-                    <input wire:model.live.debounce.300ms="search" type="text" placeholder="Ketik nama produk untuk mencari..." class="w-full bg-gray-50/80 border border-gray-300 focus:border-primary focus:ring-4 focus:ring-primary/10 focus:bg-white rounded-xl py-3 pl-11 pr-4 outline-none transition-all duration-300 text-sm font-medium placeholder:text-gray-400">
+                    <input wire:model.live.debounce.300ms="search" type="text" placeholder="Ketik nama produk untuk mencari..."
+                        class="w-full bg-gray-50/80 border border-gray-300 focus:border-primary focus:ring-4 focus:ring-primary/10 focus:bg-white rounded-xl outline-none transition-all duration-300 text-sm font-medium placeholder:text-gray-400"
+                        style="padding: 0.75rem 1rem 0.75rem 44px;">
                 </div>
             </div>
             <div class="md:col-span-1">
                 <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Pilih Kategori</label>
                 <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 z-10">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center text-gray-400 z-10" style="width: 44px;">
                         <i class="fas fa-layer-group text-xs"></i>
                     </div>
-                    <select wire:model.live="categorySlug" class="w-full bg-gray-50/80 border border-gray-300 focus:border-primary focus:ring-4 focus:ring-primary/10 focus:bg-white rounded-xl py-3 pl-11 pr-10 outline-none transition-all duration-300 text-sm font-medium appearance-none relative z-0">
+                    <select wire:model.live="categorySlug"
+                        class="w-full bg-gray-50/80 border border-gray-300 focus:border-primary focus:ring-4 focus:ring-primary/10 focus:bg-white rounded-xl outline-none transition-all duration-300 text-sm font-medium"
+                        style="padding: 0.75rem 2.5rem 0.75rem 44px; appearance: none;">
                         <option value="">Semua Kategori</option>
                         @foreach($categories as $category)
                             <option value="{{ $category->slug }}">{{ $category->name }}</option>
                         @endforeach
                     </select>
-                    <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center justify-center text-gray-400" style="width: 40px;">
                         <i class="fas fa-chevron-down text-[10px]"></i>
                     </div>
                 </div>
@@ -91,11 +95,21 @@
                         <span class="text-gray-500">Terjual {{ $compactViews($product->sold_count) }}</span>
                     </div>
 
-                    <div class="mt-auto pt-2 border-t border-gray-100 flex items-center gap-1.5">
-                        <div class="w-4 h-4 rounded bg-blue-500 flex items-center justify-center text-white text-[8px]">
-                            <i class="fas fa-shopping-bag"></i>
+                    <div class="mt-auto pt-2 border-t border-gray-100 relative h-7">
+                        <!-- Group 1: Category -->
+                        <div class="animate-fade-cat absolute inset-x-0 bottom-0 py-1 flex items-center gap-2">
+                            <div class="w-4 h-4 rounded bg-blue-600 flex items-center justify-center text-white text-[8px] flex-shrink-0">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <span class="text-[10px] font-semibold text-gray-500 truncate mt-0.5">{{ $product->category?->name ?? 'Kataloque Official' }}</span>
                         </div>
-                        <span class="text-[10px] font-medium text-gray-500 truncate">{{ $product->category?->name ?? 'Kataloque Official' }}</span>
+                        <!-- Group 2: Store -->
+                        <div class="animate-fade-store absolute inset-x-0 bottom-0 py-1 flex items-center gap-2">
+                            <div class="w-4 h-4 rounded bg-blue-600 flex items-center justify-center text-white text-[8px] flex-shrink-0">
+                                <i class="fas fa-shopping-bag"></i>
+                            </div>
+                            <span class="text-[10px] font-bold text-blue-600 truncate mt-0.5">Kataloque Official</span>
+                        </div>
                     </div>
                 </div>
             </div>

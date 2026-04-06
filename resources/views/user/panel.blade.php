@@ -120,10 +120,10 @@
                     <div>
                         <label class="block text-xs font-semibold text-gray-500 mb-1">Nama</label>
                         <div class="relative">
-                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center text-gray-400" style="width: 36px;">
                                 <i class="fas fa-user text-xs"></i>
                             </span>
-                            <input type="text" name="name" value="{{ old('name', auth()->user()->name) }}" class="w-full rounded-xl border-gray-200 bg-gray-50 py-2.5 pl-9 pr-3 text-sm focus:border-blue-500 focus:ring-blue-500">
+                            <input type="text" name="name" value="{{ old('name', auth()->user()->name) }}" class="w-full rounded-xl border border-gray-200 bg-gray-50 text-sm focus:border-blue-500 focus:ring-blue-500 outline-none" style="padding: 0.625rem 0.75rem 0.625rem 36px;">
                         </div>
                         @error('name', 'profileUpdate')
                             <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
@@ -132,10 +132,10 @@
                     <div>
                         <label class="block text-xs font-semibold text-gray-500 mb-1">Email</label>
                         <div class="relative">
-                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center text-gray-400" style="width: 36px;">
                                 <i class="fas fa-envelope text-xs"></i>
                             </span>
-                            <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}" class="w-full rounded-xl border-gray-200 bg-gray-50 py-2.5 pl-9 pr-3 text-sm focus:border-blue-500 focus:ring-blue-500">
+                            <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}" class="w-full rounded-xl border border-gray-200 bg-gray-50 text-sm focus:border-blue-500 focus:ring-blue-500 outline-none" style="padding: 0.625rem 0.75rem 0.625rem 36px;">
                         </div>
                         @error('email', 'profileUpdate')
                             <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
@@ -153,11 +153,11 @@
                     <div x-data="{ showCurrentPassword: false }">
                         <label class="block text-xs font-semibold text-gray-500 mb-1">Password Saat Ini</label>
                         <div class="relative">
-                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center text-gray-400" style="width: 36px;">
                                 <i class="fas fa-lock text-xs"></i>
                             </span>
-                            <input :type="showCurrentPassword ? 'text' : 'password'" name="current_password" class="w-full rounded-xl border-gray-200 bg-gray-50 py-2.5 pl-9 pr-10 text-sm focus:border-blue-500 focus:ring-blue-500">
-                            <button type="button" @click="showCurrentPassword = !showCurrentPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-blue-600 transition" :aria-label="showCurrentPassword ? 'Sembunyikan password saat ini' : 'Tampilkan password saat ini'">
+                            <input :type="showCurrentPassword ? 'text' : 'password'" name="current_password" class="w-full rounded-xl border border-gray-200 bg-gray-50 text-sm focus:border-blue-500 focus:ring-blue-500 outline-none" style="padding: 0.625rem 36px 0.625rem 36px;">
+                            <button type="button" @click="showCurrentPassword = !showCurrentPassword" class="absolute inset-y-0 right-0 flex items-center justify-center text-gray-400 hover:text-blue-600 transition" style="width: 36px;" :aria-label="showCurrentPassword ? 'Sembunyikan password saat ini' : 'Tampilkan password saat ini'">
                                 <i class="fas text-xs" :class="showCurrentPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
                             </button>
                         </div>
@@ -168,11 +168,11 @@
                     <div x-data="{ showNewPassword: false }">
                         <label class="block text-xs font-semibold text-gray-500 mb-1">Password Baru</label>
                         <div class="relative">
-                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center text-gray-400" style="width: 36px;">
                                 <i class="fas fa-key text-xs"></i>
                             </span>
-                            <input :type="showNewPassword ? 'text' : 'password'" name="password" class="w-full rounded-xl border-gray-200 bg-gray-50 py-2.5 pl-9 pr-10 text-sm focus:border-blue-500 focus:ring-blue-500">
-                            <button type="button" @click="showNewPassword = !showNewPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-blue-600 transition" :aria-label="showNewPassword ? 'Sembunyikan password baru' : 'Tampilkan password baru'">
+                            <input :type="showNewPassword ? 'text' : 'password'" name="password" class="w-full rounded-xl border border-gray-200 bg-gray-50 text-sm focus:border-blue-500 focus:ring-blue-500 outline-none" style="padding: 0.625rem 36px 0.625rem 36px;">
+                            <button type="button" @click="showNewPassword = !showNewPassword" class="absolute inset-y-0 right-0 flex items-center justify-center text-gray-400 hover:text-blue-600 transition" style="width: 36px;" :aria-label="showNewPassword ? 'Sembunyikan password baru' : 'Tampilkan password baru'">
                                 <i class="fas text-xs" :class="showNewPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
                             </button>
                         </div>
@@ -183,11 +183,11 @@
                     <div x-data="{ showPasswordConfirmation: false }">
                         <label class="block text-xs font-semibold text-gray-500 mb-1">Konfirmasi Password Baru</label>
                         <div class="relative">
-                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center text-gray-400" style="width: 36px;">
                                 <i class="fas fa-check-double text-xs"></i>
                             </span>
-                            <input :type="showPasswordConfirmation ? 'text' : 'password'" name="password_confirmation" class="w-full rounded-xl border-gray-200 bg-gray-50 py-2.5 pl-9 pr-10 text-sm focus:border-blue-500 focus:ring-blue-500">
-                            <button type="button" @click="showPasswordConfirmation = !showPasswordConfirmation" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-blue-600 transition" :aria-label="showPasswordConfirmation ? 'Sembunyikan konfirmasi password baru' : 'Tampilkan konfirmasi password baru'">
+                            <input :type="showPasswordConfirmation ? 'text' : 'password'" name="password_confirmation" class="w-full rounded-xl border border-gray-200 bg-gray-50 text-sm focus:border-blue-500 focus:ring-blue-500 outline-none" style="padding: 0.625rem 36px 0.625rem 36px;">
+                            <button type="button" @click="showPasswordConfirmation = !showPasswordConfirmation" class="absolute inset-y-0 right-0 flex items-center justify-center text-gray-400 hover:text-blue-600 transition" style="width: 36px;" :aria-label="showPasswordConfirmation ? 'Sembunyikan konfirmasi password baru' : 'Tampilkan konfirmasi password baru'">
                                 <i class="fas text-xs" :class="showPasswordConfirmation ? 'fa-eye-slash' : 'fa-eye'"></i>
                             </button>
                         </div>

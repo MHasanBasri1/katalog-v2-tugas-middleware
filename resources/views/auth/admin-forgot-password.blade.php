@@ -20,27 +20,32 @@
             <form method="POST" action="{{ route('admin.password.email') }}" class="space-y-5">
                 @csrf
 
+                {{-- Email --}}
                 <div>
                     <label for="email" class="mb-1.5 block text-sm font-semibold text-gray-700">Email Admin</label>
-                    <div class="relative">
-                        <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
-                            <i class="fas fa-envelope text-xs"></i>
-                        </span>
-                        <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus autocomplete="username" class="w-full rounded-xl border-gray-200 bg-gray-50 py-3 pl-9 pr-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500" placeholder="admin@example.com">
+                    <div class="relative group">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center" style="width: 44px; justify-content: center;">
+                            <i class="fas fa-envelope text-sm text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
+                        </div>
+                        <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus autocomplete="username"
+                            class="w-full rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
+                            style="padding: 0.75rem 0.75rem 0.75rem 44px;"
+                            placeholder="admin@example.com">
                     </div>
                     @error('email')
                         <p class="mt-1 text-xs text-rose-500">{{ $message }}</p>
                     @enderror
                 </div>
 
+                {{-- Buttons --}}
                 <div class="space-y-4">
-                    <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition shadow-lg shadow-blue-500/20">
-                        <i class="fas fa-paper-plane text-xs"></i>
+                    <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-bold text-white hover:bg-blue-700 transition shadow-lg shadow-blue-500/20 hover:-translate-y-0.5">
+                        <i class="fas fa-paper-plane text-[13px]"></i>
                         Kirim Link Reset
                     </button>
                     
                     <a href="{{ route('login') }}" class="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition">
-                        <i class="fas fa-arrow-left text-xs"></i>
+                        <i class="fas fa-arrow-left text-[13px]"></i>
                         Kembali ke Login
                     </a>
                 </div>

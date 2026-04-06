@@ -44,17 +44,17 @@
     @endphp
     <div class="space-y-6">
         <!-- Single Wide Banner -->
-        <div x-data="bannerSlider({{ $bannerItems->count() }})" x-init="startAutoSlide()" @mouseenter="stopAutoSlide()" @mouseleave="startAutoSlide()" class="relative rounded-xl overflow-hidden w-full aspect-[4/1.2] sm:aspect-[4/1] shadow-sm group">
+        <div x-data="bannerSlider({{ $bannerItems->count() }})" x-init="startAutoSlide()" @mouseenter="stopAutoSlide()" @mouseleave="startAutoSlide()" class="relative rounded-2xl overflow-hidden w-full aspect-[4/1.5] sm:aspect-[4/1.2] md:aspect-[4/1] shadow-sm group">
             <div class="flex h-full w-full slide-transition transition-transform duration-700 ease-in-out" :style="`transform: translateX(-${currentSlide * 100}%)`">
                 @foreach($bannerItems as $banner)
                     <div class="w-full h-full flex-shrink-0 relative">
                         <img src="{{ $banner->image_url }}" alt="{{ $banner->title }}" class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent"></div>
-                        <div class="absolute inset-0 px-6 sm:px-12 md:px-16 flex items-center">
+                        <div class="absolute inset-0 px-5 sm:px-10 md:px-16 flex items-center">
                             <div class="max-w-xl text-white">
-                                <h2 class="text-xl sm:text-3xl md:text-5xl font-black leading-tight mb-2 md:mb-4 drop-shadow-md">{{ str($banner->title)->limit(40) }}</h2>
+                                <h2 class="text-lg sm:text-3xl md:text-5xl font-black leading-tight mb-1 md:mb-3 drop-shadow-md">{{ str($banner->title)->limit(40) }}</h2>
                                 @if($banner->subtitle)
-                                    <p class="text-xs sm:text-lg font-medium text-white/90 drop-shadow line-clamp-2">{{ $banner->subtitle }}</p>
+                                    <p class="text-[11px] sm:text-base md:text-lg font-medium text-white/90 drop-shadow line-clamp-2">{{ $banner->subtitle }}</p>
                                 @endif
                             </div>
                         </div>
@@ -62,19 +62,20 @@
                 @endforeach
             </div>
 
+            {{-- Slide Controls --}}
             <div class="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 flex items-center gap-2 z-10 hidden sm:flex">
-                <button type="button" @click.stop="prevSlide()" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md text-white flex items-center justify-center transition-all shadow-sm">
-                    <i class="fas fa-chevron-left text-xs sm:text-sm"></i>
+                <button type="button" @click.stop="prevSlide()" class="w-8 h-8 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md text-white flex items-center justify-center transition-all shadow-sm">
+                    <i class="fas fa-chevron-left text-xs"></i>
                 </button>
-                <button type="button" @click.stop="nextSlide()" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md text-white flex items-center justify-center transition-all shadow-sm">
-                    <i class="fas fa-chevron-right text-xs sm:text-sm"></i>
+                <button type="button" @click.stop="nextSlide()" class="w-8 h-8 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-md text-white flex items-center justify-center transition-all shadow-sm">
+                    <i class="fas fa-chevron-right text-xs"></i>
                 </button>
             </div>
 
-            <div class="absolute bottom-4 left-6 flex items-center justify-center gap-1.5 z-10">
+            <div class="absolute bottom-4 left-6 flex items-center gap-1.5 z-10">
                 <template x-for="(slide, index) in slides" :key="index">
-                    <button type="button" @click.stop="goToSlide(index)" 
-                        :class="currentSlide === index ? 'w-6 bg-white' : 'w-2 bg-white/40'" 
+                    <button type="button" @click.stop="goToSlide(index)"
+                        :class="currentSlide === index ? 'w-6 bg-white' : 'w-2 bg-white/40'"
                         class="h-1.5 rounded-full transition-all duration-300 shadow-sm"></button>
                 </template>
             </div>
@@ -190,11 +191,6 @@
                             <i class="fas fa-truck-fast text-[10px]"></i>
                             <span class="text-[8px] font-black uppercase leading-none mt-0.5">Gratis Ongkir</span>
                         </div>
-
-                        <!-- Favorite Button (Hover) -->
-                        <div class="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                            @livewire('public.favorite-button', ['productId' => $product->id, 'class' => 'w-8 h-8 md:w-9 md:h-9 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg hover:bg-primary hover:text-white'], key('fav-flash-'.$product->id))
-                        </div>
                     </a>
                     
                     <div class="px-1 flex flex-col flex-1">
@@ -216,11 +212,21 @@
                             <span class="text-gray-500">Terjual {{ $compactViews($product->sold_count) }}</span>
                         </div>
 
-                        <div class="mt-auto pt-2 border-t border-gray-100 flex items-center gap-1.5">
-                            <div class="w-4 h-4 rounded bg-blue-500 flex items-center justify-center text-white text-[8px]">
-                                <i class="fas fa-shopping-bag"></i>
+                        <div class="mt-auto pt-2 border-t border-gray-100 relative h-7">
+                            <!-- Group 1: Category -->
+                            <div class="animate-fade-cat absolute inset-x-0 bottom-0 py-1 flex items-center gap-2">
+                                <div class="w-4 h-4 rounded bg-blue-600 flex items-center justify-center text-white text-[8px] flex-shrink-0">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-gray-500 truncate mt-0.5">{{ $product->category?->name ?? 'Kataloque Official' }}</span>
                             </div>
-                            <span class="text-[11px] font-medium text-gray-500 truncate">{{ $product->category?->name ?? 'Kataloque Official' }}</span>
+                            <!-- Group 2: Store -->
+                            <div class="animate-fade-store absolute inset-x-0 bottom-0 py-1 flex items-center gap-2">
+                                <div class="w-4 h-4 rounded bg-blue-600 flex items-center justify-center text-white text-[8px] flex-shrink-0">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </div>
+                                <span class="text-[10px] font-bold text-blue-600 truncate mt-0.5">Kataloque Official</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -257,10 +263,6 @@
                                 <i class="fas fa-truck-fast text-[10px]"></i>
                                 <span class="text-[8px] font-black uppercase leading-none mt-0.5">Gratis Ongkir</span>
                             </div>
-
-                            <div class="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                                @livewire('public.favorite-button', ['productId' => $product->id, 'class' => 'w-8 h-8 md:w-9 md:h-9 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg hover:bg-primary hover:text-white'], key('fav-best-'.$product->id))
-                            </div>
                         </a>
                         <div class="px-1 flex flex-col flex-1">
                             <h3 class="font-bold text-gray-800 text-sm md:text-base leading-snug mb-1 line-clamp-2 min-h-[40px] group-hover:text-primary transition-colors">
@@ -281,11 +283,21 @@
                                 <span class="text-gray-500">Terjual {{ $compactViews($product->sold_count) }}</span>
                             </div>
 
-                            <div class="mt-auto pt-2 border-t border-gray-100 flex items-center gap-1.5">
-                                <div class="w-4 h-4 rounded bg-blue-500 flex items-center justify-center text-white text-[8px]">
-                                    <i class="fas fa-shopping-bag"></i>
+                            <div class="mt-auto pt-2 border-t border-gray-100 relative h-7">
+                                <!-- Group 1: Category -->
+                                <div class="animate-fade-cat absolute inset-x-0 bottom-0 py-1 flex items-center gap-2">
+                                    <div class="w-4 h-4 rounded bg-blue-600 flex items-center justify-center text-white text-[8px] flex-shrink-0">
+                                        <i class="fas fa-layer-group"></i>
+                                    </div>
+                                    <span class="text-[10px] font-semibold text-gray-500 truncate mt-0.5">{{ $product->category?->name ?? 'Kataloque Official' }}</span>
                                 </div>
-                                <span class="text-[11px] font-medium text-gray-500 truncate">{{ $product->category?->name ?? 'Kataloque Official' }}</span>
+                                <!-- Group 2: Store -->
+                                <div class="animate-fade-store absolute inset-x-0 bottom-0 py-1 flex items-center gap-2">
+                                    <div class="w-4 h-4 rounded bg-blue-600 flex items-center justify-center text-white text-[8px] flex-shrink-0">
+                                        <i class="fas fa-shopping-bag"></i>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-blue-600 truncate mt-0.5">Kataloque Official</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -317,10 +329,6 @@
                             <i class="fas fa-truck-fast text-[10px]"></i>
                             <span class="text-[8px] font-black uppercase leading-none mt-0.5">Gratis Ongkir</span>
                         </div>
-
-                        <div class="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                            @livewire('public.favorite-button', ['productId' => $product->id, 'class' => 'w-8 h-8 md:w-9 md:h-9 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg hover:bg-primary hover:text-white'], key('fav-new-'.$product->id))
-                        </div>
                     </a>
                     
                     <div class="px-1 flex flex-col flex-1">
@@ -342,11 +350,21 @@
                             <span class="text-gray-500">Terjual {{ $compactViews($product->sold_count) }}</span>
                         </div>
 
-                        <div class="mt-auto pt-2 border-t border-gray-100 flex items-center gap-1.5">
-                            <div class="w-4 h-4 rounded bg-blue-500 flex items-center justify-center text-white text-[8px]">
-                                <i class="fas fa-shopping-bag"></i>
+                        <div class="mt-auto pt-2 border-t border-gray-100 relative h-7">
+                            <!-- Group 1: Category -->
+                            <div class="animate-fade-cat absolute inset-x-0 bottom-0 py-1 flex items-center gap-2">
+                                <div class="w-4 h-4 rounded bg-blue-600 flex items-center justify-center text-white text-[8px] flex-shrink-0">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-gray-500 truncate mt-0.5">{{ $product->category?->name ?? 'Kataloque Official' }}</span>
                             </div>
-                            <span class="text-[11px] font-medium text-gray-500 truncate">{{ $product->category?->name ?? 'Kataloque Official' }}</span>
+                            <!-- Group 2: Store -->
+                            <div class="animate-fade-store absolute inset-x-0 bottom-0 py-1 flex items-center gap-2">
+                                <div class="w-4 h-4 rounded bg-blue-600 flex items-center justify-center text-white text-[8px] flex-shrink-0">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </div>
+                                <span class="text-[10px] font-bold text-blue-600 truncate mt-0.5">Kataloque Official</span>
+                            </div>
                         </div>
                     </div>
                 </div>

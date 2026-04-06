@@ -159,10 +159,6 @@
                             <i class="fas fa-truck-fast text-[10px]"></i>
                             <span class="text-[8px] font-black uppercase leading-none mt-0.5">Gratis Ongkir</span>
                         </div>
-
-                        <div class="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                            @livewire('public.favorite-button', ['productId' => $item->id, 'class' => 'w-8 h-8 md:w-9 md:h-9 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg hover:bg-primary hover:text-white'], key('fav-rel-'.$item->id))
-                        </div>
                     </a>
                     
                     <div class="px-1 flex flex-col flex-1">
@@ -184,11 +180,21 @@
                             <span class="text-gray-500">Terjual {{ $compactViews($item->sold_count) }}</span>
                         </div>
 
-                        <div class="mt-auto pt-2 border-t border-gray-100 flex items-center gap-1.5">
-                            <div class="w-4 h-4 rounded bg-blue-500 flex items-center justify-center text-white text-[8px]">
-                                <i class="fas fa-shopping-bag"></i>
+                        <div class="mt-auto pt-2 border-t border-gray-100 relative h-7">
+                            <!-- Group 1: Category -->
+                            <div class="animate-fade-cat absolute inset-x-0 bottom-0 py-1 flex items-center gap-2 px-1">
+                                <div class="w-4 h-4 rounded bg-blue-600 flex items-center justify-center text-white text-[8px] flex-shrink-0">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-gray-600 truncate mt-0.5">{{ $item->category?->name ?? 'Kataloque Official' }}</span>
                             </div>
-                            <span class="text-[11px] font-medium text-gray-600 truncate">{{ $item->category?->name ?? 'Kataloque Official' }}</span>
+                            <!-- Group 2: Store -->
+                            <div class="animate-fade-store absolute inset-x-0 bottom-0 py-1 flex items-center gap-2 px-1">
+                                <div class="w-4 h-4 rounded bg-blue-600 flex items-center justify-center text-white text-[8px] flex-shrink-0">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </div>
+                                <span class="text-[10px] font-bold text-blue-600 truncate mt-0.5">Kataloque Official</span>
+                            </div>
                         </div>
                     </div>
                 </div>

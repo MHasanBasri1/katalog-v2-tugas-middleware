@@ -47,6 +47,22 @@
             .mobile-only { display: none !important; }
             .desktop-only { display: inline-flex !important; }
         }
+        @keyframes fadeCat {
+            0%, 40% { opacity: 1; visibility: visible; }
+            50%, 90% { opacity: 0; visibility: hidden; }
+            100% { opacity: 1; visibility: visible; }
+        }
+        @keyframes fadeStore {
+            0%, 40% { opacity: 0; visibility: hidden; }
+            50%, 90% { opacity: 1; visibility: visible; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+        .animate-fade-cat {
+            animation: fadeCat 5s infinite ease-in-out;
+        }
+        .animate-fade-store {
+            animation: fadeStore 5s infinite ease-in-out;
+        }
     </style>
     @livewireStyles
     @stack('meta')
@@ -58,7 +74,7 @@
 
     <livewire:public.header />
 
-    <main class="relative z-10 pt-[90px] md:pt-[108px] pb-20 md:pb-0 @yield('main_class') max-w-full overflow-x-hidden">
+    <main class="relative z-10 pt-[56px] md:pt-[89px] pb-20 md:pb-0 @yield('main_class') max-w-full overflow-x-hidden">
         @yield('content')
     </main>
 
@@ -79,10 +95,10 @@
                 <i class="fas fa-heart text-lg"></i>
                 <span class="text-[10px] font-bold">Favorit</span>
             </a>
-            <a href="{{ auth()->check() ? (auth()->user()->hasRole('admin') ? route('admin.dashboard') : route('user.panel')) : route('user.login') }}" class="flex flex-col items-center gap-1 p-2 {{ request()->is('user/profile*') || request()->is('login*') || request()->is('register*') ? 'text-primary' : 'text-gray-400' }}">
+            <a href="{{ auth()->check() ? (auth()->user()->hasRole('admin') ? route('admin.dashboard') : route('user.panel')) : route('user.login') }}" class="flex flex-col items-center gap-1 p-2 {{ request()->is('profil-saya*') || request()->routeIs('user.panel') ? 'text-primary' : 'text-gray-400' }}">
                 @auth
-                    @if(auth()->user()->avatar)
-                        <img src="{{ auth()->user()->avatar }}" class="w-5 h-5 rounded-full object-cover">
+                    @if(auth()->user()->avatar_url)
+                        <img src="{{ auth()->user()->avatar_url }}" alt="Avatar" class="w-6 h-6 rounded-full object-cover border border-gray-200">
                     @else
                         <i class="fas fa-user-circle text-lg"></i>
                     @endif
