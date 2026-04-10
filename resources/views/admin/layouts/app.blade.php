@@ -52,7 +52,7 @@
                 'xl:ml-20': !$store.sidebar.isExpanded
             }">
             @include('admin.partials.topbar')
-            <main class="flex-1 p-4 md:p-8 max-w-full overflow-x-hidden">
+            <main class="flex-1 p-4 md:p-8 pt-24 md:pt-28 max-w-full overflow-x-hidden">
                 @yield('content')
             </main>
             @include('admin.partials.footer')

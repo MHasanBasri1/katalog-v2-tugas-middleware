@@ -20,21 +20,23 @@ class UserController extends Controller
                 $request->filled('role'),
                 fn ($query) => $query->whereHas('roles', fn ($roleQuery) => $roleQuery->where('name', $request->string('role')->toString()))
             )
+            ->when(
+                $request->filled('q'),
+                fn ($query) => $query->where(function($q) use ($request) {
+                    $q->where('name', 'like', '%' . $request->q . '%')
+                      ->orWhere('email', 'like', '%' . $request->q . '%');
+                })
+            )
             ->latest('id')
             ->paginate(12)
             ->withQueryString();
-        $editUser = null;
 
-        if ($request->filled('edit')) {
-            $editUser = User::query()->find($request->integer('edit'));
-        }
-
-        return view('admin.users.index', compact('users', 'editUser'));
+        return view('admin.users.index', compact('users'));
     }
 
-    public function create(): RedirectResponse
+    public function create(): View
     {
-        return redirect()->route('admin.user.index');
+        return view('admin.users.create');
     }
 
     public function store(Request $request): RedirectResponse
@@ -57,12 +59,16 @@ class UserController extends Controller
         $this->ensureRolesExist();
         $user->syncRoles([$role]);
 
+        if ($request->input('action') === 'save_and_another') {
+            return redirect()->route('admin.user.create')->with('status', 'User berhasil ditambahkan. Silahkan tambah user lainnya.');
+        }
+
         return redirect()->route('admin.user.index')->with('status', 'User berhasil ditambahkan.');
     }
 
-    public function edit(User $user): RedirectResponse
+    public function edit(User $user): View
     {
-        return redirect()->route('admin.user.index', ['edit' => $user->id]);
+        return view('admin.users.edit', ['user' => $user]);
     }
 
     public function update(Request $request, User $user): RedirectResponse

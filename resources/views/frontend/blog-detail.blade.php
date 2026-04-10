@@ -4,20 +4,46 @@
 @section('meta_description', $seoDescription ?? 'Artikel Kataloque.')
 @section('canonical', $canonical ?? route('blog.index'))
 @section('og_url', $canonical ?? route('blog.index'))
-@section('og_image', $ogImage ?? 'https://picsum.photos/seed/kataloque-blog/1200/630')
+@section('og_image', $ogImage ?? 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=1200&h=630&auto=format&fit=crop')
 @section('og_type', 'article')
 @section('main_class', '')
 
 @section('content')
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "BlogPosting",
+  "headline": "{{ $post->title }}",
+  "image": ["{{ $post->cover_image }}"],
+  "author": {
+    "@@type": "Person",
+    "name": "{{ $post->author_name }}"
+  },
+  "publisher": {
+    "@@type": "Organization",
+    "name": "Kataloque",
+    "logo": {
+      "@@type": "ImageObject",
+      "url": "{{ url('/logo.png') }}"
+    }
+  },
+  "datePublished": "{{ optional($post->published_at)->toIso8601String() }}",
+  "description": "{{ $seoDescription }}",
+  "mainEntityOfPage": {
+    "@@type": "WebPage",
+    "@@id": "{{ url()->current() }}"
+  }
+}
+</script>
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-1 md:pt-5 pb-8 space-y-6">
         <nav class="text-sm">
-            <div class="bg-white border border-gray-200 shadow-sm rounded-xl px-5 py-3">
-                <div class="flex flex-wrap items-center gap-2 text-gray-500 font-medium">
-                    <a href="{{ route('home') }}" class="text-gray-500 hover:text-primary transition-colors flex items-center gap-1.5"><i class="fas fa-home text-xs"></i> Beranda</a>
-                    <span class="text-gray-300"><i class="fas fa-chevron-right text-[10px]"></i></span>
-                    <a href="{{ route('blog.index') }}" class="text-gray-500 hover:text-primary transition-colors">Blog</a>
-                    <span class="text-gray-300"><i class="fas fa-chevron-right text-[10px]"></i></span>
-                    <span class="font-bold text-primary">{{ $post->title }}</span>
+            <div class="bg-white border border-gray-200 shadow-sm rounded-xl px-5 py-3 overflow-hidden">
+                <div class="flex items-center gap-2 text-gray-500 font-medium whitespace-nowrap overflow-hidden">
+                    <a href="{{ route('home') }}" class="flex-shrink-0 text-gray-500 hover:text-primary transition-colors flex items-center gap-1.5"><i class="fas fa-home text-xs"></i> Beranda</a>
+                    <span class="flex-shrink-0 text-gray-300"><i class="fas fa-chevron-right text-[10px]"></i></span>
+                    <a href="{{ route('blog.index') }}" class="flex-shrink-0 text-gray-500 hover:text-primary transition-colors">Blog</a>
+                    <span class="flex-shrink-0 text-gray-300"><i class="fas fa-chevron-right text-[10px]"></i></span>
+                    <span class="font-bold text-primary truncate">{{ $post->title }}</span>
                 </div>
             </div>
         </nav>
@@ -64,7 +90,16 @@
             <!-- Featured Image -->
             <div class="px-4 md:px-12">
                 <div class="rounded-2xl overflow-hidden border border-gray-200 aspect-[16/9] md:aspect-[21/9]">
-                    <img src="{{ $post->cover_image }}" alt="{{ $post->title }}" class="w-full h-full object-cover">
+                    <x-optimized-image 
+                        :src="$post->cover_image" 
+                        :alt="$post->title" 
+                        class="w-full h-full object-cover" 
+                        width="1200" 
+                        height="514" 
+                        :lazy="false" 
+                        fetchpriority="high"
+                        sizes="(max-width: 1024px) 100vw, 1200px"
+                    />
                 </div>
             </div>
 
@@ -88,9 +123,9 @@
                     <div class="flex flex-col sm:flex-row sm:items-center gap-4 lg:ml-auto">
                         <span class="text-xs font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">Bagikan:</span>
                         <div class="flex gap-2">
-                            <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('blog.detail', $post->slug)) }}&text={{ urlencode($post->title) }}" target="_blank" class="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-600 flex items-center justify-center hover:bg-primary hover:text-white transition-all transform hover:-translate-y-1 shadow-sm"><i class="fab fa-twitter text-base"></i></a>
-                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('blog.detail', $post->slug)) }}" target="_blank" class="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-600 flex items-center justify-center hover:bg-primary hover:text-white transition-all transform hover:-translate-y-1 shadow-sm"><i class="fab fa-facebook-f text-base"></i></a>
-                            <a href="https://wa.me/?text={{ urlencode($post->title . ' ' . route('blog.detail', $post->slug)) }}" target="_blank" class="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-600 flex items-center justify-center hover:bg-primary hover:text-white transition-all transform hover:-translate-y-1 shadow-sm"><i class="fab fa-whatsapp text-base"></i></a>
+                            <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('blog.detail', $post->slug)) }}&text={{ urlencode($post->title) }}" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-600 flex items-center justify-center hover:bg-primary hover:text-white transition-all transform hover:-translate-y-1 shadow-sm" aria-label="Bagikan ke Twitter"><i class="fab fa-twitter text-base" aria-hidden="true"></i></a>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('blog.detail', $post->slug)) }}" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-600 flex items-center justify-center hover:bg-primary hover:text-white transition-all transform hover:-translate-y-1 shadow-sm" aria-label="Bagikan ke Facebook"><i class="fab fa-facebook-f text-base" aria-hidden="true"></i></a>
+                            <a href="https://wa.me/?text={{ urlencode($post->title . ' ' . route('blog.detail', $post->slug)) }}" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-600 flex items-center justify-center hover:bg-primary hover:text-white transition-all transform hover:-translate-y-1 shadow-sm" aria-label="Bagikan via WhatsApp"><i class="fab fa-whatsapp text-base" aria-hidden="true"></i></a>
                         </div>
                     </div>
                 </div>

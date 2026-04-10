@@ -3,64 +3,87 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Katalog Produk Modern')</title>
-    <meta name="description" content="@yield('meta_description', 'Kataloque adalah katalog produk modern dengan pencarian cepat, kategori lengkap, dan detail produk terbaik.')">
+    <title>@yield('title', 'Kataloque - Katalog Produk Modern & Terpercaya')</title>
+    <meta name="description" content="@yield('meta_description', 'Kataloque adalah katalog produk modern dengan pencarian cepat, kategori lengkap, dan detail produk terbaik untuk kebutuhan harian Anda.')">
     <meta name="robots" content="@yield('meta_robots', 'index,follow,max-image-preview:large')">
     <meta name="author" content="Kataloque">
     <link rel="canonical" href="@yield('canonical', url()->current())">
+    <meta name="theme-color" content="#2563eb">
 
     <meta property="og:type" content="@yield('og_type', 'website')">
     <meta property="og:site_name" content="Kataloque">
-    <meta property="og:title" content="@yield('og_title', trim($__env->yieldContent('title', 'Katalog Produk Modern')))">
-    <meta property="og:description" content="@yield('og_description', trim($__env->yieldContent('meta_description', 'Kataloque adalah katalog produk modern dengan pencarian cepat, kategori lengkap, dan detail produk terbaik.')))">
+    <meta property="og:title" content="@yield('og_title', trim($__env->yieldContent('title', 'Kataloque - Katalog Produk Modern & Terpercaya')))">
+    <meta property="og:description" content="@yield('og_description', trim($__env->yieldContent('meta_description', 'Kataloque adalah katalog produk modern dengan pencarian cepat, kategori lengkap, dan detail produk terbaik untuk kebutuhan harian Anda.')))">
     <meta property="og:url" content="@yield('og_url', trim($__env->yieldContent('canonical', url()->current())))">
-    <meta property="og:image" content="@yield('og_image', 'https://picsum.photos/seed/kataloque-og/1200/630')">
+    <meta property="og:image" content="@yield('og_image', 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&h=630&auto=format&fit=crop')">
     <meta property="og:locale" content="id_ID">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('twitter_title', trim($__env->yieldContent('title', 'Katalog Produk Modern')))">
-    <meta name="twitter:description" content="@yield('twitter_description', trim($__env->yieldContent('meta_description', 'Kataloque adalah katalog produk modern dengan pencarian cepat, kategori lengkap, dan detail produk terbaik.')))">
-    <meta name="twitter:image" content="@yield('twitter_image', trim($__env->yieldContent('og_image', 'https://picsum.photos/seed/kataloque-og/1200/630')))">
+    <meta name="twitter:title" content="@yield('twitter_title', trim($__env->yieldContent('title', 'Kataloque - Katalog Produk Modern & Terpercaya')))">
+    <meta name="twitter:description" content="@yield('twitter_description', trim($__env->yieldContent('meta_description', 'Kataloque adalah katalog produk modern dengan pencarian cepat, kategori lengkap, dan detail produk terbaik untuk kebutuhan harian Anda.')))">
+    <meta name="twitter:image" content="@yield('twitter_image', trim($__env->yieldContent('og_image', 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&h=630&auto=format&fit=crop')))">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <!-- Swiper 11.2.10 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    
+    {{-- High-performance font loading --}}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
     <script type="application/ld+json">
         {
             "@@context": "https://schema.org",
-            "@type": "WebSite",
+            "@@type": "WebSite",
             "name": "Kataloque",
             "url": "{{ url('/') }}",
             "potentialAction": {
-                "@type": "SearchAction",
+                "@@type": "SearchAction",
                 "target": "{{ route('katalog') }}?q={search_term_string}",
                 "query-input": "required name=search_term_string"
             }
         }
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
     <style>
+        @font-face {
+            font-family: 'Font Awesome 6 Free';
+            font-style: normal;
+            font-weight: 900;
+            font-display: swap;
+            src: url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2") format("woff2"),
+                 url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.ttf") format("truetype");
+        }
+        @font-face {
+            font-family: 'Font Awesome 6 Brands';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2") format("woff2"),
+                 url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.ttf") format("truetype");
+        }
         .mobile-only { display: inline-flex; }
         .desktop-only { display: none !important; }
         @media (min-width: 768px) {
             .mobile-only { display: none !important; }
             .desktop-only { display: inline-flex !important; }
         }
-        @keyframes fadeCat {
-            0%, 40% { opacity: 1; visibility: visible; }
-            50%, 90% { opacity: 0; visibility: hidden; }
-            100% { opacity: 1; visibility: visible; }
+        [x-cloak] { display: none !important; }
+        /* Performance: CSS containment for product cards */
+        .product-card {
+            
         }
-        @keyframes fadeStore {
-            0%, 40% { opacity: 0; visibility: hidden; }
-            50%, 90% { opacity: 1; visibility: visible; }
-            100% { opacity: 0; visibility: hidden; }
+        /* Performance: reduce compositing layers on mobile nav */
+        .mobile-nav-blur {
+            -webkit-backdrop-filter: saturate(180%) blur(10px);
+            backdrop-filter: saturate(180%) blur(10px);
         }
-        .animate-fade-cat {
-            animation: fadeCat 5s infinite ease-in-out;
-        }
-        .animate-fade-store {
-            animation: fadeStore 5s infinite ease-in-out;
+        /* Performance: GPU-accelerated image hover */
+        .img-hover-scale {
+            will-change: transform;
+            transform: translateZ(0);
         }
     </style>
     @livewireStyles
@@ -68,42 +91,74 @@
     @stack('styles')
 </head>
 <body class="m-0 min-h-screen text-gray-800 font-['Plus_Jakarta_Sans'] antialiased overflow-x-hidden relative selection:bg-primary/10 selection:text-primary">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-[9999] focus:p-4 focus:bg-white focus:text-primary" aria-label="Skip to content">Skip to content</a>
     <!-- Clean Retail Background -->
     <div class="fixed inset-0 -z-20 bg-gray-50/50 pointer-events-none"></div>
 
+    @if(auth()->check() && auth()->user()->hasRole('admin'))
+        <div class="fixed top-0 left-0 right-0 z-[200] bg-gray-900 text-white text-[11px] font-bold py-1.5 px-4 backdrop-blur-md border-b border-white/10 flex justify-between items-center h-[32px]">
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 px-2 py-0.5 bg-rose-500 rounded text-[9px] uppercase tracking-wider shadow-lg shadow-rose-500/20">
+                    <i class="fas fa-user-shield"></i>
+                    Admin Mode
+                </div>
+                <div class="hidden md:flex items-center gap-4 text-gray-400">
+                    <span class="w-1 h-1 bg-gray-600 rounded-full"></span>
+                    <span>Halaman: {{ Str::limit(View::getSection('title', 'Beranda'), 30) }}</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="{{ route('admin.dashboard') }}" class="hover:text-primary transition-colors flex items-center gap-1.5 px-3 py-1 rounded-md hover:bg-white/5">
+                    <i class="fas fa-tachometer-alt"></i> Kembalike Panel Admin
+                </a>
+                <span class="text-gray-700">|</span>
+                <span class="text-gray-400">Hi, {{ auth()->user()->name }}</span>
+            </div>
+        </div>
+        <style>
+            header { top: 32px !important; }
+            .fixed.top-0.left-0.right-0.z-\[100\] { transform: translateY(32px) !important; }
+            .isTopBarHidden { transform: translateY(-1px) !important; }
+            main { padding-top: calc(95px + 32px) !important; }
+            @media (min-width: 768px) {
+                main { padding-top: calc(147px + 32px) !important; }
+            }
+        </style>
+    @endif
+
     <livewire:public.header />
 
-    <main class="relative z-10 pt-[56px] md:pt-[89px] pb-20 md:pb-0 @yield('main_class') max-w-full overflow-x-hidden">
+    <main id="main-content" class="relative z-10 pt-[95px] md:pt-[147px] pb-20 md:pb-0 @yield('main_class') max-w-full overflow-x-hidden">
         @yield('content')
     </main>
 
     <livewire:public.footer />
 
     <!-- Mobile Bottom Navigation -->
-    <div class="md:hidden fixed bottom-0 left-0 right-0 z-[90] bg-white/80 backdrop-blur-xl border-t border-gray-100 px-4 py-2 pb-safe shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
-        <div class="flex items-center justify-around gap-2">
-            <a href="{{ route('home') }}" class="flex flex-col items-center gap-1 p-2 {{ request()->routeIs('home') ? 'text-primary' : 'text-gray-400' }}">
-                <i class="fas fa-home text-lg"></i>
+    <div class="md:hidden fixed bottom-0 left-0 right-0 z-[90] bg-white/95 mobile-nav-blur border-t border-gray-100 px-4 py-2 pb-safe shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+        <div class="flex items-center justify-around gap-2" role="navigation" aria-label="Menu Navigasi Mobile">
+            <a href="{{ route('home') }}" class="flex flex-col items-center gap-1 p-2 {{ request()->routeIs('home') ? 'text-primary' : 'text-gray-500' }}" aria-label="Halaman Beranda">
+                <i class="fas fa-home text-lg" aria-hidden="true"></i>
                 <span class="text-[10px] font-bold">Beranda</span>
             </a>
-            <a href="{{ route('katalog') }}" class="flex flex-col items-center gap-1 p-2 {{ request()->routeIs('katalog') ? 'text-primary' : 'text-gray-400' }}">
-                <i class="fas fa-th-large text-lg"></i>
+            <a href="{{ route('katalog') }}" class="flex flex-col items-center gap-1 p-2 {{ request()->routeIs('katalog') ? 'text-primary' : 'text-gray-500' }}" aria-label="Lihat Katalog Produk">
+                <i class="fas fa-th-large text-lg" aria-hidden="true"></i>
                 <span class="text-[10px] font-bold">Katalog</span>
             </a>
-            <a href="{{ auth()->check() ? route('user.panel', ['tab' => 'favorit']) : route('user.login') }}" class="flex flex-col items-center gap-1 p-2 {{ request()->query('tab') === 'favorit' || request()->is('user/favorites*') ? 'text-primary' : 'text-gray-400' }}">
-                <i class="fas fa-heart text-lg"></i>
+            <a href="{{ auth()->check() ? route('user.panel', ['tab' => 'favorit']) : route('user.login') }}" class="flex flex-col items-center gap-1 p-2 {{ request()->query('tab') === 'favorit' || request()->is('user/favorites*') ? 'text-primary' : 'text-gray-500' }}" aria-label="Produk Favorit Saya">
+                <i class="fas fa-heart text-lg" aria-hidden="true"></i>
                 <span class="text-[10px] font-bold">Favorit</span>
             </a>
-            <a href="{{ auth()->check() ? (auth()->user()->hasRole('admin') ? route('admin.dashboard') : route('user.panel')) : route('user.login') }}" class="flex flex-col items-center gap-1 p-2 {{ request()->is('profil-saya*') || request()->routeIs('user.panel') ? 'text-primary' : 'text-gray-400' }}">
-                @auth
+            <a href="{{ auth()->check() ? (auth()->user()->hasRole('admin') ? route('admin.dashboard') : route('user.panel')) : route('user.login') }}" class="flex flex-col items-center gap-1 p-2 {{ request()->is('profil-saya*') || request()->routeIs('user.panel') ? 'text-primary' : 'text-gray-500' }}" aria-label="Profil Akun Saya">
+                @if(auth()->check())
                     @if(auth()->user()->avatar_url)
-                        <img src="{{ auth()->user()->avatar_url }}" alt="Avatar" class="w-6 h-6 rounded-full object-cover border border-gray-200">
+                        <img src="{{ auth()->user()->avatar_url }}" alt="Avatar Pengguna" class="w-6 h-6 rounded-full object-cover border border-gray-200" loading="lazy">
                     @else
-                        <i class="fas fa-user-circle text-lg"></i>
+                        <i class="fas fa-user-circle text-lg" aria-hidden="true"></i>
                     @endif
                 @else
-                    <i class="fas fa-user-circle text-lg"></i>
-                @endauth
+                    <i class="fas fa-user-circle text-lg" aria-hidden="true"></i>
+                @endif
                 <span class="text-[10px] font-bold">Profil</span>
             </a>
         </div>
@@ -175,6 +230,30 @@
     </div>
 
     @livewireScripts
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Trending Keywords Swiper
+            new Swiper('.trending-swiper', {
+                slidesPerView: 'auto',
+                spaceBetween: 8,
+                freeMode: true,
+                slidesOffsetBefore: 0,
+                slidesOffsetAfter: 16
+            });
+        });
+
+        // Re-init for Livewire navigation if needed
+        document.addEventListener('livewire:navigated', function() {
+            new Swiper('.trending-swiper', {
+                slidesPerView: 'auto',
+                spaceBetween: 8,
+                freeMode: true,
+                slidesOffsetBefore: 0,
+                slidesOffsetAfter: 16
+            });
+        });
+    </script>
     @stack('scripts')
 </body>
 </html>

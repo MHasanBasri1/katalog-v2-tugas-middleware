@@ -29,7 +29,7 @@ class ProductController extends Controller
             ->where('slug', $slug)
             ->where('status', true)
             ->with([
-                'category:id,name',
+                'category:id,name,slug,icon',
                 'images' => fn ($query) => $query
                     ->select('id', 'product_id', 'image', 'is_primary')
                     ->orderByDesc('is_primary')
@@ -38,9 +38,14 @@ class ProductController extends Controller
             ])
             ->firstOrFail();
 
+        // Increment views count
+        $product->increment('views_count');
+
         $settings = Setting::query()->first();
         $marketplaces = $settings?->marketplaces ?? ['Shopee', 'Tokopedia', 'Lazada', 'Blibli', 'Tiktok Shop'];
-        $activeLower = array_map(fn($m) => Str::lower($m), $marketplaces);
+        $activeLower = !empty($marketplaces) && !isset($marketplaces[0]) 
+            ? array_keys($marketplaces) 
+            : array_map(fn($m) => Str::lower($m), $marketplaces);
 
         $marketplaceLinks = $product->marketplaceLinks
             ->filter(fn ($item) => in_array(Str::lower($item->marketplace), $activeLower, true))

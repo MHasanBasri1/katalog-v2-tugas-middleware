@@ -112,4 +112,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
         return asset('storage/' . $avatar);
     }
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
 }

@@ -14,19 +14,22 @@ class StaticPageController extends Controller
 {
     public function index(Request $request): View
     {
-        $pages = StaticPage::query()->latest('updated_at')->paginate(10);
-        $editPage = null;
+        $pages = StaticPage::query()
+            ->when(
+                $request->filled('q'),
+                fn ($query) => $query->where('title', 'like', '%' . $request->q . '%')
+                    ->orWhere('slug', 'like', '%' . $request->q . '%')
+            )
+            ->latest('updated_at')
+            ->paginate(10)
+            ->withQueryString();
 
-        if ($request->filled('edit')) {
-            $editPage = StaticPage::query()->find($request->integer('edit'));
-        }
-
-        return view('admin.static-pages.index', compact('pages', 'editPage'));
+        return view('admin.static-pages.index', compact('pages'));
     }
 
-    public function create(): RedirectResponse
+    public function create(): View
     {
-        return redirect()->route('admin.halaman-statis.index');
+        return view('admin.static-pages.create');
     }
 
     public function store(Request $request): RedirectResponse
@@ -36,12 +39,16 @@ class StaticPageController extends Controller
 
         StaticPage::query()->create($data);
 
+        if ($request->input('action') === 'save_and_another') {
+            return redirect()->route('admin.halaman-statis.create')->with('status', 'Halaman statis berhasil ditambahkan. Silahkan buat halaman lainnya.');
+        }
+
         return redirect()->route('admin.halaman-statis.index')->with('status', 'Halaman statis berhasil ditambahkan.');
     }
 
-    public function edit(StaticPage $halaman_stati): RedirectResponse
+    public function edit(StaticPage $halaman_stati): View
     {
-        return redirect()->route('admin.halaman-statis.index', ['edit' => $halaman_stati->id]);
+        return view('admin.static-pages.edit', ['page' => $halaman_stati]);
     }
 
     public function update(Request $request, StaticPage $halaman_stati): RedirectResponse

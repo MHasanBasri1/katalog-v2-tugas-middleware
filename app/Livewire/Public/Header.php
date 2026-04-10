@@ -14,7 +14,14 @@ class Header extends Component
 
     public int $notificationCount = 1;
 
+    public int $favoriteCount = 0;
+
     public array $categories = [];
+
+    protected $listeners = [
+        'favorite-updated' => '$refresh',
+        'notifications-updated' => '$refresh'
+    ];
 
     public array $menus = [
         ['label' => 'Beranda', 'icon' => 'fa-home', 'url' => '/', 'route' => 'home'],
@@ -105,6 +112,10 @@ class Header extends Component
 
     public function render()
     {
+        if (auth()->check()) {
+            $this->favoriteCount = auth()->user()->favorites()->count();
+        }
+
         $this->menus = array_map(function (array $menu): array {
             $menu['active'] = $menu['route'] ? request()->routeIs($menu['route']) : false;
 

@@ -218,7 +218,7 @@
     .promo-marquee-track {
         display: inline-block;
         min-width: max-content;
-        animation: promoMarquee 20s linear infinite;
+        animation: promoMarquee 20s linear 2;
     }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -248,7 +248,7 @@
         border: 2px solid #ffffff;
     }
     .blink {
-        animation: blinkPulse 1.1s ease-in-out infinite;
+        animation: blinkPulse 1.1s ease-in-out 3;
     }
     .nav-icon-circle {
         width: 26px;

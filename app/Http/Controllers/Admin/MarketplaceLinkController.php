@@ -16,8 +16,15 @@ class MarketplaceLinkController extends Controller
     {
         $links = MarketplaceLink::query()
             ->with('product:id,name')
+            ->when(
+                $request->filled('q'),
+                fn ($query) => $query->whereHas('product', fn ($q) => $q->where('name', 'like', '%' . $request->q . '%'))
+                    ->orWhere('marketplace', 'like', '%' . $request->q . '%')
+                    ->orWhere('url', 'like', '%' . $request->q . '%')
+            )
             ->latest('id')
-            ->paginate(12);
+            ->paginate(12)
+            ->withQueryString();
 
         $editLink = null;
         if ($request->filled('edit')) {

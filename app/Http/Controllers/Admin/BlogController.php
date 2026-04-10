@@ -23,25 +23,26 @@ class BlogController extends Controller
                 $request->filled('category_id'),
                 fn ($query) => $query->where('category_id', $request->integer('category_id'))
             )
+            ->when(
+                $request->filled('q'),
+                fn ($query) => $query->where(function($q) use ($request) {
+                    $q->where('title', 'like', '%' . $request->q . '%')
+                      ->orWhere('slug', 'like', '%' . $request->q . '%');
+                })
+            )
             ->latest('published_at')
             ->latest('id')
             ->paginate(10)
             ->withQueryString();
-        $editBlog = null;
+
         $categories = BlogCategory::query()->orderBy('name')->get(['id', 'name', 'slug']);
-
-        if ($request->filled('edit')) {
-            $editBlog = Blog::query()
-                ->with(['category:id,name,slug', 'tags:id,name,slug'])
-                ->find($request->integer('edit'));
-        }
-
-        return view('admin.blogs.index', compact('blogs', 'editBlog', 'categories'));
+        return view('admin.blogs.index', compact('blogs', 'categories'));
     }
 
-    public function create(): RedirectResponse
+    public function create(): View
     {
-        return redirect()->route('admin.blog.index');
+        $categories = BlogCategory::query()->orderBy('name')->get(['id', 'name', 'slug']);
+        return view('admin.blogs.create', compact('categories'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -59,12 +60,19 @@ class BlogController extends Controller
         $blog = Blog::query()->create($data);
         $blog->tags()->sync($this->resolveTagIds($tagsInput));
 
+        if ($request->input('action') === 'save_and_another') {
+            return redirect()->route('admin.blog.create')->with('status', 'Artikel blog berhasil ditambahkan. Silahkan tambah artikel lainnya.');
+        }
+
         return redirect()->route('admin.blog.index')->with('status', 'Artikel blog berhasil ditambahkan.');
     }
 
-    public function edit(Blog $blog): RedirectResponse
+    public function edit(Blog $blog): View
     {
-        return redirect()->route('admin.blog.index', ['edit' => $blog->id]);
+        $categories = BlogCategory::query()->orderBy('name')->get(['id', 'name', 'slug']);
+        $blog->load(['category:id,name,slug', 'tags:id,name,slug']);
+        
+        return view('admin.blogs.edit', compact('blog', 'categories'));
     }
 
     public function update(Request $request, Blog $blog): RedirectResponse

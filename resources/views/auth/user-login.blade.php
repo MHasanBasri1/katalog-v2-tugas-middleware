@@ -29,7 +29,7 @@
                             <i class="fas fa-envelope text-sm text-gray-400 group-focus-within:text-primary transition-colors"></i>
                         </div>
                         <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus autocomplete="username"
-                            class="w-full rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-800 placeholder:text-gray-400 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none"
+                            class="w-full rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-800 placeholder:text-gray-500 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none"
                             style="padding: 0.75rem 0.75rem 0.75rem 44px;"
                             placeholder="yourname@example.com">
                     </div>
@@ -48,7 +48,7 @@
                             <i class="fas fa-lock text-sm text-gray-400 group-focus-within:text-primary transition-colors"></i>
                         </div>
                         <input id="password" name="password" :type="showPassword ? 'text' : 'password'" required autocomplete="current-password"
-                            class="w-full rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-800 placeholder:text-gray-400 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none"
+                            class="w-full rounded-xl border border-gray-200 bg-gray-50/50 text-sm text-gray-800 placeholder:text-gray-500 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none"
                             style="padding: 0.75rem 44px 0.75rem 44px;"
                             placeholder="Masukkan password">
                         <button type="button" @click="showPassword = !showPassword"

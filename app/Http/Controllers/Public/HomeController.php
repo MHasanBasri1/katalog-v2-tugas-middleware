@@ -37,41 +37,53 @@ class HomeController extends Controller
                 ->get()
         );
 
-        $bestSellerProducts = Product::query()
-            ->select('id', 'category_id', 'name', 'slug', 'price', 'original_price', 'sold_count', 'rating_avg', 'rating_count')
-            ->where('status', true)
-            ->with([
-                'category:id,name',
-                'primaryImage:id,product_id,image',
-            ])
-            ->orderByDesc('sold_count')
-            ->latest('id')
-            ->limit(10)
-            ->get();
+        $bestSellerProducts = Cache::remember(
+            'public.home.bestseller_products',
+            now()->addMinutes(10),
+            fn () => Product::query()
+                ->select('id', 'category_id', 'name', 'slug', 'price', 'original_price', 'sold_count', 'rating_avg', 'rating_count')
+                ->where('status', true)
+                ->with([
+                    'category:id,name,slug,icon',
+                    'primaryImage:id,product_id,image',
+                ])
+                ->orderByDesc('sold_count')
+                ->latest('id')
+                ->limit(10)
+                ->get()
+        );
 
-        $flashSaleProducts = Product::query()
-            ->select('id', 'category_id', 'name', 'slug', 'price', 'original_price', 'sold_count', 'rating_avg', 'rating_count')
-            ->where('status', true)
-            ->where('show_in_promo', true)
-            ->with([
-                'category:id,name',
-                'primaryImage:id,product_id,image',
-            ])
-            ->orderByDesc('sold_count')
-            ->latest('id')
-            ->limit(10)
-            ->get();
+        $flashSaleProducts = Cache::remember(
+            'public.home.flashsale_products',
+            now()->addMinutes(10),
+            fn () => Product::query()
+                ->select('id', 'category_id', 'name', 'slug', 'price', 'original_price', 'sold_count', 'rating_avg', 'rating_count')
+                ->where('status', true)
+                ->where('show_in_promo', true)
+                ->with([
+                    'category:id,name,slug,icon',
+                    'primaryImage:id,product_id,image',
+                ])
+                ->orderByDesc('sold_count')
+                ->latest('id')
+                ->limit(10)
+                ->get()
+        );
 
-        $newProducts = Product::query()
-            ->select('id', 'category_id', 'name', 'slug', 'price', 'original_price', 'sold_count', 'rating_avg', 'rating_count')
-            ->where('status', true)
-            ->with([
-                'category:id,name',
-                'primaryImage:id,product_id,image',
-            ])
-            ->latest('id')
-            ->limit(10)
-            ->get();
+        $newProducts = Cache::remember(
+            'public.home.new_products',
+            now()->addMinutes(10),
+            fn () => Product::query()
+                ->select('id', 'category_id', 'name', 'slug', 'price', 'original_price', 'sold_count', 'rating_avg', 'rating_count')
+                ->where('status', true)
+                ->with([
+                    'category:id,name,slug,icon',
+                    'primaryImage:id,product_id,image',
+                ])
+                ->latest('id')
+                ->limit(10)
+                ->get()
+        );
 
         return view('frontend.home', [
             'heroBanners' => $heroBanners,

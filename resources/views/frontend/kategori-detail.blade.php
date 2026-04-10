@@ -7,7 +7,7 @@
 @section('main_class', '')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-1 md:pt-5 pb-8 space-y-6">
 
     <div class="relative bg-white rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8 overflow-hidden z-10 mb-8">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">

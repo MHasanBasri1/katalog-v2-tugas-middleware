@@ -4,7 +4,7 @@
 @section('meta_description', $seoDescription ?? 'Halaman informasi Kataloque.')
 @section('canonical', $canonical ?? url()->current())
 @section('og_url', $canonical ?? url()->current())
-@section('og_image', $ogImage ?? 'https://picsum.photos/seed/kataloque-static-page/1200/630')
+@section('og_image', $ogImage ?? 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&h=630&auto=format&fit=crop')
 @section('main_class', '')
 
 @section('content')

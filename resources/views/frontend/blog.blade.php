@@ -4,12 +4,12 @@
 @section('meta_description', $seoDescription ?? 'Artikel terbaru Kataloque.')
 @section('canonical', $canonical ?? route('blog.index'))
 @section('og_url', $canonical ?? route('blog.index'))
-@section('og_image', $ogImage ?? 'https://picsum.photos/seed/kataloque-blog/1200/630')
+@section('og_image', $ogImage ?? 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=1200&h=630&auto=format&fit=crop')
 @section('og_type', 'article')
 @section('main_class', '')
 
 @section('content')
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-1 md:pt-5 pb-8 space-y-8 relative">
         <div class="flex items-center justify-between mb-8">
             <div class="flex items-center gap-3">
                 <div class="w-1.5 h-8 bg-blue-600 rounded-full"></div>
@@ -20,42 +20,52 @@
             </div>
         </div>
 
-        <section class="bg-white border border-gray-200 rounded-2xl p-5 md:p-6 shadow-sm relative z-20 mx-0">
-            <form method="GET" action="{{ route('blog.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4 md:items-end">
+        <section class="bg-white border border-gray-200 rounded-2xl p-5 md:p-8 shadow-sm relative z-20 mx-0 overflow-hidden">
+            <div class="absolute -right-20 -top-20 w-64 h-64 rounded-full bg-primary/5 blur-3xl -z-10"></div>
+            
+            <form method="GET" action="{{ route('blog.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                {{-- Search Article --}}
                 <div class="md:col-span-2">
-                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Pilih Kategori</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 z-10">
-                            <i class="fas fa-folder-open"></i>
+                    <label for="blogSearchInput" class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Pencarian Artikel</label>
+                    <div class="relative group">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center text-gray-400 group-focus-within:text-primary transition-colors z-10" style="width: 44px;">
+                            <i class="fas fa-search text-xs"></i>
                         </div>
-                        <select name="kategori" class="w-full bg-gray-50/80 border border-gray-300 focus:border-primary focus:ring-4 focus:ring-primary/10 focus:bg-white rounded-xl py-3 pl-11 pr-10 outline-none transition-all duration-300 text-sm font-medium appearance-none">
+                        <input id="blogSearchInput" name="search" type="text" value="{{ request('search') }}" placeholder="Ketik judul artikel untuk mencari..."
+                            class="w-full bg-gray-50/80 border border-gray-300 focus:border-primary focus:ring-4 focus:ring-primary/10 focus:bg-white rounded-xl outline-none transition-all duration-300 text-sm font-medium placeholder:text-gray-500"
+                            style="padding: 0.75rem 1rem 0.75rem 44px;">
+                    </div>
+                </div>
+
+                {{-- Category Select --}}
+                <div class="md:col-span-1">
+                    <label for="blogCategorySelect" class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Pilih Kategori</label>
+                    <div class="relative">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center text-gray-400 z-10" style="width: 44px;">
+                            <i class="fas fa-folder-open text-xs"></i>
+                        </div>
+                        <select id="blogCategorySelect" name="kategori" 
+                            class="w-full bg-gray-50/80 border border-gray-300 focus:border-primary focus:ring-4 focus:ring-primary/10 focus:bg-white rounded-xl outline-none transition-all duration-300 text-sm font-medium appearance-none"
+                            style="padding: 0.75rem 2.5rem 0.75rem 44px;">
                             <option value="">Semua Kategori</option>
                             @foreach ($categories as $category)
                                 <option value="{{ $category->slug }}" @selected($selectedCategory === $category->slug)>{{ $category->name }}</option>
                             @endforeach
                         </select>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Pilih Tag</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 z-10">
-                            <i class="fas fa-hashtag"></i>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center justify-center text-gray-400" style="width: 40px;">
+                            <i class="fas fa-chevron-down text-[10px]"></i>
                         </div>
-                        <select name="tag" class="w-full bg-gray-50/80 border border-gray-300 focus:border-primary focus:ring-4 focus:ring-primary/10 focus:bg-white rounded-xl py-3 pl-11 pr-10 outline-none transition-all duration-300 text-sm font-medium appearance-none">
-                            <option value="">Semua Tag</option>
-                            @foreach ($tags as $tag)
-                                <option value="{{ $tag->slug }}" @selected($selectedTag === $tag->slug)>{{ $tag->name }}</option>
-                            @endforeach
-                        </select>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary hover:bg-primary-dark text-white text-sm font-bold px-5 py-3 w-full shadow-md shadow-primary/30 transition-all duration-300 hover:-translate-y-0.5">
-                        <i class="fas fa-filter text-xs"></i> Terapkan
+
+                {{-- Submit Buttons --}}
+                <div class="md:col-span-1 flex items-center gap-2">
+                    <button type="submit" class="flex-1 bg-primary text-white font-black py-3 px-6 rounded-xl hover:bg-primary-dark hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 text-sm flex items-center justify-center gap-2">
+                        <i class="fas fa-filter text-xs"></i>
+                        Terapkan
                     </button>
-                    <a href="{{ route('blog.index') }}" class="inline-flex items-center justify-center rounded-xl bg-gray-50 border border-gray-200 hover:bg-gray-100 hover:text-rose-500 text-gray-600 text-sm font-bold px-4 py-3 transition-all duration-300" title="Reset Filter">
-                        <i class="fas fa-rotate-left"></i>
+                    <a href="{{ route('blog.index') }}" class="w-12 h-12 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-rose-500 transition-all shadow-sm" title="Reset Filter">
+                        <i class="fas fa-rotate-left text-sm"></i>
                     </a>
                 </div>
             </form>
@@ -65,7 +75,14 @@
             @forelse($posts as $post)
                 <article class="group bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-1">
                     <a href="{{ route('blog.detail', $post->slug) }}" class="block relative overflow-hidden aspect-[16/10] bg-gray-100">
-                        <img src="{{ $post->cover_image }}" alt="{{ $post->title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        <x-optimized-image 
+                            :src="$post->cover_image" 
+                            :alt="$post->title" 
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                            width="600" 
+                            height="375" 
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        />
                         <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
                         @if ($post->category)
                             <span class="absolute top-4 left-4 inline-flex items-center gap-1.5 bg-white text-primary-dark text-[10px] font-black px-3 py-1.5 rounded-lg shadow-sm border border-gray-200 uppercase tracking-widest">

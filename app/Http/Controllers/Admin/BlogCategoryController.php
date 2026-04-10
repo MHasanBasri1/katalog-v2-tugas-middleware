@@ -16,20 +16,20 @@ class BlogCategoryController extends Controller
     {
         $blogCategories = BlogCategory::query()
             ->withCount('blogs')
+            ->when(
+                $request->filled('q'),
+                fn ($query) => $query->where('name', 'like', '%' . $request->q . '%')
+            )
             ->latest('id')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
-        $editBlogCategory = null;
-        if ($request->filled('edit')) {
-            $editBlogCategory = BlogCategory::query()->find($request->integer('edit'));
-        }
-
-        return view('admin.blog-categories.index', compact('blogCategories', 'editBlogCategory'));
+        return view('admin.blog-categories.index', compact('blogCategories'));
     }
 
-    public function create(): RedirectResponse
+    public function create(): View
     {
-        return redirect()->route('admin.blog-kategori.index');
+        return view('admin.blog-categories.create');
     }
 
     public function store(Request $request): RedirectResponse
@@ -43,6 +43,10 @@ class BlogCategoryController extends Controller
 
         BlogCategory::query()->create($data);
 
+        if ($request->input('action') === 'save_and_another') {
+            return redirect()->route('admin.blog-kategori.create')->with('status', 'Kategori blog berhasil ditambahkan. Silahkan buat kategori lainnya.');
+        }
+
         return redirect()->route('admin.blog-kategori.index')->with('status', 'Kategori blog berhasil ditambahkan.');
     }
 
@@ -51,9 +55,9 @@ class BlogCategoryController extends Controller
         return redirect()->route('admin.blog-kategori.edit', $blog_kategori);
     }
 
-    public function edit(BlogCategory $blog_kategori): RedirectResponse
+    public function edit(BlogCategory $blog_kategori): View
     {
-        return redirect()->route('admin.blog-kategori.index', ['edit' => $blog_kategori->id]);
+        return view('admin.blog-categories.edit', ['blog_kategori' => $blog_kategori]);
     }
 
     public function update(Request $request, BlogCategory $blog_kategori): RedirectResponse

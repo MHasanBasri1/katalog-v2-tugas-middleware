@@ -2,17 +2,22 @@
     x-data="{
         lastScrollY: 0,
         isTopBarHidden: false,
+        _ticking: false,
         init() {
             this.lastScrollY = window.scrollY;
             window.addEventListener('scroll', () => {
-                if (window.innerWidth < 768) {
-                    this.isTopBarHidden = false;
-                    this.lastScrollY = window.scrollY;
-                    return;
-                }
-                const currentY = window.scrollY;
-                this.isTopBarHidden = currentY > 8 && currentY > this.lastScrollY;
-                this.lastScrollY = currentY;
+                if (this._ticking) return;
+                this._ticking = true;
+                requestAnimationFrame(() => {
+                    if (window.innerWidth < 768) {
+                        this.isTopBarHidden = false;
+                    } else {
+                        const currentY = window.scrollY;
+                        this.isTopBarHidden = currentY > 8 && currentY > this.lastScrollY;
+                        this.lastScrollY = currentY;
+                    }
+                    this._ticking = false;
+                });
             }, { passive: true });
         }
     }"
@@ -20,193 +25,178 @@
 >
     <div class="fixed top-0 left-0 right-0 z-[100] transition-transform duration-300" :class="isTopBarHidden ? '-translate-y-[33px]' : 'translate-y-0'">
 
-        {{-- === TOP BAR (Desktop Only) === --}}
+        {{-- === ROW 1: TOP BAR (Desktop Only) === --}}
         <div class="hidden md:block bg-gray-50 border-b border-gray-200" style="height: 33px;">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex justify-between items-center text-[12px] font-semibold text-gray-500 tracking-tight">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex justify-between items-center text-[11px] font-bold text-gray-500 tracking-tight">
                 <div class="flex items-center gap-5">
-                    <a href="#" class="hover:text-primary transition-colors flex items-center gap-1.5 whitespace-nowrap"><i class="fas fa-mobile-alt text-[10px]"></i> Download App</a>
-                    <span class="w-px h-3 bg-gray-200"></span>
-                    <a href="#" class="hover:text-primary transition-colors whitespace-nowrap">Kataloque Care</a>
+                    <a href="#" class="hover:text-primary transition-colors flex items-center gap-1.5"><i class="fas fa-mobile-alt text-[10px]"></i> Download App</a>
+                    <a href="#" class="hover:text-primary transition-colors flex items-center gap-1.5"><i class="fas fa-headset text-[10px]"></i> Kataloque Care</a>
                 </div>
                 <div class="flex items-center gap-5">
-                    <a href="#" class="hover:text-primary transition-colors whitespace-nowrap">Tentang Kami</a>
-                    <a href="#" class="hover:text-primary transition-colors whitespace-nowrap">Mitra Toko</a>
+                    <a href="#" class="hover:text-primary transition-colors">Tentang Kami</a>
+                    <a href="{{ url('/blog') }}" class="hover:text-primary transition-colors">Blog & Edukasi</a>
+                    <a href="#" class="hover:text-primary transition-colors">Cara Order</a>
                 </div>
             </div>
         </div>
 
-        {{-- === MAIN HEADER === --}}
-        <header class="bg-white border-b border-gray-200" style="height: 56px;">
-            <div class="w-full max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 h-full flex items-center gap-2 md:gap-3">
+        {{-- === ROW 2: MAIN HEADER === --}}
+        <header class="bg-white py-2 md:h-[72px] flex items-center border-b border-gray-100 md:border-none">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                
+                {{-- DESKTOP HEADER (Visible on md and up) --}}
+                <div class="hidden md:flex items-center gap-6 w-full">
+                    {{-- LOGO --}}
+                    <a href="{{ route('home') }}" class="flex items-center shrink-0" aria-label="Kataloque Beranda">
+                        <img src="https://www.static-src.com/frontend/static/img/logo-blibli-blue.0f340eba.svg" alt="Logo" class="h-9 w-auto">
+                    </a>
 
-                {{-- LOGO --}}
-                <a href="{{ route('home') }}" class="hidden md:flex items-center gap-2.5 shrink-0">
-                    <div class="w-9 h-9 rounded-lg bg-primary text-white flex items-center justify-center shadow-md shadow-primary/20 shrink-0">
-                        <i class="fas fa-cube text-base"></i>
-                    </div>
-                    <span class="text-lg font-black text-gray-900 tracking-tight whitespace-nowrap">Kataloque</span>
-                </a>
+                    {{-- SEARCH --}}
+                    <div class="flex-1 relative z-50">
+                        <div class="relative w-full">
+                            <input id="desktopSearchInput" wire:model.live.debounce.300ms="search" wire:keydown.enter="goToSearch" type="search" placeholder="Cari brand, produk, atau seller"
+                                class="w-full bg-gray-50 border border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/5 rounded-lg outline-none transition-all text-sm placeholder:text-gray-400 font-medium h-10 px-4 pr-12" aria-label="Cari Produk">
+                            <button wire:click="goToSearch" class="absolute right-0 top-0 bottom-0 bg-primary text-white rounded-r-lg hover:bg-primary-dark transition-all flex items-center justify-center w-11" aria-label="Cari">
+                                <i class="fas fa-search text-sm" aria-hidden="true"></i>
+                            </button>
+                        </div>
 
-                {{-- CATEGORY BUTTON (Desktop lg+) --}}
-                <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false" class="relative hidden lg:block shrink-0 z-[60]">
-                    <button @click="open = !open" class="flex items-center gap-1.5 px-3 rounded-lg bg-gray-50 border border-gray-200 hover:border-gray-300 text-gray-700 hover:text-primary font-bold transition-all text-[13px] group whitespace-nowrap" style="height: 36px;">
-                        <i class="fas fa-th-large text-[11px] text-gray-400 group-hover:text-primary transition-colors"></i>
-                        <span>Kategori</span>
-                        <i class="fas fa-chevron-down text-[9px] opacity-50 group-hover:opacity-100 transition-all"></i>
-                    </button>
-                    <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-2" class="absolute top-full left-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl py-2 z-50" x-cloak>
-                        @foreach($categories as $category)
-                            <a href="{{ route('kategori.detail', $category['slug']) }}" class="block px-4 py-2.5 mx-2 rounded-lg hover:bg-primary/5 hover:text-primary transition-colors text-sm text-gray-700 font-medium">{{ $category['name'] }}</a>
-                        @endforeach
-                        <div class="h-px bg-gray-100 my-2 mx-4"></div>
-                        <a href="{{ route('kategori') }}" class="flex items-center justify-between px-4 py-2.5 mx-2 rounded-lg hover:bg-primary/5 text-sm font-bold text-primary transition-colors group">
-                            Explore kategori
-                            <i class="fas fa-arrow-right text-xs opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all"></i>
-                        </a>
-                    </div>
-                </div>
-
-                {{-- MOBILE SEARCH --}}
-                <div class="flex md:hidden flex-1 min-w-0 relative" wire:click.stop>
-                    <input wire:model.live.debounce.300ms="search" wire:keydown.enter="goToSearch" type="text" placeholder="Cari di Kataloque..."
-                        class="w-full bg-white border border-gray-300 focus:border-primary rounded-lg outline-none transition text-[13px] font-semibold text-gray-700 placeholder:text-gray-400"
-                        style="height: 36px; padding: 0 2.5rem 0 0.75rem;">
-                    <button wire:click="goToSearch" class="absolute right-0.5 top-1/2 -translate-y-1/2 flex items-center justify-center bg-primary text-white rounded-md" style="width: 30px; height: 30px;">
-                        <i class="fas fa-search text-[11px]"></i>
-                    </button>
-
-                    @if($search !== '')
-                        <div class="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-[200] overflow-hidden">
-                            <div class="p-2 space-y-0.5 max-h-64 overflow-y-auto">
-                                @forelse($this->searchResults as $item)
-                                    <a href="{{ $item['url'] }}" class="block px-4 py-2.5 rounded-lg text-sm text-gray-700 hover:bg-primary/5 hover:text-primary font-medium transition-colors">{{ $item['name'] }}</a>
-                                @empty
-                                    <div class="px-4 py-3 text-sm text-gray-500 text-center">Produk tidak ditemukan.</div>
-                                @endforelse
-                                <div class="border-t border-gray-100 mt-1 pt-1">
-                                    <button wire:click="goToSearch" class="w-full px-4 py-2 text-sm font-bold text-primary hover:bg-primary/5 rounded-lg transition-colors text-center">
-                                        Lihat semua hasil &rarr;
-                                    </button>
+                        {{-- Search Results Dropdown --}}
+                        @if($search !== '')
+                            <div class="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-40 overflow-hidden">
+                                <div class="p-2 space-y-0.5 max-h-72 overflow-y-auto">
+                                    @forelse($this->searchResults as $item)
+                                        <a href="{{ $item['url'] }}" class="block px-4 py-2.5 rounded-lg text-sm text-gray-700 hover:bg-primary/5 hover:text-primary font-medium transition-colors">{{ $item['name'] }}</a>
+                                    @empty
+                                        <div class="px-4 py-3 text-sm text-gray-500 text-center">Produk tidak ditemukan.</div>
+                                    @endforelse
                                 </div>
                             </div>
-                        </div>
-                    @endif
-                </div>
-
-                {{-- DESKTOP SEARCH --}}
-                <div class="hidden md:flex flex-1 min-w-0 relative z-[55]" wire:click.stop>
-                    <div class="relative w-full">
-                        <input wire:model.live.debounce.300ms="search" wire:keydown.enter="goToSearch" type="search" placeholder="Cari barang ori di Kataloque..."
-                            class="w-full bg-gray-50 border border-gray-300 focus:border-primary focus:ring-4 focus:ring-primary/10 rounded-lg outline-none transition-all text-[13px] placeholder:text-gray-400 font-medium"
-                            style="height: 36px; padding: 0 3rem 0 0.875rem;">
-                        <button wire:click="goToSearch" class="absolute right-0 top-0 bottom-0 bg-primary text-white rounded-r-lg hover:bg-primary-dark transition-all flex items-center justify-center" style="width: 42px;">
-                            <i class="fas fa-search text-sm"></i>
-                        </button>
+                        @endif
                     </div>
 
-                    @if($search !== '')
-                        <div class="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-40 overflow-hidden">
-                            <div class="p-2 space-y-0.5 max-h-72 overflow-y-auto">
-                                @forelse($this->searchResults as $item)
-                                    <a href="{{ $item['url'] }}" class="block px-4 py-2.5 rounded-lg text-sm text-gray-700 hover:bg-primary/5 hover:text-primary font-medium transition-colors">{{ $item['name'] }}</a>
-                                @empty
-                                    <div class="px-4 py-3 text-sm text-gray-500 text-center">Produk tidak ditemukan.</div>
-                                @endforelse
-                                <div class="border-t border-gray-100 mt-1 pt-1">
-                                    <button wire:click="goToSearch" class="w-full px-4 py-2 text-sm font-bold text-primary hover:bg-primary/5 rounded-lg transition-colors text-center">
-                                        Lihat semua hasil &rarr;
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                </div>
-
-                {{-- RIGHT ACTIONS --}}
-                <div class="flex items-center gap-1.5 md:gap-2 shrink-0 relative z-50">
-                    @guest
-                        {{-- Mobile: single login button --}}
-                        <a href="{{ route('user.login') }}" class="flex md:hidden items-center gap-1 bg-primary text-white px-3 rounded-lg font-bold text-[11px] shrink-0 shadow-md shadow-primary/20 whitespace-nowrap" style="height: 36px;">
-                            <i class="fas fa-sign-in-alt text-[10px]"></i>
-                            Masuk
+                    {{-- ACTIONS --}}
+                    <div class="flex items-center gap-4 shrink-0">
+                        <a href="{{ auth()->check() ? url('/profil-saya?tab=favorit') : route('user.login') }}" class="text-gray-400 hover:text-primary transition-colors">
+                            <i class="far fa-heart text-xl"></i>
                         </a>
-                    @endguest
+                        <div class="w-px h-6 bg-gray-200"></div>
+                        @if(auth()->check())
+                            @php
+                                $isAdmin = auth()->user()->hasRole('admin');
+                                $panelRoute = $isAdmin ? route('admin.dashboard') : route('user.panel');
+                            @endphp
+                            <a href="{{ $panelRoute }}" class="flex items-center gap-2 group">
+                                <div class="w-8 h-8 rounded-full {{ $isAdmin ? 'bg-rose-500/10 border-rose-500/20' : 'bg-primary/10 border-primary/20' }} flex items-center justify-center border overflow-hidden">
+                                    <i class="fas {{ $isAdmin ? 'fa-user-shield text-rose-600' : 'fa-user text-primary' }} text-xs"></i>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-[12px] font-black text-gray-700 group-hover:text-primary truncate max-w-[80px]">{{ auth()->user()->username ?? auth()->user()->name }}</span>
+                                    @if($isAdmin)
+                                        <span class="text-[9px] font-bold text-rose-600 uppercase tracking-tighter">Admin Panel</span>
+                                    @endif
+                                </div>
+                            </a>
+                        @else
+                            <a href="{{ route('user.login') }}" class="px-8 py-2.5 text-sm font-bold text-primary border-2 border-primary rounded-xl hover:bg-primary/5 transition-all flex items-center justify-center">Masuk</a>
+                            <a href="{{ route('user.register') }}" class="px-8 py-2.5 text-sm font-bold text-white bg-primary border-2 border-primary rounded-xl hover:bg-primary-dark transition-all flex items-center justify-center">Daftar</a>
+                        @endif
+                    </div>
+                </div>
 
-                    {{-- Notification Bell (Desktop) --}}
-                    <div x-data="{ notif: false }" @mouseenter="notif = true" @mouseleave="notif = false" class="relative hidden md:block">
-                        <button wire:click="clearNotifications" @click="notif = !notif" class="relative flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors" style="width: 36px; height: 36px;" title="Notifikasi">
-                            <i class="far fa-bell text-[17px] text-gray-500 hover:text-primary transition-colors"></i>
-                            @if($notificationCount > 0)
-                                <span class="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full blink"></span>
-                            @endif
-                        </button>
-                        <div x-show="notif" x-cloak x-transition class="absolute top-full right-0 mt-2 w-72 sm:w-80 bg-white border border-gray-200 rounded-xl shadow-2xl py-3 z-[100]">
-                            <div class="px-4 border-b border-gray-100 pb-2 mb-2">
-                                <h4 class="text-sm font-black text-gray-800">Pembaruan & Diskon</h4>
-                            </div>
-                            <div class="max-h-64 overflow-y-auto px-2 space-y-1">
-                                <a href="{{ route('katalog') }}" class="flex items-start gap-3 p-3 hover:bg-primary/5 rounded-lg transition-colors">
-                                    <div class="w-9 h-9 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center flex-shrink-0">
-                                        <i class="fas fa-bullhorn text-sm"></i>
+                {{-- MOBILE HEADER (Visible on mobile only) --}}
+                <div class="flex md:hidden flex-col gap-1.5 w-full">
+                    {{-- Row 1: Search & Login --}}
+                    <div class="flex items-center gap-2 w-full">
+                        <div class="relative flex-1">
+                            <input id="mobileSearchInput" wire:model.live.debounce.300ms="search" wire:keydown.enter="goToSearch" type="text" placeholder="Cari brand, produk, atau seller"
+                                class="w-full bg-gray-50 border border-gray-200 focus:border-primary rounded-lg outline-none transition text-[13px] font-semibold text-gray-700 placeholder:text-gray-400 h-9 px-3 pr-10" aria-label="Cari Produk">
+                            <button wire:click="goToSearch" class="absolute right-0 top-0 bottom-0 w-9 bg-primary text-white rounded-r-lg flex items-center justify-center" aria-label="Cari">
+                                <i class="fas fa-search text-[11px]" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        
+                        @if(!auth()->check())
+                            <a href="{{ route('user.login') }}" class="px-5 h-9 flex items-center justify-center text-[11px] font-black text-white bg-primary border-2 border-primary rounded-lg whitespace-nowrap gap-1.5 shadow-lg shadow-primary/20">
+                                <i class="fas fa-sign-in-alt text-[10px]"></i>
+                                <span>Masuk</span>
+                            </a>
+                        @else
+                            @php
+                                $isAdmin = auth()->user()->hasRole('admin');
+                                $panelRoute = $isAdmin ? route('admin.dashboard') : route('user.panel');
+                            @endphp
+                            <a href="{{ $panelRoute }}" class="w-9 h-9 flex items-center justify-center {{ $isAdmin ? 'text-rose-600 border-rose-500/20 bg-rose-50' : 'text-primary border-primary/20 bg-primary/5' }} border-2 rounded-lg shrink-0">
+                                <i class="fas {{ $isAdmin ? 'fa-user-shield' : 'fa-user-circle' }} text-lg"></i>
+                            </a>
+                        @endif
+                    </div>
+
+                    {{-- Row 2: Trending --}}
+                    <div class="relative w-full overflow-hidden h-7">
+                        <div class="swiper trending-swiper !overflow-visible">
+                            <div class="swiper-wrapper !ease-linear">
+                                @php
+                                    $trendingKeywords = ['iPhone 15 Pro', 'Samsung S24 Ultra', 'MacBook Pro M3', 'Sony WH-1000XM5', 'Logitech G Pro', 'iPad Pro M2', 'Sony Alpha A7', 'DJI Mini 4 Pro'];
+                                @endphp
+                                @foreach($trendingKeywords as $keyword)
+                                    <div class="swiper-slide !w-auto">
+                                        <a href="{{ route('katalog', ['q' => $keyword]) }}" class="block text-[10px] font-bold text-gray-500 px-2.5 py-1 bg-gray-50 border border-gray-100 rounded-md whitespace-nowrap transition-colors hover:text-primary">{{ $keyword }}</a>
                                     </div>
-                                    <div class="min-w-0">
-                                        <h5 class="text-sm font-bold text-gray-800 mb-0.5">Promo Spesial Hari Ini!</h5>
-                                        <p class="text-xs text-gray-500 line-clamp-2">Dapatkan diskon hingga 50% untuk kategori pilihan.</p>
-                                        <span class="text-[10px] text-gray-400 mt-1 block font-medium">Beberapa menit lalu</span>
-                                    </div>
-                                </a>
-                                <a href="{{ route('katalog') }}" class="flex items-start gap-3 p-3 hover:bg-primary/5 rounded-lg transition-colors">
-                                    <div class="w-9 h-9 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0">
-                                        <i class="fas fa-box-open text-sm"></i>
-                                    </div>
-                                    <div class="min-w-0">
-                                        <h5 class="text-sm font-bold text-gray-800 mb-0.5">Produk Baru Rilis</h5>
-                                        <p class="text-xs text-gray-500 line-clamp-2">Cek koleksi terbaru kami minggu ini.</p>
-                                        <span class="text-[10px] text-gray-400 mt-1 block font-medium">1 jam lalu</span>
-                                    </div>
-                                </a>
+                                @endforeach
                             </div>
                         </div>
                     </div>
-
-                    {{-- Divider --}}
-                    <div class="w-px h-5 bg-gray-200 hidden md:block"></div>
-
-                    @auth
-                        {{-- Authenticated Buttons (Desktop) --}}
-                        <div class="hidden md:flex items-center gap-1.5">
-                            @if(auth()->user()->hasRole('admin'))
-                                <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-1.5 bg-primary text-white px-4 rounded-lg font-bold text-[12px] leading-none hover:bg-primary-dark transition-all whitespace-nowrap" style="height: 36px;">
-                                    <i class="fas fa-shield-alt text-[10px]"></i>
-                                    Dashboard
-                                </a>
-                            @else
-                                <a href="{{ auth()->user()->hasVerifiedEmail() ? route('user.panel') : route('verification.notice') }}" class="inline-flex items-center gap-1.5 bg-primary text-white px-4 rounded-lg font-bold text-[12px] leading-none hover:bg-primary-dark transition-all whitespace-nowrap" style="height: 36px;">
-                                    <i class="fas {{ auth()->user()->hasVerifiedEmail() ? 'fa-user-circle' : 'fa-envelope-open-text' }} text-[10px]"></i>
-                                    {{ auth()->user()->hasVerifiedEmail() ? 'Profil' : 'Verifikasi' }}
-                                </a>
-                            @endif
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="inline-flex items-center gap-1.5 bg-gray-50 text-gray-600 border border-gray-200 px-3 rounded-lg font-bold text-[12px] leading-none hover:bg-gray-100 transition-all whitespace-nowrap" style="height: 36px;">
-                                    <i class="fas fa-sign-out-alt text-[10px]"></i>
-                                    Logout
-                                </button>
-                            </form>
-                        </div>
-                    @else
-                        {{-- Guest Buttons (Desktop) --}}
-                        <div class="hidden md:flex items-center gap-1.5 shrink-0">
-                            <a href="{{ route('user.register') }}" class="inline-flex items-center justify-center bg-white text-gray-700 border border-gray-300 px-4 rounded-lg font-bold text-[12px] leading-none hover:bg-gray-50 hover:text-primary transition-all whitespace-nowrap" style="height: 36px;">
-                                Daftar
-                            </a>
-                            <a href="{{ route('user.login') }}" class="inline-flex items-center justify-center bg-primary text-white px-4 rounded-lg font-bold text-[12px] leading-none hover:bg-primary-dark transition-all whitespace-nowrap" style="height: 36px;">
-                                Masuk
-                            </a>
-                        </div>
-                    @endauth
                 </div>
+
             </div>
         </header>
+
+        {{-- === ROW 3: SUB HEADER (Desktop Only) === --}}
+        <div class="hidden md:block bg-white border-b border-gray-100" style="height: 42px;">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
+                
+                {{-- KATEGORI DROPDOWN --}}
+                <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false" class="relative h-full flex items-center">
+                    <button @click="open = !open" class="flex items-center gap-2 pr-4 text-[13px] font-bold text-gray-600 hover:text-primary transition-all group" aria-haspopup="true" :aria-expanded="open">
+                        <i class="fas fa-th-large text-gray-400 group-hover:text-primary transition-colors"></i>
+                        <span>Semua Kategori</span>
+                        <i class="fas fa-chevron-down text-[10px] opacity-40 group-hover:opacity-100 transition-all"></i>
+                    </button>
+
+                    <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-2" class="absolute top-full left-0 mt-0 w-64 bg-white border border-gray-100 rounded-b-xl shadow-2xl py-3 z-[60]" x-cloak>
+                        <div class="px-4 pb-2 mb-2 border-b border-gray-50">
+                            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Kategori Populer</span>
+                        </div>
+                        @foreach(collect($categories)->take(8) as $category)
+                            @if(!empty($category['slug']))
+                                <a href="{{ route('kategori.detail', $category['slug']) }}" class="flex items-center justify-between px-5 py-2.5 hover:bg-gray-50 hover:text-primary transition-colors text-[13px] text-gray-700 font-semibold group">
+                                    {{ $category['name'] }}
+                                    <i class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-100 transition-all"></i>
+                                </a>
+                            @endif
+                        @endforeach
+                        <div class="mt-2 pt-2 border-t border-gray-50 px-2">
+                            <a href="{{ route('kategori') }}" class="flex items-center justify-center py-2 text-[12px] font-black text-primary bg-primary/5 rounded-lg hover:bg-primary/10 transition-all">Lihat Semua Kategori</a>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- TRENDING LINKS / KEYWORDS --}}
+                <div class="flex items-center gap-4 ml-6 text-[12px] font-medium text-gray-500 overflow-hidden">
+                    <span class="hidden lg:block text-gray-300">|</span>
+                    @php
+                        $trending = ['iPhone 15 Pro', 'Samsung S24 Ultra', 'MacBook Pro M3', 'Logitech G Pro', 'Sony WH-1000XM5', 'iPad Pro M2'];
+                    @endphp
+                    @foreach($trending as $link)
+                        <a href="{{ route('katalog') }}?q={{ urlencode($link) }}" class="hover:text-primary transition-colors whitespace-nowrap">{{ $link }}</a>
+                        @if(!$loop->last)
+                            <span class="text-gray-200 font-light hidden lg:block">|</span>
+                        @endif
+                    @endforeach
+                </div>
+
+            </div>
+        </div>
     </div>
 </div>

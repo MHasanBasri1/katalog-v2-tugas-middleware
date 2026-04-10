@@ -14,36 +14,41 @@ class BlogSeeder extends Seeder
     {
         $posts = [
             [
-                'title' => 'Tips Belanja Online Aman dan Hemat',
-                'excerpt' => 'Langkah sederhana agar transaksi online tetap aman, cepat, dan tidak boros.',
-                'content' => 'Belanja online yang aman dimulai dari toko terpercaya, cek ulasan asli, dan bandingkan harga sebelum checkout. Gunakan metode pembayaran yang memiliki perlindungan transaksi dan hindari membagikan OTP kepada siapa pun. Simpan bukti transaksi sampai barang diterima dengan baik. Supaya hemat, manfaatkan promo berkala, voucher, dan gratis ongkir secara terencana.',
-                'author_name' => 'Tim Kataloque',
-                'published_at' => now()->subDays(10),
-                'cover_image' => 'https://picsum.photos/seed/blog-kataloque-1/1200/700',
-                'category' => 'Tips Belanja',
-                'tags' => ['Belanja Online', 'Promo', 'Keamanan'],
+                'title' => 'Review iPhone 15 Pro: Apakah Material Titanium Sehebat Itu?',
+                'excerpt' => 'Mengulas kenyamanan dan ketahanan iPhone terbaru dengan bingkai titanium.',
+                'content' => 'iPhone 15 Pro membawa perubahan besar dengan penggunaan titanium kelas dirgantara. Tidak hanya lebih ringan, material ini juga memberikan kesan premium yang berbeda. Dengan chip A17 Pro, performa gaming dan multitasking menjadi sangat lancar. Kamera 48MP terbarunya juga memberikan detail yang luar biasa untuk fotografi profesional.',
+                'author_name' => 'Editor Gadget',
+                'published_at' => now()->subDays(5),
+                'cover_image' => 'https://picsum.photos/seed/tech-1/1200/700',
+                'category' => 'Gadget Review',
+                'tags' => ['iPhone', 'Smartphone', 'Apple'],
             ],
             [
-                'title' => 'Cara Memilih Smartphone Sesuai Kebutuhan',
-                'excerpt' => 'Fokus ke performa, kamera, baterai, dan budget agar tidak salah pilih.',
-                'content' => 'Tentukan prioritas utama sebelum membeli smartphone. Jika banyak aktivitas harian, pilih baterai besar dan pengisian cepat. Untuk konten, utamakan kamera yang stabil. Perhatikan juga kapasitas penyimpanan agar tidak cepat penuh. Sesuaikan spesifikasi dengan budget supaya pembelian lebih rasional dan maksimal dipakai dalam jangka panjang.',
-                'author_name' => 'Editor Teknologi',
-                'published_at' => now()->subDays(7),
-                'cover_image' => 'https://picsum.photos/seed/blog-kataloque-2/1200/700',
-                'category' => 'Teknologi',
-                'tags' => ['Smartphone', 'Gadget'],
+                'title' => 'Tips Memilih Sepatu Nike Original Agar Tidak Tertipu',
+                'excerpt' => 'Kenali ciri-ciri fisik dan kode produk Nike asli sebelum membeli.',
+                'content' => 'Populeritas sepatu Nike sering dimanfaatkan oleh pihak tidak bertanggung jawab untuk menjual produk palsu. Selalu cek nomor SKU pada lidah sepatu dan kotak, pastikan keduanya cocok. Kualitas jahitan dan bahan midsole juga menjadi pembeda utama. Belanja di toko resmi atau marketplace terpercaya adalah cara paling aman untuk mendapatkan produk orisinal.',
+                'author_name' => 'Fashionista',
+                'published_at' => now()->subDays(3),
+                'cover_image' => 'https://picsum.photos/seed/fashion-1/1200/700',
+                'category' => 'Lifestyle',
+                'tags' => ['Nike', 'Sepatu', 'Fashion'],
             ],
             [
-                'title' => 'Panduan Setup Audio Rumah Biar Makin Jernih',
-                'excerpt' => 'Posisi speaker dan pengaturan dasar yang berdampak besar ke kualitas suara.',
-                'content' => 'Kualitas audio tidak hanya ditentukan produk, tetapi juga tata letaknya. Jaga jarak speaker kiri kanan seimbang dan arahkan ke posisi duduk utama. Hindari meletakkan speaker menempel dinding jika bass terasa berlebih. Gunakan equalizer secara halus, lalu tes beberapa genre musik untuk mendapatkan karakter suara yang paling nyaman.',
-                'author_name' => 'Tim Audio Kataloque',
-                'published_at' => now()->subDays(4),
-                'cover_image' => 'https://picsum.photos/seed/blog-kataloque-3/1200/700',
-                'category' => 'Audio',
-                'tags' => ['Audio', 'Setup Rumah'],
+                'title' => 'Investasi Emas Antam: Tabungan Masa Depan Aman',
+                'excerpt' => 'Mengapa Logam Mulia tetap menjadi pilihan favorit para investor pemula.',
+                'content' => 'Emas dikenal sebagai safe haven karena nilainya yang cenderung stabil bahkan naik saat kondisi ekonomi tidak menentu. Logam Mulia Antam dengan sertifikat LBMA menawarkan kemurnian dan likuiditas tinggi. Mulailah menabung emas dari ukuran kecil secara rutin untuk mempersiapkan dana pendidikan atau masa pensiun yang lebih terjamin.',
+                'author_name' => 'Finansial Advisor',
+                'published_at' => now()->subDays(1),
+                'cover_image' => 'https://picsum.photos/seed/gold-1/1200/700',
+                'category' => 'Investasi',
+                'tags' => ['Emas', 'Antam', 'Keuangan'],
             ],
         ];
+
+        // Clear existing data
+        Blog::query()->delete();
+        BlogCategory::query()->delete();
+        BlogTag::query()->delete();
 
         foreach ($posts as $item) {
             $slug = Str::slug($item['title']);
@@ -58,20 +63,17 @@ class BlogSeeder extends Seeder
                 $categoryId = $category->id;
             }
 
-            $blog = Blog::query()->updateOrCreate(
-                ['slug' => $slug],
-                [
-                    'title' => $item['title'],
-                    'slug' => $slug,
-                    'excerpt' => $item['excerpt'],
-                    'content' => $item['content'],
-                    'cover_image' => $item['cover_image'],
-                    'category_id' => $categoryId,
-                    'author_name' => $item['author_name'],
-                    'is_published' => true,
-                    'published_at' => $item['published_at'],
-                ]
-            );
+            $blog = Blog::query()->create([
+                'title' => $item['title'],
+                'slug' => $slug,
+                'excerpt' => $item['excerpt'],
+                'content' => $item['content'],
+                'cover_image' => $item['cover_image'],
+                'category_id' => $categoryId,
+                'author_name' => $item['author_name'],
+                'is_published' => true,
+                'published_at' => $item['published_at'],
+            ]);
 
             $tagIds = collect($item['tags'] ?? [])
                 ->map(function (string $tagName): int {

@@ -34,14 +34,14 @@ class HomeController extends BaseApiController
         return $this->success([
             'banners' => $banners,
             'categories' => $categories,
-            'flashsale_products' => $promoProducts->map(fn ($product) => ProductTransformer::transform($product))->values(),
-            'terlaris_products' => $popularProducts->map(fn ($product) => ProductTransformer::transform($product))->values(),
-            'best_seller_products' => $popularProducts->map(fn ($product) => ProductTransformer::transform($product))->values(),
-            'terbaru_products' => $latestProducts->map(fn ($product) => ProductTransformer::transform($product))->values(),
+            'flashsale_products' => $promoProducts->map(fn (Product $product) => ProductTransformer::transform($product))->values(),
+            'terlaris_products' => $popularProducts->map(fn (Product $product) => ProductTransformer::transform($product))->values(),
+            'best_seller_products' => $popularProducts->map(fn (Product $product) => ProductTransformer::transform($product))->values(),
+            'terbaru_products' => $latestProducts->map(fn (Product $product) => ProductTransformer::transform($product))->values(),
             // Keep original keys for compatibility
-            'promo_products' => $promoProducts->map(fn ($product) => ProductTransformer::transform($product))->values(),
-            'popular_products' => $popularProducts->map(fn ($product) => ProductTransformer::transform($product))->values(),
-            'latest_products' => $latestProducts->map(fn ($product) => ProductTransformer::transform($product))->values(),
+            'promo_products' => $promoProducts->map(fn (Product $product) => ProductTransformer::transform($product))->values(),
+            'popular_products' => $popularProducts->map(fn (Product $product) => ProductTransformer::transform($product))->values(),
+            'latest_products' => $latestProducts->map(fn (Product $product) => ProductTransformer::transform($product))->values(),
         ]);
     }
 
@@ -58,7 +58,7 @@ class HomeController extends BaseApiController
         $products = $this->promoProductsCollection($limit);
 
         return $this->success([
-            'products' => $products->map(fn ($product) => ProductTransformer::transform($product))->values(),
+            'products' => $products->map(fn (Product $product) => ProductTransformer::transform($product))->values(),
         ]);
     }
 
@@ -75,7 +75,7 @@ class HomeController extends BaseApiController
         $products = $this->popularProductsCollection($limit);
 
         return $this->success([
-            'products' => $products->map(fn ($product) => ProductTransformer::transform($product))->values(),
+            'products' => $products->map(fn (Product $product) => ProductTransformer::transform($product))->values(),
         ]);
     }
 
@@ -92,13 +92,13 @@ class HomeController extends BaseApiController
         $products = $this->latestProductsCollection($limit);
 
         return $this->success([
-            'products' => $products->map(fn ($product) => ProductTransformer::transform($product))->values(),
+            'products' => $products->map(fn (Product $product) => ProductTransformer::transform($product))->values(),
         ]);
     }
 
     private function withRelations(): array
     {
-        return ['category:id,name,slug', 'primaryImage:id,product_id,image', 'images:id,product_id,image,is_primary', 'marketplaceLinks:id,product_id,marketplace,url'];
+        return ['category:id,name,slug,icon', 'primaryImage:id,product_id,image', 'images:id,product_id,image,is_primary', 'marketplaceLinks:id,product_id,marketplace,url'];
     }
 
     private function promoProductsCollection(int $limit)

@@ -75,7 +75,7 @@ class ProductController extends BaseApiController
 
         return $this->success([
             'product' => ProductTransformer::transform($product),
-            'related_products' => $related->map(fn ($item) => ProductTransformer::transform($item))->values(),
+            'related_products' => $related->map(fn (Product $item) => ProductTransformer::transform($item))->values(),
         ]);
     }
 
@@ -100,7 +100,7 @@ class ProductController extends BaseApiController
             ->get();
 
         return $this->success([
-            'products' => $related->map(fn ($item) => ProductTransformer::transform($item))->values(),
+            'products' => $related->map(fn (Product $item) => ProductTransformer::transform($item))->values(),
         ], 'Produk terkait.');
     }
 
@@ -124,7 +124,7 @@ class ProductController extends BaseApiController
         $products = $query->paginate($perPage)->withQueryString();
 
         $data = array_merge($extraData, [
-            'products' => collect($products->items())->map(fn ($product) => ProductTransformer::transform($product))->values(),
+            'products' => collect($products->items())->map(fn (Product $product) => ProductTransformer::transform($product))->values(),
         ]);
 
         return $this->success(
@@ -181,7 +181,7 @@ class ProductController extends BaseApiController
 
     private function withRelations(): array
     {
-        return ['category:id,name,slug', 'primaryImage:id,product_id,image', 'images:id,product_id,image,is_primary', 'marketplaceLinks:id,product_id,marketplace,url'];
+        return ['category:id,name,slug,icon', 'primaryImage:id,product_id,image', 'images:id,product_id,image,is_primary', 'marketplaceLinks:id,product_id,marketplace,url'];
     }
 
     private function applySorting(Builder $query, string $sort): void

@@ -18,6 +18,7 @@ class Product extends Model
         'original_price',
         'status',
         'sold_count',
+        'views_count',
         'likes_count',
         'rating_avg',
         'rating_count',
@@ -32,6 +33,8 @@ class Product extends Model
         'is_featured' => 'boolean',
         'show_in_promo' => 'boolean',
         'rating_avg' => 'decimal:1',
+        'views_count' => 'integer',
+        'sold_count' => 'integer',
     ];
 
     public function category(): BelongsTo

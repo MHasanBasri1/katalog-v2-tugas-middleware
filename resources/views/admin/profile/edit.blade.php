@@ -4,7 +4,7 @@
 @section('header', 'Profil Admin')
 
 @section('content')
-    <div class="max-w-4xl space-y-4">
+    <div class="space-y-4">
         @if (session('status'))
             <div class="rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 px-4 py-3 text-sm font-semibold">
                 {{ session('status') }}

@@ -26,26 +26,31 @@ class ProductController extends Controller
                 $request->filled('category_id'),
                 fn ($query) => $query->where('category_id', $request->integer('category_id'))
             )
+            ->when(
+                $request->filled('q'),
+                fn ($query) => $query->where(function($q) use ($request) {
+                    $q->where('name', 'like', '%' . $request->q . '%')
+                      ->orWhere('slug', 'like', '%' . $request->q . '%');
+                })
+            )
             ->latest('id')
             ->paginate(10)
             ->withQueryString();
 
         $categories = Category::query()->orderBy('name')->get(['id', 'name']);
-        $marketplaceOptions = Setting::query()->first()?->marketplaces ?? ['Shopee', 'Tokopedia', 'Lazada', 'Blibli', 'Tiktok Shop'];
-        $editProduct = null;
 
-        if ($request->filled('edit')) {
-            $editProduct = Product::query()
-                ->with('marketplaceLinks:id,product_id,marketplace,url')
-                ->find($request->integer('edit'));
-        }
-
-        return view('admin.products.index', compact('products', 'categories', 'marketplaceOptions', 'editProduct'));
+        return view('admin.products.index', compact('products', 'categories'));
     }
 
-    public function create(): RedirectResponse
+    public function create(): View
     {
-        return redirect()->route('admin.produk.index');
+        $categories = Category::query()->orderBy('name')->get(['id', 'name']);
+        $marketplaces = Setting::query()->first()?->marketplaces ?? [];
+        $marketplaceOptions = !empty($marketplaces) && !isset($marketplaces[0])
+            ? array_map(fn($k) => Str::title($k), array_keys($marketplaces))
+            : ($marketplaces ?: ['Shopee', 'Tokopedia', 'Lazada', 'Blibli', 'Tiktok Shop']);
+
+        return view('admin.products.create', compact('categories', 'marketplaceOptions'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -61,6 +66,10 @@ class ProductController extends Controller
             $this->syncMarketplaceLinks($product, $links);
         });
 
+        if ($request->input('action') === 'save_and_another') {
+            return redirect()->route('admin.produk.create')->with('status', 'Produk berhasil ditambahkan. Silahkan tambah produk lainnya.');
+        }
+
         return redirect()->route('admin.produk.index')->with('status', 'Produk berhasil ditambahkan.');
     }
 
@@ -69,9 +78,21 @@ class ProductController extends Controller
         return redirect()->route('admin.produk.edit', $produk);
     }
 
-    public function edit(Product $produk): RedirectResponse
+    public function edit(Product $produk): View
     {
-        return redirect()->route('admin.produk.index', ['edit' => $produk->id]);
+        $categories = Category::query()->orderBy('name')->get(['id', 'name']);
+        $marketplaces = Setting::query()->first()?->marketplaces ?? [];
+        $marketplaceOptions = !empty($marketplaces) && !isset($marketplaces[0])
+            ? array_map(fn($k) => Str::title($k), array_keys($marketplaces))
+            : ($marketplaces ?: ['Shopee', 'Tokopedia', 'Lazada', 'Blibli', 'Tiktok Shop']);
+        
+        $produk->load('marketplaceLinks:id,product_id,marketplace,url');
+
+        return view('admin.products.edit', [
+            'product' => $produk,
+            'categories' => $categories,
+            'marketplaceOptions' => $marketplaceOptions
+        ]);
     }
 
     public function update(Request $request, Product $produk): RedirectResponse

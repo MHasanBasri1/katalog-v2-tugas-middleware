@@ -75,7 +75,7 @@ class ProductsPage extends Component
             })
             ->when($selectedCategory, fn ($query) => $query->where('category_id', $selectedCategory->id))
             ->with([
-                'category:id,name',
+                'category:id,name,slug,icon',
                 'primaryImage:id,product_id,image',
             ])
             ->orderByDesc('id')

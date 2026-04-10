@@ -10,7 +10,7 @@
     <div class="h-20 px-4 flex items-center border-b border-gray-200 dark:border-gray-800">
         <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 overflow-hidden">
             <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center shadow-lg shadow-primary/25">
-                <i class="fas fa-cube text-xl"></i>
+                <i class="fas fa-shopping-basket text-xl"></i>
             </div>
             <div x-show="$store.sidebar.isExpanded" x-cloak>
                 <p class="text-lg font-black text-gray-900 dark:text-white leading-none tracking-tight">Kataloque</p>
@@ -58,6 +58,7 @@
             }
         }"
     >
+        <div x-show="$store.sidebar.isExpanded" x-cloak class="px-3 pt-2 pb-1 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Utama</div>
         @if ($canDashboard)
             <a href="{{ route('admin.dashboard') }}"
                class="flex items-center rounded-xl px-3 py-3 text-sm font-semibold transition"
@@ -72,6 +73,7 @@
         @endif
 
         @if ($canCatalog)
+            <div x-show="$store.sidebar.isExpanded" x-cloak class="px-3 pt-4 pb-1 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Inventori</div>
             <button
                 type="button"
                 @click="toggleGroup('openCatalog')"
@@ -94,7 +96,6 @@
                            'bg-blue-600 text-white shadow-sm shadow-blue-600/20' => request()->routeIs('admin.kategori.*'),
                            'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900' => !request()->routeIs('admin.kategori.*'),
                        ])>
-                        <i class="ti ti-category text-lg"></i>
                         <span class="ml-2.5">Kategori</span>
                     </a>
                 @endcan
@@ -105,7 +106,6 @@
                            'bg-blue-600 text-white shadow-sm shadow-blue-600/20' => request()->routeIs('admin.produk.*'),
                            'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900' => !request()->routeIs('admin.produk.*'),
                        ])>
-                        <i class="ti ti-package text-lg"></i>
                         <span class="ml-2.5">Produk</span>
                     </a>
                 @endcan
@@ -113,6 +113,7 @@
         @endif
 
         @if ($canContent)
+            <div x-show="$store.sidebar.isExpanded" x-cloak class="px-3 pt-4 pb-1 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Publikasi</div>
             <button
                 type="button"
                 @click="toggleGroup('openContent')"
@@ -135,7 +136,6 @@
                            'bg-blue-600 text-white shadow-sm shadow-blue-600/20' => request()->routeIs('admin.blog.*'),
                            'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900' => !request()->routeIs('admin.blog.*'),
                        ])>
-                        <i class="ti ti-news text-lg"></i>
                         <span class="ml-2.5">Artikel Blog</span>
                     </a>
                     <a href="{{ route('admin.blog-kategori.index') }}"
@@ -144,7 +144,6 @@
                            'bg-blue-600 text-white shadow-sm shadow-blue-600/20' => request()->routeIs('admin.blog-kategori.*'),
                            'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900' => !request()->routeIs('admin.blog-kategori.*'),
                        ])>
-                        <i class="ti ti-tags text-lg"></i>
                         <span class="ml-2.5">Kategori Blog</span>
                     </a>
                 @endcan
@@ -155,7 +154,6 @@
                            'bg-blue-600 text-white shadow-sm shadow-blue-600/20' => request()->routeIs('admin.banner.*'),
                            'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900' => !request()->routeIs('admin.banner.*'),
                        ])>
-                        <i class="ti ti-photo text-lg"></i>
                         <span class="ml-2.5">Banner</span>
                     </a>
                 @endcan
@@ -166,11 +164,14 @@
                            'bg-blue-600 text-white shadow-sm shadow-blue-600/20' => request()->routeIs('admin.halaman-statis.*'),
                            'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900' => !request()->routeIs('admin.halaman-statis.*'),
                        ])>
-                        <i class="ti ti-file-text text-lg"></i>
                         <span class="ml-2.5">Halaman</span>
                     </a>
                 @endcan
             </div>
+        @endif
+
+        @if ($canUsers || $canSystem)
+            <div x-show="$store.sidebar.isExpanded" x-cloak class="px-3 pt-4 pb-1 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Sistem</div>
         @endif
 
         @if ($canUsers)

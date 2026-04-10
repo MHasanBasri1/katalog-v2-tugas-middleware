@@ -14,21 +14,22 @@ class BannerController extends Controller
     public function index(Request $request): View
     {
         $banners = Banner::query()
+            ->when(
+                $request->filled('q'),
+                fn ($query) => $query->where('title', 'like', '%' . $request->q . '%')
+                    ->orWhere('subtitle', 'like', '%' . $request->q . '%')
+            )
             ->orderBy('sort_order')
             ->latest('id')
-            ->paginate(10);
-        $editBanner = null;
+            ->paginate(10)
+            ->withQueryString();
 
-        if ($request->filled('edit')) {
-            $editBanner = Banner::query()->find($request->integer('edit'));
-        }
-
-        return view('admin.banners.index', compact('banners', 'editBanner'));
+        return view('admin.banners.index', compact('banners'));
     }
 
-    public function create(): RedirectResponse
+    public function create(): View
     {
-        return redirect()->route('admin.banner.index');
+        return view('admin.banners.create');
     }
 
     public function store(Request $request): RedirectResponse
@@ -37,12 +38,16 @@ class BannerController extends Controller
         $data['image_url'] = $this->storeImage($request, 'image_file', 'banners');
         Banner::query()->create($data);
 
+        if ($request->input('action') === 'save_and_another') {
+            return redirect()->route('admin.banner.create')->with('status', 'Banner berhasil ditambahkan. Silahkan tambah banner lainnya.');
+        }
+
         return redirect()->route('admin.banner.index')->with('status', 'Banner berhasil ditambahkan.');
     }
 
-    public function edit(Banner $banner): RedirectResponse
+    public function edit(Banner $banner): View
     {
-        return redirect()->route('admin.banner.index', ['edit' => $banner->id]);
+        return view('admin.banners.edit', ['banner' => $banner]);
     }
 
     public function update(Request $request, Banner $banner): RedirectResponse

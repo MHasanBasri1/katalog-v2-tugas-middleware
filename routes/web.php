@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\StaticPageController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\LogController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/admin/login', [AuthenticatedSessionController::class, 'create'])->name('login');
@@ -229,7 +230,7 @@ Route::get('/{slug}', function (string $slug) {
     return view('frontend.static-page', compact('page', 'canonical', 'seoTitle', 'seoDescription', 'ogImage'));
 })->name('halaman.show');
 
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin', 'log.activity'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->middleware('permission:dashboard.view')
         ->name('dashboard');
@@ -305,4 +306,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/halaman-statis/bulk-delete', [StaticPageController::class, 'bulkDestroy'])
         ->middleware('permission:static_pages.manage')
         ->name('halaman-statis.bulk-destroy');
+
+    // Activity Logs
+    Route::get('/logs', [LogController::class, 'index'])->name('logs.index');
+    Route::post('/logs/clear', [LogController::class, 'clear'])->name('logs.clear');
 });

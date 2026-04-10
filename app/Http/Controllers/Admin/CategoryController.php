@@ -14,18 +14,24 @@ class CategoryController extends Controller
 {
     public function index(Request $request): View
     {
-        $categories = Category::query()->latest('id')->paginate(10);
-        $editCategory = null;
-        if ($request->filled('edit')) {
-            $editCategory = Category::query()->find($request->integer('edit'));
-        }
+        $categories = Category::query()
+            ->when(
+                $request->filled('q'),
+                fn ($query) => $query->where(function($q) use ($request) {
+                    $q->where('name', 'like', '%' . $request->q . '%')
+                      ->orWhere('slug', 'like', '%' . $request->q . '%');
+                })
+            )
+            ->latest('id')
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('admin.categories.index', compact('categories', 'editCategory'));
+        return view('admin.categories.index', compact('categories'));
     }
 
-    public function create(): RedirectResponse
+    public function create(): View
     {
-        return redirect()->route('admin.kategori.index');
+        return view('admin.categories.create');
     }
 
     public function store(Request $request): RedirectResponse
@@ -47,6 +53,10 @@ class CategoryController extends Controller
 
         Category::query()->create($data);
 
+        if ($request->input('action') === 'save_and_another') {
+            return redirect()->route('admin.kategori.create')->with('status', 'Kategori berhasil ditambahkan. Silahkan tambah kategori lainnya.');
+        }
+
         return redirect()->route('admin.kategori.index')->with('status', 'Kategori berhasil ditambahkan.');
     }
 
@@ -55,9 +65,9 @@ class CategoryController extends Controller
         return redirect()->route('admin.kategori.edit', $kategori);
     }
 
-    public function edit(Category $kategori): RedirectResponse
+    public function edit(Category $kategori): View
     {
-        return redirect()->route('admin.kategori.index', ['edit' => $kategori->id]);
+        return view('admin.categories.edit', ['category' => $kategori]);
     }
 
     public function update(Request $request, Category $kategori): RedirectResponse

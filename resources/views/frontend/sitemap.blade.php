@@ -26,21 +26,25 @@
     </url>
 
     @foreach ($categories as $category)
+    @if($category->slug)
     <url>
         <loc>{{ route('kategori.detail', $category->slug) }}</loc>
         <lastmod>{{ ($category->updated_at ?? $generatedAt)->toAtomString() }}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>
     </url>
+    @endif
     @endforeach
 
     @foreach ($products as $product)
+    @if($product->slug)
     <url>
         <loc>{{ route('produk.detail', $product->slug) }}</loc>
         <lastmod>{{ ($product->updated_at ?? $generatedAt)->toAtomString() }}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
+    @endif
     @endforeach
 
     @foreach ($blogs ?? [] as $blog)
