@@ -127,15 +127,22 @@
 
             <!-- Filters -->
             <form method="GET" action="{{ route('admin.produk.index') }}" class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-end gap-4">
-                <div class="flex-1 min-w-[300px]">
+                <div class="flex-1 min-w-[300px]" x-data="{ q: '{{ request('q') }}' }">
                     <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Pencarian Produk</label>
                     <div class="relative group">
                         <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center text-gray-400 group-focus-within:text-blue-600 transition-colors" style="width: 44px;">
                             <i class="ti ti-search text-xs"></i>
                         </div>
-                        <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama produk..." 
-                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium placeholder:text-gray-500"
-                            style="padding: 0.65rem 1rem 0.65rem 44px;">
+                        <input type="text" name="q" x-model="q" placeholder="Cari nama produk..." 
+                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium placeholder:text-gray-500 pr-10"
+                            style="padding: 0.65rem 2.5rem 0.65rem 44px;">
+                        
+                        {{-- Clear Button --}}
+                        <template x-if="q.length > 0">
+                            <button type="button" @click="q = ''; $nextTick(() => $el.closest('form').submit())" class="absolute right-0 top-0 bottom-0 px-3 text-gray-400 hover:text-rose-500 transition-colors">
+                                <i class="ti ti-circle-x text-sm"></i>
+                            </button>
+                        </template>
                     </div>
                 </div>
                 <div class="w-full md:w-56">

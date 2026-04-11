@@ -16,8 +16,17 @@
                         <i class="fas fa-search text-xs"></i>
                     </div>
                     <input id="catalogSearchInput" wire:model.live.debounce.300ms="search" type="text" placeholder="Ketik nama produk untuk mencari..."
-                        class="w-full bg-gray-50/80 border border-gray-300 focus:border-primary focus:ring-4 focus:ring-primary/10 focus:bg-white rounded-xl outline-none transition-all duration-300 text-sm font-medium placeholder:text-gray-500"
-                        style="padding: 0.75rem 1rem 0.75rem 44px;" aria-label="Cari Produk Lengkap">
+                        class="w-full bg-gray-50/80 border border-gray-300 focus:border-primary focus:ring-4 focus:ring-primary/10 focus:bg-white rounded-xl outline-none transition-all duration-300 text-sm font-medium placeholder:text-gray-500 pr-12"
+                        style="padding: 0.75rem 3rem 0.75rem 44px;" aria-label="Cari Produk Lengkap">
+                    
+                    {{-- Clear Search Button --}}
+                    @if($search !== '')
+                        <button wire:click="clearSearch"
+                            class="absolute right-0 top-0 bottom-0 px-4 text-gray-400 hover:text-rose-500 transition-colors"
+                            aria-label="Hapus Pencarian">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    @endif
                 </div>
             </div>
             <div class="md:col-span-1">

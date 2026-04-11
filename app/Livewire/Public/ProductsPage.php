@@ -42,6 +42,12 @@ class ProductsPage extends Component
         $this->resetPage();
     }
 
+    public function clearSearch(): void
+    {
+        $this->search = '';
+        $this->resetPage();
+    }
+
     public function clearFilters(): void
     {
         $this->search = '';

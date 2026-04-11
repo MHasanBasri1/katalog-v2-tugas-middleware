@@ -59,8 +59,18 @@
                             <input id="desktopSearchInput" wire:model.live.debounce.300ms="search"
                                 wire:keydown.enter="goToSearch" type="search"
                                 placeholder="Cari brand, produk, atau seller"
-                                class="w-full bg-gray-50 border border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/5 rounded-lg outline-none transition-all text-sm placeholder:text-gray-400 font-medium h-10 px-4 pr-12"
+                                class="w-full bg-gray-50 border border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/5 rounded-lg outline-none transition-all text-sm placeholder:text-gray-400 font-medium h-10 px-4 pr-20"
                                 aria-label="Cari Produk">
+                            
+                            {{-- Clear Search Button (Desktop) --}}
+                            @if($search !== '')
+                                <button wire:click="clearSearch"
+                                    class="absolute right-12 top-0 bottom-0 px-3 text-gray-400 hover:text-rose-500 transition-colors"
+                                    aria-label="Hapus Pencarian">
+                                    <i class="fas fa-times-circle"></i>
+                                </button>
+                            @endif
+
                             <button wire:click="goToSearch"
                                 class="absolute right-0 top-0 bottom-0 bg-primary text-white rounded-r-lg hover:bg-primary-dark transition-all flex items-center justify-center w-11"
                                 aria-label="Cari">
@@ -317,8 +327,18 @@
                             <input id="mobileSearchInput" wire:model.live.debounce.300ms="search"
                                 wire:keydown.enter="goToSearch" type="text"
                                 placeholder="Cari brand, produk, atau seller"
-                                class="w-full bg-gray-50 border border-gray-200 focus:border-primary rounded-lg outline-none transition text-[13px] font-semibold text-gray-700 placeholder:text-gray-400 h-9 px-3 pr-10"
+                                class="w-full bg-gray-50 border border-gray-200 focus:border-primary rounded-lg outline-none transition text-[13px] font-semibold text-gray-700 placeholder:text-gray-400 h-9 px-3 pr-16"
                                 aria-label="Cari Produk">
+
+                            {{-- Clear Search Button (Mobile) --}}
+                            @if($search !== '')
+                                <button wire:click="clearSearch"
+                                    class="absolute right-10 top-0 bottom-0 px-2 text-gray-400 hover:text-rose-500 transition-colors"
+                                    aria-label="Hapus Pencarian">
+                                    <i class="fas fa-times-circle text-sm"></i>
+                                </button>
+                            @endif
+
                             <button wire:click="goToSearch"
                                 class="absolute right-0 top-0 bottom-0 w-9 bg-primary text-white rounded-r-lg flex items-center justify-center"
                                 aria-label="Cari">

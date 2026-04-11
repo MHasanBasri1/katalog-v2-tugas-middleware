@@ -233,9 +233,9 @@
                 'xl:left-20': !$store.sidebar.isExpanded,
                 'left-0': true
             }">
-            <div class="flex flex-col sm:flex-row items-center justify-end gap-3 px-4">
-                <button type="submit" class="w-full sm:w-auto px-12 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200 dark:shadow-none text-center">
-                    Simpan Seluruh Pengaturan
+            <div class="flex flex-row items-center justify-end gap-2 sm:gap-3 px-3 sm:px-6">
+                <button type="submit" class="flex-1 sm:flex-none px-12 py-2.5 rounded-xl bg-blue-600 text-white text-xs sm:text-sm font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200 dark:shadow-none text-center whitespace-nowrap">
+                    Simpan
                 </button>
             </div>
         </div>

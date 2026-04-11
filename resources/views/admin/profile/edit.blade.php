@@ -41,8 +41,8 @@
                         @enderror
                     </div>
 
-                    <button type="submit" class="inline-flex items-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 transition">
-                        Simpan Profil
+                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-6 py-2.5 transition">
+                        Simpan
                     </button>
                 </form>
             </section>
@@ -91,8 +91,8 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="inline-flex items-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 transition">
-                        Simpan Password
+                    <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-6 py-2.5 transition">
+                        Simpan
                     </button>
                 </form>
             </section>

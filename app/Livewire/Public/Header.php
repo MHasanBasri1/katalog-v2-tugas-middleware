@@ -73,6 +73,11 @@ class Header extends Component
         $this->redirectRoute('katalog', ['q' => $query]);
     }
 
+    public function clearSearch(): void
+    {
+        $this->search = '';
+    }
+
     public function getSearchResultsProperty(): array
     {
         $query = trim($this->search);

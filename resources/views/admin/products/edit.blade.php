@@ -184,12 +184,12 @@
                 'xl:left-20': !$store.sidebar.isExpanded,
                 'left-0': true
             }">
-            <div class="flex flex-col sm:flex-row items-center justify-end gap-3 px-4">
-                <a href="{{ route('admin.produk.index') }}" class="w-full sm:w-auto px-6 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-center">
+            <div class="flex flex-row items-center justify-end gap-2 sm:gap-3 px-3 sm:px-6">
+                <a href="{{ route('admin.produk.index') }}" class="flex-1 sm:flex-none px-4 sm:px-8 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-center whitespace-nowrap">
                     Batal
                 </a>
-                <button type="submit" class="w-full sm:w-auto px-10 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200 dark:shadow-none text-center">
-                    Simpan Perubahan
+                <button type="submit" class="flex-1 sm:flex-none px-8 sm:px-14 py-2.5 rounded-xl bg-blue-600 text-white text-xs sm:text-sm font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200 dark:shadow-none text-center whitespace-nowrap">
+                    Simpan
                 </button>
             </div>
         </div>

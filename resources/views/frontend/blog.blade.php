@@ -25,15 +25,22 @@
             
             <form method="GET" action="{{ route('blog.index') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                 {{-- Search Article --}}
-                <div class="md:col-span-2">
+                <div class="md:col-span-2" x-data="{ search: '{{ request('search') }}' }">
                     <label for="blogSearchInput" class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Pencarian Artikel</label>
                     <div class="relative group">
                         <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center text-gray-400 group-focus-within:text-primary transition-colors z-10" style="width: 44px;">
                             <i class="fas fa-search text-xs"></i>
                         </div>
-                        <input id="blogSearchInput" name="search" type="text" value="{{ request('search') }}" placeholder="Ketik judul artikel untuk mencari..."
-                            class="w-full bg-gray-50/80 border border-gray-300 focus:border-primary focus:ring-4 focus:ring-primary/10 focus:bg-white rounded-xl outline-none transition-all duration-300 text-sm font-medium placeholder:text-gray-500"
-                            style="padding: 0.75rem 1rem 0.75rem 44px;">
+                        <input id="blogSearchInput" name="search" x-model="search" type="text" placeholder="Ketik judul artikel untuk mencari..."
+                            class="w-full bg-gray-50/80 border border-gray-300 focus:border-primary focus:ring-4 focus:ring-primary/10 focus:bg-white rounded-xl outline-none transition-all duration-300 text-sm font-medium placeholder:text-gray-500 pr-10"
+                            style="padding: 0.75rem 2.5rem 0.75rem 44px;">
+                        
+                        {{-- Clear Button --}}
+                        <template x-if="search.length > 0">
+                            <button type="button" @click="search = ''; $nextTick(() => $el.closest('form').submit())" class="absolute right-0 top-0 bottom-0 px-4 text-gray-400 hover:text-rose-500 transition-colors z-20">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
+                        </template>
                     </div>
                 </div>
 

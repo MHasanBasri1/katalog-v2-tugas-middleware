@@ -96,15 +96,22 @@
 
                 <!-- Filters -->
                 <form method="GET" action="{{ route('admin.user.index') }}" class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-end gap-4">
-                    <div class="flex-1 min-w-[300px]">
+                    <div class="flex-1 min-w-[300px]" x-data="{ q: '{{ request('q') }}' }">
                         <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Pencarian User</label>
                         <div class="relative group">
                             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center text-gray-400 group-focus-within:text-blue-600 transition-colors" style="width: 44px;">
                                 <i class="ti ti-search text-xs"></i>
                             </div>
-                            <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari nama atau email..." 
-                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium placeholder:text-gray-500"
-                                style="padding: 0.65rem 1rem 0.65rem 44px;">
+                            <input type="text" name="q" x-model="q" placeholder="Cari nama atau email..." 
+                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium placeholder:text-gray-500 pr-10"
+                                style="padding: 0.65rem 2.5rem 0.65rem 44px;">
+                            
+                            {{-- Clear Button --}}
+                            <template x-if="q.length > 0">
+                                <button type="button" @click="q = ''; $nextTick(() => $el.closest('form').submit())" class="absolute right-0 top-0 bottom-0 px-3 text-gray-400 hover:text-rose-500 transition-colors">
+                                    <i class="ti ti-circle-x text-sm"></i>
+                                </button>
+                            </template>
                         </div>
                     </div>
                     <div class="w-full md:w-48">
@@ -180,32 +187,38 @@
                                         </td>
                                         <td class="px-4 py-3">
                                             <div class="flex items-center justify-end gap-2">
-                                                @if (!$user->is_frozen)
-                                                    <form method="POST" action="{{ route('admin.user.freeze', $user) }}" onsubmit="return confirm('Bekukan akun user ini?')">
+                                                @if ($user->id !== auth()->id())
+                                                    @if (!$user->is_frozen)
+                                                        <form method="POST" action="{{ route('admin.user.freeze', $user) }}" onsubmit="return confirm('Bekukan akun user ini?')">
+                                                            @csrf
+                                                            <input type="hidden" name="freeze_reason" value="Dibekukan oleh admin">
+                                                            <button type="submit" class="inline-flex items-center rounded-lg border border-amber-100 dark:border-amber-900/10 p-2 text-amber-600 hover:bg-amber-600 hover:text-white transition-all text-center" title="Bekukan">
+                                                                <i class="ti ti-user-x text-base"></i>
+                                                            </button>
+                                                        </form>
+                                                    @else
+                                                        <form method="POST" action="{{ route('admin.user.unfreeze', $user) }}" onsubmit="return confirm('Aktifkan kembali akun user ini?')">
+                                                            @csrf
+                                                            <button type="submit" class="inline-flex items-center rounded-lg border border-emerald-100 dark:border-emerald-900/10 p-2 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all text-center" title="Aktifkan">
+                                                                <i class="ti ti-user-check text-base"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                    <a href="{{ route('admin.user.edit', $user) }}" class="inline-flex items-center rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800" title="Edit">
+                                                        <i class="ti ti-pencil text-base"></i>
+                                                    </a>
+                                                    <form method="POST" action="{{ route('admin.user.destroy', $user) }}" onsubmit="return confirm('Hapus user ini? Tindakan ini tidak dapat dibatalkan.')">
                                                         @csrf
-                                                        <input type="hidden" name="freeze_reason" value="Dibekukan oleh admin">
-                                                        <button type="submit" class="inline-flex items-center rounded-lg border border-amber-100 dark:border-amber-900/10 p-2 text-amber-600 hover:bg-amber-600 hover:text-white transition-all text-center" title="Bekukan">
-                                                            <i class="ti ti-user-x text-base"></i>
+                                                        @method('DELETE')
+                                                        <button type="submit" class="inline-flex items-center rounded-lg border border-rose-100 dark:border-rose-900/10 p-2 text-rose-600 hover:bg-rose-600 hover:text-white transition-all text-center" title="Hapus">
+                                                            <i class="ti ti-trash text-base"></i>
                                                         </button>
                                                     </form>
                                                 @else
-                                                    <form method="POST" action="{{ route('admin.user.unfreeze', $user) }}" onsubmit="return confirm('Aktifkan kembali akun user ini?')">
-                                                        @csrf
-                                                        <button type="submit" class="inline-flex items-center rounded-lg border border-emerald-100 dark:border-emerald-900/10 p-2 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all text-center" title="Aktifkan">
-                                                            <i class="ti ti-user-check text-base"></i>
-                                                        </button>
-                                                    </form>
+                                                    <div class="px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 text-[10px] font-black uppercase tracking-widest border border-blue-100 dark:border-blue-800">
+                                                        Akun Anda
+                                                    </div>
                                                 @endif
-                                                <a href="{{ route('admin.user.edit', $user) }}" class="inline-flex items-center rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800" title="Edit">
-                                                    <i class="ti ti-pencil text-base"></i>
-                                                </a>
-                                                <form method="POST" action="{{ route('admin.user.destroy', $user) }}" onsubmit="return confirm('Hapus user ini? Tindakan ini tidak dapat dibatalkan.')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="inline-flex items-center rounded-lg border border-rose-100 dark:border-rose-900/10 p-2 text-rose-600 hover:bg-rose-600 hover:text-white transition-all text-center" title="Hapus">
-                                                        <i class="ti ti-trash text-base"></i>
-                                                    </button>
-                                                </form>
                                             </div>
                                         </td>
                                     </tr>
