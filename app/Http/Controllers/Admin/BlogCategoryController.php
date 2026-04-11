@@ -21,7 +21,7 @@ class BlogCategoryController extends Controller
                 fn ($query) => $query->where('name', 'like', '%' . $request->q . '%')
             )
             ->latest('id')
-            ->paginate(10)
+            ->paginate(15)
             ->withQueryString();
 
         return view('admin.blog-categories.index', compact('blogCategories'));
@@ -99,6 +99,7 @@ class BlogCategoryController extends Controller
         $deleted = 0;
         $skipped = 0;
 
+        /** @var \App\Models\BlogCategory $category */
         foreach ($categories as $category) {
             if ($category->blogs()->exists()) {
                 $skipped++;

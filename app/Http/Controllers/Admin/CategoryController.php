@@ -23,7 +23,7 @@ class CategoryController extends Controller
                 })
             )
             ->latest('id')
-            ->paginate(10)
+            ->paginate(15)
             ->withQueryString();
 
         return view('admin.categories.index', compact('categories'));
@@ -118,6 +118,7 @@ class CategoryController extends Controller
         $deleted = 0;
         $skipped = 0;
 
+        /** @var \App\Models\Category $category */
         foreach ($categories as $category) {
             if ($category->products()->exists()) {
                 $skipped++;

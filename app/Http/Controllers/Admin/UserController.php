@@ -18,17 +18,17 @@ class UserController extends Controller
         $users = User::query()
             ->when(
                 $request->filled('role'),
-                fn ($query) => $query->whereHas('roles', fn ($roleQuery) => $roleQuery->where('name', $request->string('role')->toString()))
+                fn($query) => $query->whereHas('roles', fn($roleQuery) => $roleQuery->where('name', $request->string('role')->toString()))
             )
             ->when(
                 $request->filled('q'),
-                fn ($query) => $query->where(function($q) use ($request) {
+                fn($query) => $query->where(function ($q) use ($request) {
                     $q->where('name', 'like', '%' . $request->q . '%')
-                      ->orWhere('email', 'like', '%' . $request->q . '%');
+                        ->orWhere('email', 'like', '%' . $request->q . '%');
                 })
             )
             ->latest('id')
-            ->paginate(12)
+            ->paginate(25)
             ->withQueryString();
 
         return view('admin.users.index', compact('users'));
@@ -85,7 +85,7 @@ class UserController extends Controller
             'freeze_reason' => (bool) $data['is_frozen'] ? ($data['freeze_reason'] ?? null) : null,
         ];
 
-        if (! empty($data['password'])) {
+        if (!empty($data['password'])) {
             $payload['password'] = Hash::make((string) $data['password']);
         }
 
@@ -116,8 +116,8 @@ class UserController extends Controller
 
         $currentUserId = (int) auth()->id();
         $targetIds = collect($validated['selected_ids'])
-            ->map(fn ($id) => (int) $id)
-            ->filter(fn ($id) => $id !== $currentUserId)
+            ->map(fn($id) => (int) $id)
+            ->filter(fn($id) => $id !== $currentUserId)
             ->values();
 
         if ($targetIds->isEmpty()) {

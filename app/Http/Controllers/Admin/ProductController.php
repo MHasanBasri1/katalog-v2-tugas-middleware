@@ -34,7 +34,7 @@ class ProductController extends Controller
                 })
             )
             ->latest('id')
-            ->paginate(10)
+            ->paginate(15)
             ->withQueryString();
 
         $categories = Category::query()->orderBy('name')->get(['id', 'name']);
@@ -324,7 +324,7 @@ class ProductController extends Controller
             'marketplace_urls',
         ];
 
-        return response()->streamDownload(function () use ($headers) {
+        return response()->streamDownload(function () use ($headers, $request) {
             $output = fopen('php://output', 'w');
             fputcsv($output, $headers);
 

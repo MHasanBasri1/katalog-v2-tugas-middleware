@@ -13,11 +13,22 @@
                     <p class="text-sm text-gray-500">Memantau seluruh interaksi user dan pengunjung dalam aplikasi.</p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <form action="{{ route('admin.logs.clear') }}" method="POST" onsubmit="return confirm('Hapus semua log yang sudah lebih dari 3 bulan?')">
+                    <form action="{{ route('admin.logs.clear') }}" method="POST" class="flex items-center gap-2" x-data="{ months: 3 }" @submit="return confirm('Hapus semua log yang sudah lebih dari ' + months + ' bulan?')">
                         @csrf
-                        <button type="submit" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-50 dark:bg-rose-900/20 text-rose-600 hover:bg-rose-600 hover:text-white transition-all text-xs font-bold uppercase tracking-wider border border-rose-100 dark:border-rose-900/10">
-                            <i class="ti ti-trash"></i>
-                            Bersihkan Log (> 3 Bulan)
+                        <div class="relative">
+                            <select name="months" x-model="months" class="appearance-none bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl pl-4 pr-10 py-2.5 text-xs font-bold text-gray-700 dark:text-gray-300 outline-none focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10 transition-all cursor-pointer uppercase tracking-wider">
+                                <option value="1">1 Bulan</option>
+                                <option value="3">3 Bulan</option>
+                                <option value="6">6 Bulan</option>
+                                <option value="12">12 Bulan</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-400">
+                                <i class="ti ti-chevron-down text-xs"></i>
+                            </div>
+                        </div>
+                        <button type="submit" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-50 dark:bg-rose-900/20 text-rose-600 hover:bg-rose-600 hover:text-white transition-all text-xs font-bold uppercase tracking-wider border border-rose-100 dark:border-rose-900/10 shadow-sm">
+                            <i class="ti ti-trash text-sm"></i>
+                            Bersihkan
                         </button>
                     </form>
                 </div>
@@ -77,22 +88,17 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        @if($log->user)
-                                            <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center font-bold text-xs">
-                                                {{ substr($log->user->name, 0, 1) }}
-                                            </div>
-                                            <div class="flex flex-col">
-                                                <span class="text-sm font-bold text-gray-900 dark:text-white">{{ $log->user->name }}</span>
-                                                <span class="text-[10px] font-black uppercase tracking-tighter text-blue-500">{{ $log->user->hasRole('admin') ? 'ADMIN' : 'USER' }}</span>
-                                            </div>
-                                        @else
-                                            <div class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-400 flex items-center justify-center">
-                                                <i class="ti ti-user-x"></i>
-                                            </div>
+                                    @if($log->user)
+                                        <div class="flex flex-col">
+                                            <span class="text-sm font-bold text-gray-900 dark:text-white">{{ $log->user->name }}</span>
+                                            <span class="text-[10px] font-black uppercase tracking-tighter text-blue-500">{{ $log->user->hasRole('admin') ? 'ADMIN' : 'USER' }}</span>
+                                        </div>
+                                    @else
+                                        <div class="flex flex-col">
                                             <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Pengunjung</span>
-                                        @endif
-                                    </div>
+                                            <span class="text-[9px] font-medium text-gray-300 dark:text-gray-600">Guest Session</span>
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4">
                                     <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $log->description }}</span>

@@ -1,5 +1,5 @@
 <aside
-    class="fixed top-0 left-0 z-50 h-screen flex flex-col bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-r border-gray-200 dark:border-gray-800 transition-all duration-500 ease-in-out shadow-2xl shadow-gray-200/50 dark:shadow-none"
+    class="fixed top-0 left-0 z-50 h-screen flex flex-col bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 transition-all duration-500 ease-in-out shadow-xl shadow-gray-200/50 dark:shadow-none"
     :class="{
         'w-72': $store.sidebar.isSidebarForceExpanded,
         'w-20': !$store.sidebar.isSidebarForceExpanded,
@@ -7,7 +7,7 @@
         'translate-x-0': $store.sidebar.isMobileOpen
     }"
 >
-    <div class="h-20 px-4 flex items-center border-b border-gray-200 dark:border-gray-800">
+    <div class="h-20 px-6 flex items-center border-b border-gray-100 dark:border-gray-800/50">
         <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 overflow-hidden">
             <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center shadow-lg shadow-primary/25">
                 <i class="fas fa-shopping-basket text-xl"></i>
@@ -42,7 +42,7 @@
     @endphp
 
     <nav
-        class="px-3 py-4 space-y-1 overflow-y-auto flex-1 min-h-0 hide-scrollbar"
+        class="px-4 py-4 space-y-1.5 overflow-y-auto flex-1 min-h-0 custom-scrollbar"
         x-data="{
             openCatalog: @js($isCatalogActive),
             openContent: @js($isContentActive),
@@ -94,7 +94,11 @@
                 <span x-show="$store.sidebar.isSidebarForceExpanded" x-cloak class="ml-3">Katalog</span>
                 <i x-show="$store.sidebar.isSidebarForceExpanded" x-cloak class="ti ti-chevron-down ml-auto text-[10px] opacity-50 transition-transform" :class="openCatalog ? 'rotate-180' : ''"></i>
             </button>
-            <div x-show="$store.sidebar.isSidebarForceExpanded && openCatalog" class="space-y-1 pl-6 pr-1 mt-0.5 border-l-2 border-gray-100 dark:border-gray-800 ml-5">
+            <div x-show="$store.sidebar.isSidebarForceExpanded && openCatalog" 
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 -translate-y-2"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 class="space-y-1 pr-1 mt-0.5 ml-7 border-l border-gray-100 dark:border-gray-800">
                 @can('categories.manage')
                     <a href="{{ route('admin.kategori.index') }}"
                        class="flex items-center rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 relative overflow-hidden group"
@@ -103,7 +107,7 @@
                            'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-gray-800' => !request()->routeIs('admin.kategori.*'),
                        ])>
                         @if(request()->routeIs('admin.kategori.*'))
-                            <span class="w-1.5 h-1.5 rounded-full bg-blue-200 animate-pulse mr-2.5"></span>
+                            <div class="absolute left-0 inset-y-1.5 w-0.5 bg-blue-300/80 rounded-r-full"></div>
                         @endif
                         <span>Kategori</span>
                     </a>
@@ -116,7 +120,7 @@
                            'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-gray-800' => !request()->routeIs('admin.produk.*'),
                        ])>
                         @if(request()->routeIs('admin.produk.*'))
-                            <span class="w-1.5 h-1.5 rounded-full bg-blue-200 animate-pulse mr-2.5"></span>
+                            <div class="absolute left-0 inset-y-1.5 w-0.5 bg-blue-300/80 rounded-r-full"></div>
                         @endif
                         <span>Produk</span>
                     </a>
@@ -143,7 +147,11 @@
                 <span x-show="$store.sidebar.isSidebarForceExpanded" x-cloak class="ml-3">Konten</span>
                 <i x-show="$store.sidebar.isSidebarForceExpanded" x-cloak class="ti ti-chevron-down ml-auto text-[10px] opacity-50 transition-transform" :class="openContent ? 'rotate-180' : ''"></i>
             </button>
-            <div x-show="$store.sidebar.isSidebarForceExpanded && openContent" class="space-y-1 pl-6 pr-1 mt-0.5 border-l-2 border-gray-100 dark:border-gray-800 ml-5">
+            <div x-show="$store.sidebar.isSidebarForceExpanded && openContent" 
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 -translate-y-2"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 class="space-y-1 pr-1 mt-0.5 ml-7 border-l border-gray-100 dark:border-gray-800">
                 @can('blogs.manage')
                     <a href="{{ route('admin.blog.index') }}"
                        class="flex items-center rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 relative overflow-hidden group"
@@ -152,7 +160,7 @@
                            'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-gray-800' => !request()->routeIs('admin.blog.*'),
                        ])>
                         @if(request()->routeIs('admin.blog.*'))
-                            <span class="w-1.5 h-1.5 rounded-full bg-blue-200 animate-pulse mr-2.5"></span>
+                            <div class="absolute left-0 inset-y-1.5 w-0.5 bg-blue-300/80 rounded-r-full"></div>
                         @endif
                         <span>Artikel Blog</span>
                     </a>
@@ -163,7 +171,7 @@
                            'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-gray-800' => !request()->routeIs('admin.blog-kategori.*'),
                        ])>
                         @if(request()->routeIs('admin.blog-kategori.*'))
-                            <span class="w-1.5 h-1.5 rounded-full bg-blue-200 animate-pulse mr-2.5"></span>
+                            <div class="absolute left-0 inset-y-1.5 w-0.5 bg-blue-300/80 rounded-r-full"></div>
                         @endif
                         <span>Kategori Blog</span>
                     </a>
@@ -176,7 +184,7 @@
                            'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-gray-800' => !request()->routeIs('admin.banner.*'),
                        ])>
                         @if(request()->routeIs('admin.banner.*'))
-                            <span class="w-1.5 h-1.5 rounded-full bg-blue-200 animate-pulse mr-2.5"></span>
+                            <div class="absolute left-0 inset-y-1.5 w-0.5 bg-blue-300/80 rounded-r-full"></div>
                         @endif
                         <span>Banner</span>
                     </a>
@@ -189,7 +197,7 @@
                            'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-gray-800' => !request()->routeIs('admin.halaman-statis.*'),
                        ])>
                         @if(request()->routeIs('admin.halaman-statis.*'))
-                            <span class="w-1.5 h-1.5 rounded-full bg-blue-200 animate-pulse mr-2.5"></span>
+                            <div class="absolute left-0 inset-y-1.5 w-0.5 bg-blue-300/80 rounded-r-full"></div>
                         @endif
                         <span>Halaman</span>
                     </a>
@@ -234,7 +242,7 @@
         @endif
     </nav>
 
-    <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-white/50 dark:bg-gray-950/50 backdrop-blur-md">
+    <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950">
         <div class="flex items-center gap-2" :class="$store.sidebar.isSidebarForceExpanded ? 'justify-between' : 'justify-center'">
             <a
                 href="{{ route('admin.profile.edit') }}"

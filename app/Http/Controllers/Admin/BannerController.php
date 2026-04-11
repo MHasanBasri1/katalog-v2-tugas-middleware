@@ -21,7 +21,7 @@ class BannerController extends Controller
             )
             ->orderBy('sort_order')
             ->latest('id')
-            ->paginate(10)
+            ->paginate(15)
             ->withQueryString();
 
         return view('admin.banners.index', compact('banners'));
@@ -82,6 +82,7 @@ class BannerController extends Controller
             ->get();
 
         $deleted = 0;
+        /** @var \App\Models\Banner $banner */
         foreach ($banners as $banner) {
             $this->deleteStoredImage($banner->image_url);
             $banner->delete();

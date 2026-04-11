@@ -17,7 +17,7 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $range = $request->get('range', 'all');
+        $range = $request->input('range', 'all');
 
         $stats = [
             'products' => Product::count(),
@@ -57,7 +57,7 @@ class DashboardController extends Controller
         $activityLogs = ActivityLog::with('user')
             ->whereNotNull('user_id')
             ->latest()
-            ->take(10)
+            ->take(5)
             ->get();
 
         return view('admin.dashboard.index', compact('stats', 'pieChartData', 'lineChartData', 'activityLogs', 'range'));

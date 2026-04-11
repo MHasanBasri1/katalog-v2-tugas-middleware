@@ -21,7 +21,7 @@ class StaticPageController extends Controller
                     ->orWhere('slug', 'like', '%' . $request->q . '%')
             )
             ->latest('updated_at')
-            ->paginate(10)
+            ->paginate(15)
             ->withQueryString();
 
         return view('admin.static-pages.index', compact('pages'));

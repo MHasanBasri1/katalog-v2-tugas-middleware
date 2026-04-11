@@ -32,7 +32,7 @@ class BlogController extends Controller
             )
             ->latest('published_at')
             ->latest('id')
-            ->paginate(10)
+            ->paginate(15)
             ->withQueryString();
 
         $categories = BlogCategory::query()->orderBy('name')->get(['id', 'name', 'slug']);
@@ -113,6 +113,7 @@ class BlogController extends Controller
             ->get();
 
         $deleted = 0;
+        /** @var \App\Models\Blog $blog */
         foreach ($blogs as $blog) {
             $this->deleteStoredImage($blog->cover_image);
             $blog->delete();

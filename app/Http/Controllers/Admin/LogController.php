@@ -31,17 +31,22 @@ class LogController extends Controller
             }
         }
 
-        $logs = $query->paginate(20)->withQueryString();
+        $logs = $query->paginate(25)->withQueryString();
 
         return view('admin.logs.index', compact('logs'));
     }
 
     public function clear(Request $request)
     {
-        $months = 3;
-        $count = ActivityLog::where('created_at', '<', now()->subMonths($months))->count();
+        $request->validate([
+            'months' => 'required|integer|in:1,3,6,12'
+        ]);
+
+        $months = $request->months;
+        $date = now()->subMonths($months);
         
-        ActivityLog::where('created_at', '<', now()->subMonths($months))->delete();
+        $count = ActivityLog::where('created_at', '<', $date)->count();
+        ActivityLog::where('created_at', '<', $date)->delete();
 
         return back()->with('success', "$count log lama (di atas $months bulan) berhasil dihapus.");
     }
