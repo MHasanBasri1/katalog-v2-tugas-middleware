@@ -140,8 +140,6 @@
                                 <input type="checkbox" :checked="isAllOnPageSelected" @change="toggleSelectAllOnPage()" class="rounded border-gray-300 text-blue-600">
                             </th>
                             <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-100 dark:border-gray-800">Artikel</th>
-                            <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-100 dark:border-gray-800 text-center">Cover</th>
-                            <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-100 dark:border-gray-800">Kategori</th>
                             <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-100 dark:border-gray-800 text-center">Status</th>
                             <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-100 dark:border-gray-800 text-right">Aksi</th>
                         </tr>
@@ -152,35 +150,36 @@
                                     <td class="px-4 py-3 text-center">
                                         <input type="checkbox" :checked="selectedIds.includes({{ $blog->id }})" @change="toggleRowSelection({{ $blog->id }})" class="rounded border-gray-300 text-blue-600">
                                     </td>
-                                    <td class="px-4 py-3 min-w-[300px]">
-                                        <p class="font-semibold text-gray-900 dark:text-gray-100">{{ $blog->title }}</p>
-                                        <p class="text-[10px] text-gray-500 font-mono">#{{ $blog->id }} • {{ $blog->author_name }} • {{ optional($blog->published_at)->format('d M Y') ?: '-' }}</p>
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        @if($blog->cover_image)
-                                            <img src="{{ asset('storage/' . $blog->cover_image) }}" class="w-12 h-12 object-cover rounded-lg border border-gray-100 dark:border-gray-800 mx-auto" alt="Cover">
-                                        @else
-                                            <div class="w-12 h-12 rounded-lg bg-gray-50 dark:bg-gray-800 border border-dashed border-gray-200 dark:border-gray-700 flex items-center justify-center mx-auto">
-                                                <i class="ti ti-photo text-gray-400"></i>
-                                            </div>
-                                        @endif
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        <span class="inline-flex rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 px-2 py-1 text-[10px] font-bold uppercase tracking-wider">
-                                            {{ $blog->category?->name ?? 'Uncategorized' }}
-                                        </span>
+                                    <td class="px-4 py-3 min-w-[200px] max-w-[400px]">
+                                        <p class="font-semibold text-gray-900 dark:text-gray-100 line-clamp-1" title="{{ $blog->title }}">
+                                            {{ $blog->title }}
+                                        </p>
+                                        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
+                                            <span class="inline-flex rounded bg-blue-50 dark:bg-blue-900/20 text-blue-600 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider">
+                                                {{ $blog->category?->name ?? 'Uncategorized' }}
+                                            </span>
+                                            <p class="text-[10px] text-gray-500 font-mono">#{{ $blog->id }} • {{ $blog->author_name }} • {{ optional($blog->published_at)->format('d M Y') ?: '-' }}</p>
+                                        </div>
                                     </td>
                                     <td class="px-4 py-3 text-center">
-                                        <span @class([
-                                            'inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider',
-                                            'bg-emerald-100 text-emerald-700 shadow-sm shadow-emerald-100' => $blog->is_published,
-                                            'bg-gray-100 text-gray-700' => ! $blog->is_published,
-                                        ])>
-                                            {{ $blog->is_published ? 'Published' : 'Draft' }}
-                                        </span>
+                                        <form action="{{ route('admin.blog.update-status', $blog) }}" method="POST">
+                                            @csrf
+                                            @method('PATCH')
+                                            <select name="is_published" onchange="this.form.submit()" @class([
+                                                'inline-flex w-auto min-w-[95px] items-center rounded-lg border-0 py-1 pl-2 pr-7 text-[10px] font-bold uppercase tracking-wider focus:ring-0 cursor-pointer transition-all',
+                                                'bg-emerald-50 text-emerald-700' => $blog->is_published,
+                                                'bg-gray-100 text-gray-700' => ! $blog->is_published,
+                                            ])>
+                                                <option value="1" @selected($blog->is_published)>Publish</option>
+                                                <option value="0" @selected(!$blog->is_published)>Draft</option>
+                                            </select>
+                                        </form>
                                     </td>
                                     <td class="px-4 py-3">
                                         <div class="flex items-center justify-end gap-2">
+                                            <a href="{{ route('blog.detail', $blog->slug) }}" target="_blank" class="inline-flex items-center rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20" title="Lihat Postingan">
+                                                <i class="ti ti-eye text-base"></i>
+                                            </a>
                                             <a href="{{ route('admin.blog.edit', $blog) }}" class="inline-flex items-center rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800" title="Edit">
                                                 <i class="ti ti-pencil text-base"></i>
                                             </a>
@@ -196,7 +195,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-4 py-10 text-center text-gray-500">Belum ada artikel blog.</td>
+                                    <td colspan="4" class="px-4 py-10 text-center text-gray-500">Belum ada artikel blog.</td>
                                 </tr>
                             @endforelse
                         </tbody>

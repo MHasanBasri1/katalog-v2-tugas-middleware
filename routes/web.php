@@ -272,6 +272,9 @@ Route::middleware(['auth', 'role:admin', 'log.activity'])->prefix('admin')->name
     Route::resource('/blog', BlogController::class)
         ->except(['show'])
         ->middleware('permission:blogs.manage');
+    Route::patch('/blog/{blog}/status', [BlogController::class, 'updateStatus'])
+        ->middleware('permission:blogs.manage')
+        ->name('blog.update-status');
     Route::post('/blog/bulk-delete', [BlogController::class, 'bulkDestroy'])
         ->middleware('permission:blogs.manage')
         ->name('blog.bulk-destroy');

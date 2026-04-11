@@ -101,6 +101,20 @@ class BlogController extends Controller
         return redirect()->route('admin.blog.index')->with('status', 'Artikel blog berhasil dihapus.');
     }
 
+    public function updateStatus(Request $request, Blog $blog): RedirectResponse
+    {
+        $validated = $request->validate([
+            'is_published' => ['required', 'boolean'],
+        ]);
+
+        $blog->update([
+            'is_published' => $validated['is_published'],
+            'published_at' => $validated['is_published'] ? ($blog->published_at ?: now()) : $blog->published_at,
+        ]);
+
+        return back()->with('status', 'Status artikel berhasil diperbarui.');
+    }
+
     public function bulkDestroy(Request $request): RedirectResponse
     {
         $validated = $request->validate([

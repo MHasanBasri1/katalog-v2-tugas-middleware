@@ -176,7 +176,6 @@
                                 <input type="checkbox" :checked="isAllOnPageSelected" @change="toggleSelectAllOnPage()" class="rounded border-gray-300 text-blue-600">
                             </th>
                             <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500">Produk</th>
-                            <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500">Kategori</th>
                             <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 text-right">Harga</th>
                             <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 text-center">Featured</th>
                             <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 text-center">Status</th>
@@ -189,11 +188,16 @@
                                     <td class="px-4 py-3 text-center">
                                         <input type="checkbox" :checked="selectedIds.includes({{ $product->id }})" @change="toggleRowSelection({{ $product->id }})" class="rounded border-gray-300 text-blue-600">
                                     </td>
-                                    <td class="px-4 py-3">
-                                        <p class="font-semibold text-gray-900 dark:text-gray-100">{{ $product->name }}</p>
-                                        <p class="text-xs text-gray-500">{{ $product->slug }}</p>
+                                    <td class="px-4 py-3 min-w-[200px] max-w-[400px]">
+                                        <p class="font-semibold text-gray-900 dark:text-gray-100 line-clamp-1" title="{{ $product->name }}">
+                                            {{ $product->name }}
+                                        </p>
+                                        <div class="mt-1">
+                                            <span class="inline-flex rounded bg-blue-50 dark:bg-blue-900/20 text-blue-600 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider">
+                                                {{ $product->category?->name ?? 'Uncategorized' }}
+                                            </span>
+                                        </div>
                                     </td>
-                                    <td class="px-4 py-3 text-gray-600 dark:text-gray-300 text-xs">{{ $product->category?->name }}</td>
                                     <td class="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">Rp {{ number_format((float) $product->price, 0, ',', '.') }}</td>
                                     <td class="px-4 py-3 text-center">
                                         <span @class([
@@ -230,7 +234,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="px-4 py-10 text-center text-gray-500">Belum ada data produk.</td>
+                                    <td colspan="6" class="px-4 py-10 text-center text-gray-500">Belum ada data produk.</td>
                                 </tr>
                             @endforelse
                         </tbody>
