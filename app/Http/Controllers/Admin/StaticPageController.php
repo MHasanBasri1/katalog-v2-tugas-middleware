@@ -61,6 +61,21 @@ class StaticPageController extends Controller
         return redirect()->route('admin.halaman-statis.index')->with('status', 'Halaman statis berhasil diperbarui.');
     }
 
+    public function updateStatus(Request $request, StaticPage $halaman_stati)
+    {
+        $validated = $request->validate([
+            'is_published' => ['required', 'boolean'],
+        ]);
+
+        $halaman_stati->update($validated);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Status halaman berhasil diperbarui.',
+            'is_published' => $halaman_stati->is_published
+        ]);
+    }
+
     public function destroy(StaticPage $halaman_stati): RedirectResponse
     {
         $halaman_stati->delete();

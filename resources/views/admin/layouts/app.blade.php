@@ -21,6 +21,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>[x-cloak]{display:none!important}</style>
     @livewireStyles
+    @stack('styles')
 </head>
 <body class="m-0 h-full bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-['Plus_Jakarta_Sans'] antialiased overflow-x-hidden">
     <div class="min-h-screen flex max-w-full overflow-x-hidden" x-data>
@@ -92,5 +93,6 @@
             </button>
         </div>
     </div>
+    @stack('scripts')
 </body>
 </html>

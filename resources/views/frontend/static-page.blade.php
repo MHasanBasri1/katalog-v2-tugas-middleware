@@ -29,7 +29,7 @@
             </div>
 
             <div class="prose prose-sm md:prose-base lg:prose-lg max-w-none text-gray-600 leading-relaxed">
-                <div class="mt-2 whitespace-pre-line prose-headings:font-black prose-headings:text-gray-900 prose-a:text-primary hover:prose-a:text-primary-dark prose-p:mb-5 prose-ul:my-5 prose-li:my-2">{{ $page->content }}</div>
+                <div class="mt-2 prose-headings:font-black prose-headings:text-gray-900 prose-a:text-primary hover:prose-a:text-primary-dark prose-p:mb-5 prose-ul:my-5 prose-li:my-2">{!! $page->content !!}</div>
             </div>
         </article>
     </div>

@@ -165,6 +165,96 @@ class UserController extends Controller
         return back()->with('status', 'Akun user sudah diaktifkan kembali.');
     }
 
+    public function exportCsv()
+    {
+        $filename = 'users-export-' . now()->format('Y-m-d-His') . '.csv';
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ];
+
+        $callback = function () {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, ['Name', 'Email', 'Role', 'Status']);
+
+            User::query()->chunk(100, function ($users) use ($file) {
+                foreach ($users as $user) {
+                    fputcsv($file, [
+                        $user->name,
+                        $user->email,
+                        $user->hasRole('admin') ? 'admin' : 'user',
+                        $user->is_frozen ? 'frozen' : 'active',
+                    ]);
+                }
+            });
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function importCsv(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'csv_file' => ['required', 'file', 'mimes:csv,txt'],
+        ]);
+
+        $file = $request->file('csv_file');
+        $handle = fopen($file->getRealPath(), 'r');
+        
+        // Skip header
+        $header = fgetcsv($handle);
+        
+        $imported = 0;
+        $skipped = 0;
+        $errors = [];
+
+        while (($row = fgetcsv($handle)) !== false) {
+            if (count($row) < 3) {
+                $skipped++;
+                continue;
+            }
+
+            $name = $row[0];
+            $email = $row[1];
+            $password = $row[2];
+            $role = $row[3] ?? 'user';
+            $status = $row[4] ?? 'active';
+
+            if (User::where('email', $email)->exists()) {
+                $skipped++;
+                continue;
+            }
+
+            try {
+                $user = User::create([
+                    'name' => $name,
+                    'email' => $email,
+                    'password' => Hash::make($password),
+                    'is_admin' => $role === 'admin',
+                    'is_frozen' => $status === 'frozen',
+                ]);
+
+                $this->ensureRolesExist();
+                $user->assignRole($role);
+                $imported++;
+            } catch (\Exception $e) {
+                $errors[] = "Error importing $email: " . $e->getMessage();
+                $skipped++;
+            }
+        }
+
+        fclose($handle);
+
+        $message = "Import selesai. Berhasil: $imported, Dilewati: $skipped.";
+        if (count($errors) > 0) {
+            return redirect()->route('admin.user.index')->with('status', $message)->with('error_list', $errors);
+        }
+
+        return redirect()->route('admin.user.index')->with('status', $message);
+    }
+
     private function validatePayload(Request $request, ?int $ignoreId = null): array
     {
         $rules = [

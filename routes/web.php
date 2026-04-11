@@ -286,6 +286,13 @@ Route::middleware(['auth', 'role:admin', 'log.activity'])->prefix('admin')->name
         ->middleware('permission:blogs.manage')
         ->name('blog-kategori.bulk-destroy');
 
+    Route::get('/user/export-csv', [UserController::class, 'exportCsv'])
+        ->middleware('permission:users.manage')
+        ->name('user.export-csv');
+    Route::post('/user/import-csv', [UserController::class, 'importCsv'])
+        ->middleware('permission:users.manage')
+        ->name('user.import-csv');
+
     Route::resource('/user', UserController::class)
         ->except(['show'])
         ->middleware('permission:users.manage');
@@ -310,6 +317,9 @@ Route::middleware(['auth', 'role:admin', 'log.activity'])->prefix('admin')->name
     Route::resource('/halaman-statis', StaticPageController::class)
         ->except(['show'])
         ->middleware('permission:static_pages.manage');
+    Route::patch('/halaman-statis/{halaman_stati}/status', [StaticPageController::class, 'updateStatus'])
+        ->middleware('permission:static_pages.manage')
+        ->name('halaman-statis.update-status');
     Route::post('/halaman-statis/bulk-delete', [StaticPageController::class, 'bulkDestroy'])
         ->middleware('permission:static_pages.manage')
         ->name('halaman-statis.bulk-destroy');

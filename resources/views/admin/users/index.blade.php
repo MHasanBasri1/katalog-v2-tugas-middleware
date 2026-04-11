@@ -77,6 +77,23 @@
                         <p class="text-sm text-gray-500">Kelola akun administrator dan pengguna terdaftar.</p>
                     </div>
                     <div class="flex items-center gap-2">
+                        <div x-data="{ 
+                            showUpload() { this.$refs.fileInput.click() },
+                            submit() { this.$refs.importForm.submit() }
+                        }" class="flex items-center gap-2">
+                            <form x-ref="importForm" action="{{ route('admin.user.import-csv') }}" method="POST" enctype="multipart/form-data" class="hidden">
+                                @csrf
+                                <input x-ref="fileInput" type="file" name="csv_file" accept=".csv" @change="submit()">
+                            </form>
+                            <button type="button" @click="showUpload()" class="inline-flex items-center gap-2 rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+                                <i class="ti ti-upload"></i>
+                                Import
+                            </button>
+                            <a href="{{ route('admin.user.export-csv') }}" class="inline-flex items-center gap-2 rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+                                <i class="ti ti-download"></i>
+                                Export
+                            </a>
+                        </div>
                         <button
                             type="button"
                             x-show="selectedIds.length > 0"
@@ -152,19 +169,14 @@
                         </thead>
                         <tbody class="divide-y divide-gray-100 dark:divide-gray-800 text-sm">
                                 @forelse ($users as $user)
-                                    <tr>
+                                    <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
                                         <td class="px-4 py-3 text-center">
                                             <input type="checkbox" :checked="selectedIds.includes({{ $user->id }})" @change="toggleRowSelection({{ $user->id }})" class="rounded border-gray-300 text-blue-600">
                                         </td>
                                         <td class="px-4 py-3 min-w-[250px]">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0">
-                                                    {{ strtoupper(substr($user->name, 0, 1)) }}
-                                                </div>
-                                                <div>
-                                                    <p class="font-semibold text-gray-900 dark:text-gray-100 leading-none">{{ $user->name }}</p>
-                                                    <p class="text-[10px] text-gray-500 mt-1">{{ $user->email }}</p>
-                                                </div>
+                                            <div>
+                                                <p class="font-semibold text-gray-900 dark:text-gray-100 leading-none">{{ $user->name }}</p>
+                                                <p class="text-[10px] text-gray-500 mt-1.5">{{ $user->email }}</p>
                                             </div>
                                         </td>
                                         <td class="px-4 py-3 text-center">
