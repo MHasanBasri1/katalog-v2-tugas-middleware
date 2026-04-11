@@ -16,6 +16,7 @@ use Illuminate\View\View;
 use App\Models\ProductImage;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductController extends Controller
@@ -414,7 +415,7 @@ class ProductController extends Controller
         // If primary was deleted, set another one as primary if available
         if ($isPrimary) {
             $nextImage = $produk->images()->first();
-            if ($nextImage) {
+            if ($nextImage instanceof \App\Models\ProductImage) {
                 $nextImage->update(['is_primary' => true]);
             }
         }
