@@ -106,7 +106,7 @@
             <!-- Content Section -->
             <div class="p-6 md:p-12">
                 <div class="prose prose-sm md:prose-base lg:prose-lg max-w-none text-gray-700 leading-relaxed font-medium prose-p:mb-6 prose-headings:font-black prose-headings:text-gray-900 prose-img:rounded-3xl">
-                    {!! nl2br(e($post->content)) !!}
+                    {!! $post->content !!}
                 </div>
                 
                 <!-- Bottom Tags & Share -->

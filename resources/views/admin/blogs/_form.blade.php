@@ -29,9 +29,19 @@
         if (file) {
             this.imageUrl = URL.createObjectURL(file);
         }
+    },
+    removeImage() {
+        this.imageUrl = null;
+        this.$refs.imageInput.value = '';
+        // Add hidden input to tell backend to delete image if needed
+        let delInput = document.createElement('input');
+        delInput.type = 'hidden';
+        delInput.name = 'remove_cover_image';
+        delInput.value = '1';
+        this.$el.querySelector('form').appendChild(delInput);
     }
 }">
-    <form method="POST" action="{{ $isEdit ? route('admin.blog.update', $blog) : route('admin.blog.store') }}" enctype="multipart/form-data" class="space-y-6">
+    <form method="POST" action="{{ $isEdit ? route('admin.blog.update', $blog) : route('admin.blog.store') }}" enctype="multipart/form-data" class="space-y-6 pb-24">
         @csrf
         @if ($isEdit)
             @method('PUT')
@@ -81,15 +91,22 @@
                     <h3 class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-widest mb-6 pb-4 border-b border-gray-100 dark:border-gray-800">Media Cover</h3>
                     
                     <div class="space-y-4">
-                        <div class="relative group cursor-pointer">
-                            <input type="file" name="cover_image_file" @change="updatePreview" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                        <div class="relative group cursor-pointer overflow-hidden rounded-2xl">
+                            <input type="file" x-ref="imageInput" name="cover_image_file" @change="updatePreview" accept="image/*" class="sr-only">
                             <template x-if="imageUrl">
-                                <div class="relative rounded-2xl overflow-hidden aspect-video bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-200 dark:border-gray-700">
+                                <div class="relative aspect-video bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-200 dark:border-gray-700">
                                     <img :src="imageUrl" class="w-full h-full object-cover">
+                                    <!-- Hover Overlay -->
+                                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 backdrop-blur-[2px]">
+                                        <div class="flex items-center gap-2">
+                                            <button type="button" @click="$refs.imageInput.click()" class="px-3 py-1.5 bg-white text-gray-900 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-gray-100 transition-all">Ganti</button>
+                                            <button type="button" @click="removeImage" class="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-rose-700 transition-all">Hapus</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </template>
                             <template x-if="!imageUrl">
-                                <div class="rounded-2xl aspect-video bg-gray-50 dark:bg-gray-800 border-2 border-dashed border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center gap-2 group-hover:bg-gray-100 dark:group-hover:bg-gray-700/50 transition-all">
+                                <div @click="$refs.imageInput.click()" class="aspect-video bg-gray-50 dark:bg-gray-800 border-2 border-dashed border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center gap-2 group-hover:bg-gray-100 dark:group-hover:bg-gray-700/50 transition-all">
                                     <i class="ti ti-photo-plus text-2xl text-gray-400"></i>
                                     <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Pilih Gambar</span>
                                 </div>
@@ -157,18 +174,26 @@
             </div>
         @endif
 
-        <div class="flex items-center gap-2 mt-8">
-            <button type="submit" class="inline-flex items-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-6 py-2.5 transition shadow-sm">
-                {{ $isEdit ? 'Simpan Perubahan' : 'Simpan Artikel' }}
-            </button>
-            <a href="{{ route('admin.blog.index') }}" class="inline-flex items-center rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-semibold px-6 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
-                Kembali
-            </a>
-            @if(!$isEdit)
-                <button type="submit" name="action" value="save_and_another" class="ml-auto hidden md:inline-flex items-center rounded-xl border border-blue-600 text-blue-600 text-sm font-semibold px-6 py-2.5 hover:bg-blue-50 transition">
-                    Simpan & Tambah Lagi
+        <!-- Sticky Bottom Actions (Matched with Blog Category form) -->
+        <div class="fixed bottom-0 right-0 z-[100] transition-all duration-300 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 p-4"
+            :class="{
+                'xl:left-72': $store.sidebar.isExpanded,
+                'xl:left-20': !$store.sidebar.isExpanded,
+                'left-0': true
+            }">
+            <div class="flex flex-row items-center justify-end gap-2 sm:gap-3 px-3 sm:px-6">
+                <a href="{{ route('admin.blog.index') }}" class="flex-1 sm:flex-none px-3 sm:px-6 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-[10px] sm:text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-center whitespace-nowrap">
+                    Batal
+                </a>
+                @if(!$isEdit)
+                <button type="submit" name="action" value="save_and_another" class="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 rounded-xl border border-blue-600 text-blue-600 text-[10px] sm:text-sm font-bold hover:bg-blue-50 transition text-center whitespace-nowrap">
+                    Simpan & Buat Lagi
                 </button>
-            @endif
+                @endif
+                <button type="submit" class="flex-1 sm:flex-none px-6 sm:px-10 py-2.5 rounded-xl bg-blue-600 text-white text-[10px] sm:text-sm font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200 dark:shadow-none text-center whitespace-nowrap">
+                    Simpan
+                </button>
+            </div>
         </div>
     </form>
 </div>
