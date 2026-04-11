@@ -100,9 +100,9 @@
                 <div class="mb-5 space-y-4">
                     <div class="flex items-center justify-between gap-3 flex-wrap">
                         @if($product->category && $product->category->slug)
-                            <a href="{{ route('kategori.detail', $product->category->slug) }}" class="inline-flex items-center gap-2 bg-primary/10 text-primary-dark px-3 py-1.5 rounded-lg text-xs font-bold tracking-wide hover:bg-primary/20 transition-colors"><i class="fas fa-folder text-primary/70"></i> {{ $product->category->name }}</a>
+                            <a href="{{ route('kategori.detail', $product->category->slug) }}" class="inline-flex items-center gap-2 bg-primary/10 text-primary-dark px-3 py-1.5 rounded-lg text-xs font-bold tracking-wide hover:bg-primary/20 transition-colors"><i class="fas {{ $product->category->icon ?: 'fa-folder' }} text-primary/70"></i> {{ $product->category->name }}</a>
                         @else
-                            <div class="inline-flex items-center gap-2 bg-gray-100 text-gray-400 px-3 py-1.5 rounded-lg text-xs font-bold tracking-wide"><i class="fas fa-folder opacity-50"></i> Tanpa Kategori</div>
+                            <div class="inline-flex items-center gap-2 bg-gray-100 text-gray-400 px-3 py-1.5 rounded-lg text-xs font-bold tracking-wide"><i class="fas fa-folder-open opacity-50"></i> Tanpa Kategori</div>
                         @endif
                         @livewire('public.favorite-button', ['productId' => $product->id, 'class' => 'ml-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white text-gray-600 hover:text-rose-500 hover:border-rose-200 shadow-sm text-xs font-bold font-primary'], key('fav-'.$product->id))
                     </div>
@@ -158,15 +158,97 @@
                 </div>
             </div>
 
-            <div class="hidden lg:block bg-white rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
-                    <h3 class="text-lg font-black text-gray-900 tracking-tight uppercase">Deskripsi Produk</h3>
+            {{-- Unified Tabs for Description & Reviews --}}
+            <div class="bg-white rounded-2xl md:rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden" x-data="{ activeTab: 'description' }">
+                {{-- Tab Header --}}
+                <div class="flex border-b border-gray-100 px-4 md:px-8 bg-gray-50/50">
+                    <button @click="activeTab = 'description'" 
+                        :class="activeTab === 'description' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'"
+                        class="px-6 py-4 text-sm font-bold uppercase tracking-wider border-b-2 transition-all duration-300">
+                        Deskripsi
+                    </button>
+                    <button @click="activeTab = 'reviews'" 
+                        :class="activeTab === 'reviews' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'"
+                        class="px-6 py-4 text-sm font-bold uppercase tracking-wider border-b-2 transition-all duration-300 flex items-center gap-2">
+                        Ulasan
+                    </button>
                 </div>
-                <div class="prose prose-sm md:prose-base max-w-none text-gray-600 font-medium leading-relaxed"><p>{!! nl2br(e($product->description)) ?: 'Belum ada deskripsi spesifik untuk produk ini.' !!}</p></div>
-            </div>
 
-            <div class="lg:hidden bg-white rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 md:p-8"><h3 class="text-lg font-black text-gray-900 mb-4 flex items-center gap-3"><span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-gray-50 text-gray-600 border border-gray-100 shadow-sm"><i class="fas fa-align-left text-sm"></i></span>Deskripsi Lengkap</h3><div class="prose prose-sm md:prose-base max-w-none text-gray-600 font-medium leading-relaxed"><p>{!! nl2br(e($product->description)) !!}</p></div></div>
+                {{-- Tab Body --}}
+                <div class="p-6 md:p-8">
+                    {{-- Description Tab --}}
+                    <div x-show="activeTab === 'description'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                            <h3 class="text-lg font-black text-gray-900 tracking-tight uppercase">Detail Produk</h3>
+                        </div>
+                        <div class="prose prose-sm md:prose-base max-w-none text-gray-600 font-medium leading-relaxed">
+                            <p>{!! nl2br(e($product->description)) ?: 'Belum ada deskripsi spesifik untuk produk ini.' !!}</p>
+                        </div>
+                    </div>
+
+                    {{-- Reviews Tab --}}
+                    <div x-show="activeTab === 'reviews'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                            <h3 class="text-lg font-black text-gray-900 tracking-tight uppercase">Ulasan Pembeli</h3>
+                        </div>
+                        
+                        <div class="flex flex-col md:flex-row gap-8 items-start md:items-center p-6 bg-gray-50 rounded-2xl mb-8 border border-gray-100">
+                            <div class="text-center md:px-8 md:border-r border-gray-200">
+                                <div class="text-5xl font-black text-gray-900 mb-1">{{ number_format((float) $product->rating_avg, 1) }}</div>
+                                <div class="flex items-center justify-center gap-1 text-amber-400 mb-2">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star text-gray-200"></i>
+                                </div>
+                                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Rating Kepuasan</div>
+                            </div>
+                            <div class="flex-1 space-y-2 w-full">
+                                @foreach([5, 4, 3, 2, 1] as $star)
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex items-center gap-1 w-8">
+                                            <span class="text-xs font-bold text-gray-600">{{ $star }}</span>
+                                            <i class="fas fa-star text-[10px] text-amber-400"></i>
+                                        </div>
+                                        <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                            <div class="h-full bg-amber-400 rounded-full" style="width: {{ $star == 5 ? '85%' : ($star == 4 ? '10%' : '2%') }}"></div>
+                                        </div>
+                                        <span class="text-[10px] font-bold text-gray-400 w-8">{{ $star == 5 ? '85' : ($star == 4 ? '10' : '0') }}%</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        {{-- Dummy Review Items --}}
+                        <div class="space-y-6">
+                            @php
+                                $dummies = [
+                                    ['name' => 'Andi Wijaya', 'date' => '2 hari yang lalu', 'rating' => 5, 'comment' => 'Barang sangat bagus, pengiriman cepat sekali. Recomended seller!'],
+                                    ['name' => 'Siti Aminah', 'date' => '1 minggu yang lalu', 'rating' => 5, 'comment' => 'Kualitas produk sangat baik, produk original. Harga produk sangat baik.'],
+                                ];
+                            @endphp
+                            @foreach($dummies as $rev)
+                                <div class="pb-6 border-b border-gray-100 last:border-0">
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">{{ substr($rev['name'], 0, 1) }}</div>
+                                        <div>
+                                            <div class="text-sm font-bold text-gray-900">{{ $rev['name'] }}</div>
+                                            <div class="text-[10px] text-gray-400 font-medium">{{ $rev['date'] }}</div>
+                                        </div>
+                                        <div class="ml-auto flex items-center gap-1 text-[10px] text-amber-400">
+                                            @for($i=0; $i<$rev['rating']; $i++) <i class="fas fa-star"></i> @endfor
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-gray-600 leading-relaxed font-medium">{{ $rev['comment'] }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             {{-- Mobile Share --}}
             <div class="lg:hidden mt-6 bg-white rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6">

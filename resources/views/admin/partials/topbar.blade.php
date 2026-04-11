@@ -6,18 +6,18 @@
         ->get();
 @endphp
 
-<header class="admin-topbar fixed top-0 right-0 z-40 transition-all duration-300 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800"
+<header class="admin-topbar fixed top-0 right-0 z-40 transition-all duration-500 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800"
     :class="{
         'xl:left-72': $store.sidebar.isExpanded,
         'xl:left-20': !$store.sidebar.isExpanded,
         'left-0': true
     }">
-    <div class="px-4 md:px-8 py-4 flex items-center justify-between gap-3">
-        <div class="flex items-center gap-3">
+    <div class="px-4 md:px-8 py-3.5 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-4">
             <button
                 type="button"
                 @click="$store.sidebar.toggleMobileOpen()"
-                class="xl:hidden w-10 h-10 rounded-xl border border-gray-200 dark:border-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-blue-600"
+                class="xl:hidden w-11 h-11 rounded-2xl border border-gray-100 dark:border-gray-800 flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-blue-600 hover:bg-white dark:hover:bg-gray-900 hover:shadow-sm transition-all duration-300"
                 :aria-label="$store.sidebar.isMobileOpen ? 'Hide sidebar' : 'Show sidebar'"
                 :title="$store.sidebar.isMobileOpen ? 'Hide sidebar' : 'Show sidebar'"
             >
@@ -26,13 +26,13 @@
             <button
                 type="button"
                 @click="$store.sidebar.toggleExpanded()"
-                class="hidden xl:flex w-10 h-10 rounded-xl border border-gray-200 dark:border-gray-800 items-center justify-center text-gray-500 dark:text-gray-400 hover:text-blue-600"
+                class="hidden xl:flex w-11 h-11 rounded-2xl border border-gray-100 dark:border-gray-800 items-center justify-center text-gray-400 dark:text-gray-500 hover:text-blue-600 hover:bg-white dark:hover:bg-gray-900 hover:shadow-sm transition-all duration-300"
             >
-                <i class="ti text-xl" :class="$store.sidebar.isExpanded ? 'ti-layout-sidebar-left-collapse' : 'ti-layout-sidebar-right-collapse'"></i>
+                <i class="ti text-xl transition-transform duration-500" :class="$store.sidebar.isExpanded ? 'ti-layout-sidebar-left-collapse' : 'ti-layout-sidebar-right-collapse rotate-180'"></i>
             </button>
-            <div>
-                <h1 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white">@yield('header', 'Dashboard')</h1>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Kataloque Admin Management</p>
+            <div class="flex flex-col">
+                <h1 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white leading-tight">@yield('header', 'Dashboard')</h1>
+                <p class="text-xs text-gray-500 dark:text-gray-400 leading-tight">Kataloque Admin Management</p>
             </div>
         </div>
 

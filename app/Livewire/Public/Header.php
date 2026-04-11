@@ -110,6 +110,58 @@ class Header extends Component
         ));
     }
 
+    public function getFavoriteItemsProperty(): array
+    {
+        if (!auth()->check()) {
+            return [];
+        }
+
+        return \App\Models\Favorite::query()
+            ->where('user_id', auth()->id())
+            ->with(['product.primaryImage'])
+            ->latest()
+            ->limit(3)
+            ->get()
+            ->map(fn($fav) => [
+                'id' => $fav->product->id,
+                'name' => $fav->product->name,
+                'price' => $fav->product->price,
+                'image' => $fav->product->primaryImage?->image_url ?? 'https://via.placeholder.com/50x50?text=No+Image',
+                'url' => route('produk.detail', $fav->product->slug),
+            ])
+            ->all();
+    }
+
+    public function removeFromFavorite(int $productId): void
+    {
+        if (!auth()->check()) {
+            return;
+        }
+
+        \App\Models\Favorite::query()
+            ->where('user_id', auth()->id())
+            ->where('product_id', $productId)
+            ->delete();
+
+        $this->dispatch('favorite-updated');
+    }
+
+    public function getNotificationItemsProperty(): array
+    {
+        return \App\Models\Product::query()
+            ->where('status', true)
+            ->latest('updated_at')
+            ->limit(3)
+            ->get()
+            ->map(fn($p) => [
+                'name' => $p->name,
+                'price' => $p->price,
+                'url' => route('produk.detail', $p->slug),
+                'time' => $p->updated_at->diffForHumans(),
+            ])
+            ->all();
+    }
+
     public function render()
     {
         if (auth()->check()) {

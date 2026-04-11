@@ -16,15 +16,12 @@
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
-        @php
-            $icons = ['fa-mobile-screen', 'fa-laptop', 'fa-tv', 'fa-headphones', 'fa-camera', 'fa-gamepad', 'fa-basket-shopping', 'fa-couch', 'fa-shoe-prints', 'fa-shirt'];
-        @endphp
         @forelse($categories as $category)
             <a href="{{ route('kategori.detail', $category->slug) }}" class="group relative bg-white rounded-2xl border border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 flex flex-col items-center text-center gap-2 md:gap-3 overflow-hidden">
                 <div class="absolute inset-x-0 -bottom-2 h-1/2 bg-gradient-to-t from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                 
                 <div class="w-12 h-12 md:w-16 md:h-16 flex-none rounded-2xl bg-gray-50 flex items-center justify-center group-hover:bg-primary group-hover:scale-[1.10] transition-transform duration-300 shadow-sm border border-gray-200 group-hover:border-primary">
-                    <i class="fas {{ $icons[$loop->index % count($icons)] }} text-lg md:text-2xl text-gray-400 group-hover:text-white transition-colors duration-300"></i>
+                    <i class="fas {{ $category->icon ?: 'fa-layer-group' }} text-lg md:text-2xl text-gray-400 group-hover:text-white transition-colors duration-300"></i>
                 </div>
                 
                 <h3 class="font-black text-gray-800 text-xs md:text-lg leading-snug group-hover:text-primary transition-colors flex-1">{{ $category->name }}</h3>
