@@ -40,7 +40,7 @@
                     </div>
 
                     <div class="md:col-span-2">
-                        <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Slug</label>
+                        <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Slug (Kosongkan untuk auto)</label>
                         <input type="text" name="slug" value="{{ old('slug', $category->slug) }}"
                             class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">
                         @error('slug') <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p> @enderror

@@ -219,6 +219,9 @@
                                     </td>
                                     <td class="px-4 py-3">
                                         <div class="flex items-center justify-end gap-2">
+                                            <a href="{{ route('produk.detail', $product->slug) }}" target="_blank" class="inline-flex items-center rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800" title="Lihat Produk">
+                                                <i class="ti ti-eye text-base"></i>
+                                            </a>
                                             <a href="{{ route('admin.produk.edit', $product) }}" class="inline-flex items-center rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800" title="Edit">
                                                 <i class="ti ti-pencil text-base"></i>
                                             </a>
