@@ -14,8 +14,13 @@ class SettingController extends Controller
     public function index(): View
     {
         $setting = Setting::query()->firstOrNew(['id' => 1]);
+        
+        $section = 'umum';
+        if (request()->routeIs('admin.setting.branding')) $section = 'branding';
+        if (request()->routeIs('admin.setting.marketplace')) $section = 'marketplace';
+        if (request()->routeIs('admin.setting.seo')) $section = 'seo';
 
-        return view('admin.settings.index', compact('setting'));
+        return view('admin.settings.index', compact('setting', 'section'));
     }
 
     public function create(): RedirectResponse
@@ -30,7 +35,7 @@ class SettingController extends Controller
         
         Setting::query()->updateOrCreate(['id' => 1], $data);
 
-        return redirect()->route('admin.setting.index')->with('status', 'Setting berhasil disimpan.');
+        return back()->with('status', 'Setting berhasil disimpan.');
     }
 
     public function show(string $id): RedirectResponse
@@ -50,7 +55,7 @@ class SettingController extends Controller
         
         $setting->update($data);
 
-        return redirect()->route('admin.setting.index')->with('status', 'Setting berhasil diperbarui.');
+        return back()->with('status', 'Setting berhasil diperbarui.');
     }
 
     public function destroy(string $id): RedirectResponse

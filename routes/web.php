@@ -239,9 +239,14 @@ Route::middleware(['auth', 'role:admin', 'log.activity'])->prefix('admin')->name
     Route::put('/profil', [AdminProfileController::class, 'update'])->name('profile.update');
     Route::put('/profil/password', [AdminProfileController::class, 'updatePassword'])->name('profile.password.update');
 
-    Route::resource('/setting', SettingController::class)
-        ->only(['index', 'store', 'update'])
-        ->middleware('permission:settings.manage');
+    Route::prefix('setting')->name('setting.')->group(function () {
+        Route::get('/', [SettingController::class, 'index'])->name('index');
+        Route::get('/branding', [SettingController::class, 'index'])->name('branding');
+        Route::get('/marketplace', [SettingController::class, 'index'])->name('marketplace');
+        Route::get('/seo', [SettingController::class, 'index'])->name('seo');
+        Route::put('/', [SettingController::class, 'update'])->name('update');
+        Route::post('/', [SettingController::class, 'store'])->name('store');
+    });
 
     Route::resource('/kategori', CategoryController::class)
         ->middleware('permission:categories.manage');

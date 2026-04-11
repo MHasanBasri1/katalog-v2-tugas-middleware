@@ -229,6 +229,46 @@
         </div>
     </div>
 
+    @php
+        $whatsapp_setting = \Illuminate\Support\Facades\Cache::remember('public.whatsapp_setting', 600, function() {
+            return \App\Models\Setting::query()->select('whatsapp')->first()?->whatsapp;
+        });
+    @endphp
+
+    @if($whatsapp_setting)
+    <!-- Floating Agents Care -->
+    <div 
+        x-data="{ show: false }" 
+        x-init="setTimeout(() => show = true, 1000)" 
+        x-show="show" 
+        x-transition:enter="transition ease-out duration-700" 
+        x-transition:enter-start="opacity-0 translate-y-10 scale-90" 
+        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+        class="fixed bottom-[85px] right-6 z-[100] md:bottom-10 group"
+    >
+        <a 
+            href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $whatsapp_setting) }}" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="relative flex items-center gap-3 bg-white/80 backdrop-blur-xl border border-white/40 p-2 pr-6 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_60px_rgba(37,211,102,0.25)] transition-all duration-500 group hover:-translate-y-2"
+        >
+            <div class="relative">
+                <div class="absolute inset-0 bg-[#25D366] rounded-xl animate-ping opacity-20 group-hover:opacity-40"></div>
+                <div class="relative flex items-center justify-center w-12 h-12 bg-gradient-to-br from-[#25D366] to-[#128C7E] text-white rounded-xl shadow-lg shadow-[#25D366]/30 group-hover:rotate-[360deg] transition-transform duration-700">
+                    <i class="fab fa-whatsapp text-2xl"></i>
+                </div>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.1em] leading-none mb-1">Agents Care</span>
+                <span class="text-sm font-extrabold text-gray-800 leading-none">Chat Sekarang</span>
+            </div>
+            
+            <!-- Hover Glow Effect -->
+            <div class="absolute -inset-px bg-gradient-to-r from-[#25D366]/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity -z-10"></div>
+        </a>
+    </div>
+    @endif
+
     @livewireScripts
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
