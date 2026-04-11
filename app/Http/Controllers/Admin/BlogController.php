@@ -42,7 +42,8 @@ class BlogController extends Controller
     public function create(): View
     {
         $categories = BlogCategory::query()->orderBy('name')->get(['id', 'name', 'slug']);
-        return view('admin.blogs.create', compact('categories'));
+        $authors = \App\Models\User::query()->orderBy('name')->get(['id', 'name']);
+        return view('admin.blogs.create', compact('categories', 'authors'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -70,9 +71,10 @@ class BlogController extends Controller
     public function edit(Blog $blog): View
     {
         $categories = BlogCategory::query()->orderBy('name')->get(['id', 'name', 'slug']);
+        $authors = \App\Models\User::query()->orderBy('name')->get(['id', 'name']);
         $blog->load(['category:id,name,slug', 'tags:id,name,slug']);
         
-        return view('admin.blogs.edit', compact('blog', 'categories'));
+        return view('admin.blogs.edit', compact('blog', 'categories', 'authors'));
     }
 
     public function update(Request $request, Blog $blog): RedirectResponse
