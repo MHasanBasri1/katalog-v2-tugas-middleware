@@ -7,6 +7,7 @@ use App\Models\Banner;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class BannerController extends Controller
@@ -94,6 +95,8 @@ class BannerController extends Controller
             $banner->delete();
             $deleted++;
         }
+
+        Cache::forget('public.home.hero_banners');
 
         return redirect()->route('admin.banner.index')->with('status', "{$deleted} banner berhasil dihapus.");
     }
