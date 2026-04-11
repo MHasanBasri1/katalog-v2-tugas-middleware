@@ -1,5 +1,5 @@
 <aside
-    class="fixed top-0 left-0 z-50 h-screen flex flex-col bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 transition-all duration-500 ease-in-out shadow-xl shadow-gray-200/50 dark:shadow-none"
+    class="fixed top-0 left-0 z-[200] h-screen flex flex-col bg-white dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 transition-all duration-500 ease-in-out shadow-xl shadow-gray-200/50 dark:shadow-none"
     :class="{
         'w-72': $store.sidebar.isSidebarForceExpanded,
         'w-20': !$store.sidebar.isSidebarForceExpanded,
@@ -260,16 +260,29 @@
                 </div>
             </a>
 
-            <form method="POST" action="{{ route('logout') }}" class="m-0">
-                @csrf
+            <div class="flex items-center gap-1">
+                <!-- Logout (Desktop: Always, Mobile: Specific Button) -->
+                <form method="POST" action="{{ route('logout') }}" class="m-0">
+                    @csrf
+                    <button
+                        type="submit"
+                        class="group w-11 h-11 rounded-2xl text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 inline-flex items-center justify-center transition-all duration-300 border border-transparent hover:border-rose-100 dark:hover:border-rose-900/10"
+                        title="Logout"
+                    >
+                        <i class="ti ti-logout-2 text-xl group-hover:rotate-12 transition-transform"></i>
+                    </button>
+                </form>
+
+                <!-- Theme Toggle (Only on Mobile) -->
                 <button
-                    type="submit"
-                    class="group w-11 h-11 rounded-2xl text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 inline-flex items-center justify-center transition-all duration-300 border border-transparent hover:border-rose-100 dark:hover:border-rose-900/10"
-                    title="Logout"
+                    type="button"
+                    @click="$store.theme.toggle()"
+                    class="xl:hidden w-11 h-11 rounded-2xl text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 inline-flex items-center justify-center transition-all duration-300 border border-transparent hover:border-blue-100 dark:hover:border-blue-900/10"
+                    title="Toggle Theme"
                 >
-                    <i class="ti ti-logout-2 text-xl group-hover:rotate-12 transition-transform"></i>
+                    <i class="ti text-xl transition-all duration-300" :class="$store.theme.theme === 'light' ? 'ti-moon' : 'ti-sun'"></i>
                 </button>
-            </form>
+            </div>
         </div>
     </div>
 </aside>

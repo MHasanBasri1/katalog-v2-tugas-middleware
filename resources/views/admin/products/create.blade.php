@@ -12,7 +12,7 @@
         <span class="text-gray-900 dark:text-white">Tambah Produk Baru</span>
     </nav>
 
-    <form method="POST" action="{{ route('admin.produk.store') }}" class="space-y-6">
+    <form method="POST" action="{{ route('admin.produk.store') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
         
         <!-- Main Info Card -->
@@ -140,27 +140,88 @@
             </div>
         </div>
 
-        <!-- Marketplace Links Card -->
-        <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
-            <div class="p-6 border-b border-gray-100 dark:border-gray-800">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-white">Tautan Marketplace</h3>
-                <p class="text-xs text-gray-500 mt-1">Masukkan URL toko atau produk di setiap platform.</p>
-            </div>
-            <div class="p-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    @foreach ($marketplaceOptions as $index => $marketplace)
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">{{ $marketplace }}</label>
-                            <input type="hidden" name="marketplace_links[{{ $index }}][marketplace]" value="{{ $marketplace }}">
-                            <div class="relative group">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                    <i class="ti ti-link text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
-                                </div>
-                                <input type="url" name="marketplace_links[{{ $index }}][url]" value="{{ old('marketplace_links.'.$index.'.url') }}" placeholder="https://..."
-                                    class="w-full pl-10 bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">
+        <!-- Gallery & Marketplace Card Group -->
+        <div class="space-y-6">
+            <!-- Product Gallery Card -->
+            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden" 
+                x-data="{ 
+                    previews: [],
+                    handleFileChange(event) {
+                        const files = Array.from(event.target.files);
+                        if (files.length > 10) {
+                            alert('Maksimal 10 gambar diperbolehkan.');
+                            event.target.value = '';
+                            return;
+                        }
+                        this.previews = [];
+                        files.forEach(file => {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                this.previews.push(e.target.result);
+                            };
+                            reader.readAsDataURL(file);
+                        });
+                    }
+                }">
+                <div class="p-6 border-b border-gray-100 dark:border-gray-800">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-white">Galeri Produk</h3>
+                    <p class="text-xs text-gray-500 mt-1">Upload satu atau beberapa gambar produk (Maks 2MB/file).</p>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                        {{-- Previews --}}
+                        <template x-for="(preview, index) in previews" :key="index">
+                            <div class="relative aspect-square rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm bg-gray-50 dark:bg-gray-800">
+                                <img :src="preview" class="w-full h-full object-cover">
+                                <div class="absolute top-2 left-2 bg-blue-600 text-[8px] font-black text-white px-2 py-0.5 rounded shadow-sm z-10 uppercase tracking-tighter">BARU</div>
+                                <button type="button" @click="previews.splice(index, 1); if(previews.length === 0) $refs.fileInput.value = '';" 
+                                    class="absolute top-2 right-2 bg-rose-600 text-white w-6 h-6 rounded-lg flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <i class="ti ti-x text-xs"></i>
+                                </button>
                             </div>
+                        </template>
+
+                        {{-- Add Button --}}
+                        <div x-show="previews.length < 10" class="relative aspect-square">
+                            <label class="flex flex-col items-center justify-center w-full h-full border-2 border-gray-200 border-dashed rounded-2xl cursor-pointer bg-gray-50/50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300 group">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center">
+                                    <div class="w-10 h-10 bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center shadow-sm mb-2 group-hover:scale-110 transition-transform duration-300">
+                                        <i class="ti ti-photo-plus text-xl text-gray-400 group-hover:text-blue-600"></i>
+                                    </div>
+                                    <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-tight">Tambah<br>Gambar</p>
+                                </div>
+                                <input type="file" name="images[]" multiple class="hidden" accept="image/*" @change="handleFileChange" x-ref="fileInput" />
+                            </label>
                         </div>
-                    @endforeach
+                    </div>
+                    
+                    <div class="mt-4 flex items-center gap-2">
+                        <div class="flex-1 h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-blue-600 rounded-full transition-all duration-500" :style="'width: ' + (previews.length / 10 * 100) + '%'"></div>
+                        </div>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-gray-400" x-text="previews.length + ' / 10 GAMBAR'"></span>
+                    </div>
+                    @error('images.*') <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p> @enderror
+                </div>
+            </div>
+
+            <!-- Marketplace Links Card -->
+            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
+                <div class="p-6 border-b border-gray-100 dark:border-gray-800">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-white">Tautan Marketplace</h3>
+                    <p class="text-xs text-gray-500 mt-1">Masukkan URL produk di setiap marketplace.</p>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        @foreach ($marketplaceOptions as $index => $marketplace)
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">{{ $marketplace }}</label>
+                                <input type="hidden" name="marketplace_links[{{ $index }}][marketplace]" value="{{ $marketplace }}">
+                                <input type="url" name="marketplace_links[{{ $index }}][url]" value="{{ old('marketplace_links.'.$index.'.url') }}" placeholder="https://..."
+                                    class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>

@@ -28,7 +28,7 @@
             x-show="$store.sidebar.isMobileOpen"
             x-cloak
             @click="$store.sidebar.toggleMobileOpen()"
-            class="fixed inset-0 z-40 bg-black/50 xl:hidden"
+            class="fixed inset-0 z-[190] bg-black/50 xl:hidden"
         ></div>
         @include('admin.partials.sidebar')
 
@@ -45,5 +45,52 @@
         </div>
     </div>
     @livewireScripts
+    
+    <!-- Global Notification Toast -->
+    <div x-data="{ 
+            show: false, 
+            type: 'success', 
+            message: '',
+            timeout: null,
+            init() {
+                window.addEventListener('notify', event => {
+                    const data = Array.isArray(event.detail) ? event.detail[0] : event.detail;
+                    this.message = data.message;
+                    this.type = data.type || 'success';
+                    this.show = true;
+                    if(this.timeout) clearTimeout(this.timeout);
+                    this.timeout = setTimeout(() => { this.show = false }, 3000);
+                });
+            }
+        }"
+        x-show="show"
+        x-cloak
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 translate-y-4 md:translate-y-0 md:translate-x-4"
+        x-transition:enter-end="opacity-100 translate-y-0 md:translate-x-0"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="fixed bottom-6 right-6 z-[300] max-w-sm w-full"
+    >
+        <div class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-2xl rounded-2xl p-4 flex items-center gap-4">
+            <template x-if="type === 'success'">
+                <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl flex items-center justify-center shrink-0">
+                    <i class="ti ti-check text-emerald-600 text-lg"></i>
+                </div>
+            </template>
+            <template x-if="type === 'error'">
+                <div class="w-10 h-10 bg-rose-50 dark:bg-rose-900/20 rounded-xl flex items-center justify-center shrink-0">
+                    <i class="ti ti-x text-rose-600 text-lg"></i>
+                </div>
+            </template>
+            <div class="flex-1">
+                <p class="text-sm font-bold text-gray-900 dark:text-white" x-text="message"></p>
+            </div>
+            <button @click="show = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <i class="ti ti-x text-sm"></i>
+            </button>
+        </div>
+    </div>
 </body>
 </html>

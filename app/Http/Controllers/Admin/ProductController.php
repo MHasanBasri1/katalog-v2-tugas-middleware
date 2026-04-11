@@ -11,9 +11,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use App\Models\ProductImage;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductController extends Controller
@@ -57,14 +59,18 @@ class ProductController extends Controller
     {
         $data = $this->validatePayload($request);
         $links = $data['marketplace_links'] ?? [];
+        $images = $request->file('images') ?: [];
         unset($data['marketplace_links']);
 
         $data['slug'] = $this->makeUniqueSlug($data['slug'] ?: $data['name']);
 
-        DB::transaction(function () use ($data, $links) {
+        DB::transaction(function () use ($data, $links, $images) {
             $product = Product::query()->create($data);
             $this->syncMarketplaceLinks($product, $links);
+            $this->syncProductImages($product, $images);
         });
+
+        $this->clearProductCaches();
 
         if ($request->input('action') === 'save_and_another') {
             return redirect()->route('admin.produk.create')->with('status', 'Produk berhasil ditambahkan. Silahkan tambah produk lainnya.');
@@ -86,7 +92,7 @@ class ProductController extends Controller
             ? array_map(fn($k) => Str::title($k), array_keys($marketplaces))
             : ($marketplaces ?: ['Shopee', 'Tokopedia', 'Lazada', 'Blibli', 'Tiktok Shop']);
         
-        $produk->load('marketplaceLinks:id,product_id,marketplace,url');
+        $produk->load(['marketplaceLinks', 'images']);
 
         return view('admin.products.edit', [
             'product' => $produk,
@@ -99,14 +105,18 @@ class ProductController extends Controller
     {
         $data = $this->validatePayload($request, $produk->id);
         $links = $data['marketplace_links'] ?? [];
+        $images = $request->file('images') ?: [];
         unset($data['marketplace_links']);
 
         $data['slug'] = $this->makeUniqueSlug($data['slug'] ?: $data['name'], $produk->id);
 
-        DB::transaction(function () use ($produk, $data, $links) {
+        DB::transaction(function () use ($produk, $data, $links, $images) {
             $produk->update($data);
             $this->syncMarketplaceLinks($produk, $links);
+            $this->syncProductImages($produk, $images);
         });
+
+        $this->clearProductCaches();
 
         return redirect()->route('admin.produk.index')->with('status', 'Produk berhasil diperbarui.');
     }
@@ -114,8 +124,16 @@ class ProductController extends Controller
     public function destroy(Product $produk): RedirectResponse
     {
         $produk->delete();
+        $this->clearProductCaches();
 
         return redirect()->route('admin.produk.index')->with('status', 'Produk berhasil dihapus.');
+    }
+
+    private function clearProductCaches(): void
+    {
+        Cache::forget('public.home.bestseller_products');
+        Cache::forget('public.home.flashsale_products');
+        Cache::forget('public.home.new_products');
     }
 
     public function bulkDestroy(Request $request): RedirectResponse
@@ -366,6 +384,44 @@ class ProductController extends Controller
         ]);
     }
 
+    public function setPrimaryImage(Product $produk, ProductImage $image): RedirectResponse
+    {
+        if ($image->product_id !== $produk->id) {
+            abort(403);
+        }
+
+        $produk->images()->update(['is_primary' => false]);
+        $image->update(['is_primary' => true]);
+
+        return back()->with('status', 'Gambar utama berhasil diperbarui.');
+    }
+
+    public function deleteImage(Product $produk, ProductImage $image): RedirectResponse
+    {
+        if ($image->product_id !== $produk->id) {
+            abort(403);
+        }
+
+        $isPrimary = $image->is_primary;
+        
+        // Delete file
+        if (Storage::disk('public')->exists($image->image)) {
+            Storage::disk('public')->delete($image->image);
+        }
+        
+        $image->delete();
+
+        // If primary was deleted, set another one as primary if available
+        if ($isPrimary) {
+            $nextImage = $produk->images()->first();
+            if ($nextImage) {
+                $nextImage->update(['is_primary' => true]);
+            }
+        }
+
+        return back()->with('status', 'Gambar berhasil dihapus.');
+    }
+
     private function validatePayload(Request $request, ?int $ignoreId = null): array
     {
         return $request->validate([
@@ -385,7 +441,24 @@ class ProductController extends Controller
             'marketplace_links' => ['nullable', 'array'],
             'marketplace_links.*.marketplace' => ['nullable', 'string', 'max:100'],
             'marketplace_links.*.url' => ['nullable', 'url', 'max:2000'],
+            'images' => ['nullable', 'array'],
+            'images.*' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ]);
+    }
+
+    private function syncProductImages(Product $product, array $images): void
+    {
+        if (empty($images)) {
+            return;
+        }
+
+        foreach ($images as $image) {
+            $path = $image->store('products', 'public');
+            $product->images()->create([
+                'image' => $path,
+                'is_primary' => ! $product->images()->exists(),
+            ]);
+        }
     }
 
     private function makeUniqueSlug(string $value, ?int $ignoreId = null): string

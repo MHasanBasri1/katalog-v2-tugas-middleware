@@ -11,7 +11,14 @@
 
 @php
     $isPicsum = str_contains($src, 'picsum.photos');
-    $finalSrc = $src;
+    $isExternal = str_starts_with($src, 'http://') || str_starts_with($src, 'https://') || str_starts_with($src, '//');
+    $isStorage = str_starts_with($src, '/storage/') || str_starts_with($src, 'storage/');
+    
+    if ($isExternal || $isPicsum || $isStorage) {
+        $finalSrc = $src;
+    } else {
+        $finalSrc = \Illuminate\Support\Facades\Storage::url($src);
+    }
     $srcset = '';
 
     if ($isPicsum && $width && $height) {

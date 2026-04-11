@@ -1,4 +1,4 @@
-<div class="flex-1 max-w-xl ml-2 relative" x-data="{ open: false }" @click.outside="open = false">
+<div class="flex-1 max-w-xl relative" x-data="{ open: false }" @click.outside="open = false">
     <div class="relative group">
         <div class="absolute inset-y-0 left-0 flex items-center justify-center text-gray-400 group-focus-within:text-blue-600 transition-colors" style="width: 44px;">
             <i class="ti ti-search text-base"></i>

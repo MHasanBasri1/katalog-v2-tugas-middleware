@@ -14,21 +14,15 @@
         <span class="text-gray-500 truncate max-w-[200px]">{{ $product->name }}</span>
     </nav>
 
-    <form method="POST" action="{{ route('admin.produk.update', $product) }}" class="space-y-6">
+    <form method="POST" action="{{ route('admin.produk.update', $product) }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('PUT')
         
         <!-- Main Info Card -->
         <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
-            <div class="p-6 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                <div>
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Informasi Produk</h3>
-                    <p class="text-sm text-gray-500">Perbarui detail produk dan kategori.</p>
-                </div>
-                <div class="text-right">
-                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">ID Produk</span>
-                    <span class="text-sm font-mono text-gray-600 dark:text-gray-400">#{{ $product->id }}</span>
-                </div>
+            <div class="p-6 border-b border-gray-100 dark:border-gray-800">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white text-center sm:text-left">Informasi Produk</h3>
+                <p class="text-sm text-gray-500 text-center sm:text-left">Perbarui detail utama dan kategori produk.</p>
             </div>
             <div class="p-6 space-y-5">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -149,30 +143,53 @@
             </div>
         </div>
 
-        <!-- Marketplace Links Card -->
-        <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
-            <div class="p-6 border-b border-gray-100 dark:border-gray-800">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-white">Tautan Marketplace</h3>
-                <p class="text-xs text-gray-500 mt-1">Sesuikan tautan produk di setiap platform marketplace.</p>
+        <!-- Gallery & Marketplace Card Group -->
+        <div class="space-y-6">
+            <!-- Product Gallery Card -->
+            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden"
+                x-data="{ 
+                    previews: [],
+                    handleFileChange(event) {
+                        const files = Array.from(event.target.files);
+                        this.previews = [];
+                        files.forEach(file => {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                this.previews.push(e.target.result);
+                            };
+                            reader.readAsDataURL(file);
+                        });
+                    }
+                }">
+                <div class="p-6 border-b border-gray-100 dark:border-gray-800">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-white text-center sm:text-left">Galeri Produk</h3>
+                    <p class="text-xs text-gray-500 mt-1 text-center sm:text-left">Kelola galeri foto produk (Maks 2MB/file).</p>
+                </div>
+                <div class="p-6">
+                    <livewire:admin.product-gallery :product="$product" />
+                </div>
             </div>
-            <div class="p-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    @foreach ($marketplaceOptions as $index => $marketplace)
-                        @php
-                            $link = $product->marketplaceLinks->firstWhere('marketplace', $marketplace);
-                        @endphp
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">{{ $marketplace }}</label>
-                            <input type="hidden" name="marketplace_links[{{ $index }}][marketplace]" value="{{ $marketplace }}">
-                            <div class="relative group">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                    <i class="ti ti-link text-gray-400 group-focus-within:text-blue-600 transition-colors"></i>
-                                </div>
+
+            <!-- Marketplace Links Card -->
+            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+                <div class="p-6 border-b border-gray-100 dark:border-gray-800">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-white text-center sm:text-left">Tautan Marketplace</h3>
+                    <p class="text-xs text-gray-500 mt-1 text-center sm:text-left">Masukkan URL produk di setiap marketplace.</p>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        @foreach ($marketplaceOptions as $index => $marketplace)
+                            @php
+                                $link = $product->marketplaceLinks->firstWhere('marketplace', $marketplace);
+                            @endphp
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">{{ $marketplace }}</label>
+                                <input type="hidden" name="marketplace_links[{{ $index }}][marketplace]" value="{{ $marketplace }}">
                                 <input type="url" name="marketplace_links[{{ $index }}][url]" value="{{ old('marketplace_links.'.$index.'.url', $link?->url) }}" placeholder="https://..."
-                                    class="w-full pl-10 bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">
+                                    class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
@@ -185,11 +202,11 @@
                 'left-0': true
             }">
             <div class="flex flex-row items-center justify-end gap-2 sm:gap-3 px-3 sm:px-6">
-                <a href="{{ route('admin.produk.index') }}" class="flex-1 sm:flex-none px-4 sm:px-8 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-center whitespace-nowrap">
+                <a href="{{ route('admin.produk.index') }}" class="flex-1 sm:flex-none px-4 sm:px-8 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-[10px] sm:text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-center whitespace-nowrap">
                     Batal
                 </a>
-                <button type="submit" class="flex-1 sm:flex-none px-8 sm:px-14 py-2.5 rounded-xl bg-blue-600 text-white text-xs sm:text-sm font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200 dark:shadow-none text-center whitespace-nowrap">
-                    Simpan
+                <button type="submit" class="flex-1 sm:flex-none px-8 sm:px-14 py-2.5 rounded-xl bg-blue-600 text-white text-[10px] sm:text-sm font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200 dark:shadow-none text-center whitespace-nowrap">
+                    Simpan Perubahan
                 </button>
             </div>
         </div>

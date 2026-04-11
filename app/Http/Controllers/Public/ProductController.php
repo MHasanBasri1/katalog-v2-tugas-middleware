@@ -53,8 +53,7 @@ class ProductController extends Controller
             ->toArray();
 
         $galleryImages = $product->images
-            ->pluck('image')
-            ->filter()
+            ->map(fn($item) => \Illuminate\Support\Facades\Storage::url($item->image))
             ->values()
             ->all();
 

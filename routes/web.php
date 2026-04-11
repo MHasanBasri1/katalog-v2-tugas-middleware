@@ -264,6 +264,10 @@ Route::middleware(['auth', 'role:admin', 'log.activity'])->prefix('admin')->name
     Route::resource('/produk', ProductController::class)
         ->whereNumber('produk')
         ->middleware('permission:products.manage');
+    Route::post('/produk/{produk}/images/{image}/set-primary', [ProductController::class, 'setPrimaryImage'])
+        ->name('produk.images.set-primary');
+    Route::delete('/produk/{produk}/images/{image}', [ProductController::class, 'deleteImage'])
+        ->name('produk.images.delete');
 
     Route::resource('/blog', BlogController::class)
         ->except(['show'])
