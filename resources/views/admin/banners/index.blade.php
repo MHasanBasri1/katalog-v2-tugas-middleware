@@ -97,7 +97,7 @@
                             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center text-gray-400 group-focus-within:text-blue-600 transition-colors" style="width: 44px;">
                                 <i class="ti ti-search text-xs"></i>
                             </div>
-                            <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari judul/subtitle banner..." 
+                            <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari banner..." 
                                 class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium placeholder:text-gray-500"
                                 style="padding: 0.65rem 1rem 0.65rem 44px;">
                         </div>
@@ -136,18 +136,19 @@
                                         <td class="px-4 py-3 text-center">
                                             <input type="checkbox" :checked="selectedIds.includes({{ $banner->id }})" @change="toggleRowSelection({{ $banner->id }})" class="rounded border-gray-300 text-blue-600">
                                         </td>
-                                        <td class="px-4 py-3 min-w-[300px]">
+                                        <td class="px-4 py-3 min-w-[200px]">
                                             <div class="flex items-center gap-4">
                                                 @if($banner->image_url)
-                                                    <img src="{{ $banner->image_url }}" class="w-20 h-10 object-cover rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm" alt="Banner">
+                                                    <img src="{{ $banner->image_url }}" class="w-24 h-12 object-cover rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm" alt="Banner">
                                                 @else
-                                                    <div class="w-20 h-10 rounded-lg bg-gray-50 dark:bg-gray-800 border border-dashed border-gray-200 dark:border-gray-700 flex items-center justify-center">
+                                                    <div class="w-24 h-12 rounded-lg bg-gray-50 dark:bg-gray-800 border border-dashed border-gray-200 dark:border-gray-700 flex items-center justify-center">
                                                         <i class="ti ti-photo text-gray-400"></i>
                                                     </div>
                                                 @endif
-                                                <div>
-                                                    <p class="font-semibold text-gray-900 dark:text-gray-100 leading-none">{{ $banner->title }}</p>
-                                                    <p class="text-[10px] text-gray-500 mt-2">{{ \Illuminate\Support\Str::limit($banner->subtitle, 50) }}</p>
+                                                <div class="truncate max-w-[200px]">
+                                                    <p class="font-bold text-gray-900 dark:text-white text-sm truncate">{{ $banner->title }}</p>
+                                                    <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold mt-1">Link:</p>
+                                                    <span class="text-[10px] text-blue-600 dark:text-blue-400 truncate block">{{ $banner->cta_url ?: '-' }}</span>
                                                 </div>
                                             </div>
                                         </td>

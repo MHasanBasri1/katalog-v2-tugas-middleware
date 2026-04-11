@@ -38,6 +38,8 @@ class BannerController extends Controller
         $data['image_url'] = $this->storeImage($request, 'image_file', 'banners');
         Banner::query()->create($data);
 
+        Cache::forget('public.home.hero_banners');
+
         if ($request->input('action') === 'save_and_another') {
             return redirect()->route('admin.banner.create')->with('status', 'Banner berhasil ditambahkan. Silahkan tambah banner lainnya.');
         }
@@ -59,6 +61,8 @@ class BannerController extends Controller
         }
         $banner->update($data);
 
+        Cache::forget('public.home.hero_banners');
+
         return redirect()->route('admin.banner.index')->with('status', 'Banner berhasil diperbarui.');
     }
 
@@ -66,6 +70,8 @@ class BannerController extends Controller
     {
         $this->deleteStoredImage($banner->image_url);
         $banner->delete();
+
+        Cache::forget('public.home.hero_banners');
 
         return redirect()->route('admin.banner.index')->with('status', 'Banner berhasil dihapus.');
     }
@@ -96,8 +102,6 @@ class BannerController extends Controller
     {
         $rules = [
             'title' => ['required', 'string', 'max:255'],
-            'subtitle' => ['nullable', 'string', 'max:255'],
-            'cta_label' => ['nullable', 'string', 'max:60'],
             'cta_url' => ['nullable', 'url', 'max:2048'],
             'sort_order' => ['required', 'integer', 'min:0'],
             'is_active' => ['required', 'boolean'],

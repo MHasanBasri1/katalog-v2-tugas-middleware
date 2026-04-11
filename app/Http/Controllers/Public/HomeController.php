@@ -13,17 +13,13 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $heroBanners = Cache::remember(
-            'public.home.hero_banners',
-            now()->addMinutes(10),
-            fn () => Banner::query()
-                ->select('id', 'title', 'subtitle', 'image_url', 'cta_label', 'cta_url')
-                ->where('is_active', true)
-                ->orderBy('sort_order')
-                ->latest('id')
-                ->limit(6)
-                ->get()
-        );
+        $heroBanners = Banner::query()
+            ->select('id', 'title', 'subtitle', 'image_url', 'cta_label', 'cta_url')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->latest('id')
+            ->limit(6)
+            ->get();
 
         $popularCategories = Cache::remember(
             'public.home.categories_all',

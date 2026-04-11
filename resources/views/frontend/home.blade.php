@@ -99,36 +99,12 @@
 @section('content')
 <h1 class="sr-only">Kataloque - Katalog Produk Modern & Terpercaya</h1>
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-1 md:pt-3 pb-8 space-y-4 md:space-y-6">
-    @php
-        $bannerItems = collect([
-            (object) [
-                'image_url' => 'https://www.static-src.com/siva/asset/04_2026/imagebtrgendesk.jpg?w=1200',
-                'cta_url' => route('katalog'),
-            ],
-            (object) [
-                'image_url' => 'https://www.static-src.com/siva/asset/04_2026/CRTV-12373_CAROUSEL_2000x500_Saucony_3_26.jpg?w=1200',
-                'cta_url' => route('katalog'),
-            ],
-            (object) [
-                'image_url' => 'https://www.static-src.com/siva/asset/04_2026/Carousel-Pisen-Reg-apr26-2000x500.jpeg?w=1200',
-                'cta_url' => route('katalog'),
-            ],
-            (object) [
-                'image_url' => 'https://www.static-src.com/siva/asset/03_2026/ocbcthurday-Desktop-carousel.jpg?w=1200',
-                'cta_url' => route('katalog'),
-            ],
-            (object) [
-                'image_url' => 'https://www.static-src.com/siva/asset/04_2026/Home-Desk-Travo-PAW-Expo-26-75rb-1.jpg?w=1200',
-                'cta_url' => route('katalog'),
-            ],
-        ]);
-    @endphp
     <div class="mt-2 md:mt-4">
         <!-- Hero Banner Slider -->
         <div class="relative group pb-3">
             <div class="swiper hero-swiper !overflow-visible">
                 <div class="swiper-wrapper">
-                    @foreach($bannerItems as $banner)
+                    @forelse($heroBanners as $banner)
                         <div class="swiper-slide !w-[90%] md:!w-[70%] px-1 sm:px-2 md:px-4">
                             <a href="{{ $banner->cta_url ?? route('katalog') }}" class="block w-full aspect-[4/1] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                                 <x-optimized-image 
@@ -143,7 +119,14 @@
                                 />
                             </a>
                         </div>
-                    @endforeach
+                    @empty
+                        {{-- Fallback if no banners --}}
+                        <div class="swiper-slide !w-[90%] md:!w-[70%] px-1 sm:px-2 md:px-4">
+                            <div class="w-full aspect-[4/1] rounded-2xl bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-200">
+                                <span class="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Belum ada banner aktif</span>
+                            </div>
+                        </div>
+                    @endforelse
                 </div>
 
                 {{-- Navigation Buttons (Visible on Hover) --}}
