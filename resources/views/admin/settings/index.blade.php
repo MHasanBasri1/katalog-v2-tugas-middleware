@@ -454,8 +454,98 @@
                         <select name="seo_settings[robots]" 
                             class="bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl px-6 py-2.5 text-[11px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-indigo-600/20 transition-all">
                             <option value="index, follow" @selected(($setting->seo_settings['robots'] ?? '') === 'index, follow')>Index, Follow</option>
-                            <option value="noindex, nofollow" @selected(($setting->seo_settings['robots'] ?? '') === 'noindex, nofollow')>No-Index (Private)</option>
                         </select>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        @if($section === 'sistem')
+            <div class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <!-- Maintenance Mode Card -->
+                <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+                    <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-1.5 h-6 bg-rose-600 rounded-full"></div>
+                            <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Mode Pemeliharaan (Maintenance)</h3>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="hidden" name="is_maintenance" value="0">
+                            <input type="checkbox" name="is_maintenance" value="1" @checked($setting->is_maintenance) class="sr-only peer">
+                            <div class="w-12 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-rose-600"></div>
+                        </label>
+                    </div>
+                    <div class="p-8 space-y-4">
+                        <div class="p-4 bg-rose-50 dark:bg-rose-900/10 rounded-2xl border border-rose-100 dark:border-rose-900/20 flex gap-4">
+                            <div class="w-10 h-10 bg-rose-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-rose-200 dark:shadow-none">
+                                <i class="ti ti-tool"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-black text-rose-900 dark:text-rose-400 uppercase tracking-widest mb-1">Perhatian!</h4>
+                                <p class="text-[10px] text-rose-700 dark:text-rose-500 leading-relaxed font-bold">Saat mode pemeliharaan aktif, pengunjung tidak akan bisa mengakses katalog Anda. Pastikan Anda sudah mengisi pesan informasi di bawah.</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">Pesan Pemeliharaan</label>
+                            <textarea name="system_settings[maintenance_message]" rows="3" placeholder="Maaf, kami sedang melakukan perbaikan sistem..."
+                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-rose-600 focus:ring-4 focus:ring-rose-600/10 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4 resize-none leading-relaxed">{{ old('system_settings.maintenance_message', $setting->system_settings['maintenance_message'] ?? '') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Announcement Bar Card -->
+                <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden text-sm">
+                    <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-1.5 h-6 bg-amber-500 rounded-full"></div>
+                            <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Announcement Bar (Promo)</h3>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="hidden" name="system_settings[announcement_enabled]" value="0">
+                            <input type="checkbox" name="system_settings[announcement_enabled]" value="1" @checked($setting->system_settings['announcement_enabled'] ?? false) class="sr-only peer">
+                            <div class="w-12 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-amber-500"></div>
+                        </label>
+                    </div>
+                    <div class="p-8 space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">Pesan Promo / Pengumuman</label>
+                                <input type="text" name="system_settings[announcement_text]" value="{{ old('system_settings.announcement_text', $setting->system_settings['announcement_text'] ?? '') }}" placeholder="Contoh: Promo Ramadhan Diskon 50%!"
+                                    class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 rounded-2xl outline-none transition-all duration-300 text-xs font-bold p-4">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">Target Link (Optional)</label>
+                                <input type="text" name="system_settings[announcement_url]" value="{{ old('system_settings.announcement_url', $setting->system_settings['announcement_url'] ?? '') }}" placeholder="https://..."
+                                    class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 rounded-2xl outline-none transition-all duration-300 text-xs font-bold p-4">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Marketing & Tracking Card -->
+                <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+                    <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
+                        <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                        <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Marketing & Tracking ID</h3>
+                    </div>
+                    <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest flex items-center gap-2">
+                                <i class="ti ti-brand-google text-blue-600"></i>
+                                Google Analytics ID (G-XXXX)
+                            </label>
+                            <input type="text" name="system_settings[google_analytics_id]" value="{{ old('system_settings.google_analytics_id', $setting->system_settings['google_analytics_id'] ?? '') }}" placeholder="G-ABC123XYZ"
+                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest flex items-center gap-2">
+                                <i class="ti ti-brand-facebook text-blue-600"></i>
+                                Facebook Pixel ID
+                            </label>
+                            <input type="text" name="system_settings[facebook_pixel_id]" value="{{ old('system_settings.facebook_pixel_id', $setting->system_settings['facebook_pixel_id'] ?? '') }}" placeholder="1234567890"
+                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4">
+                        </div>
                     </div>
                 </div>
             </div>

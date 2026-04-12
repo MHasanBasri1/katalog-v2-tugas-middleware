@@ -24,11 +24,15 @@ class Setting extends Model
         'marketplaces',
         'social_media',
         'seo_settings',
+        'system_settings',
+        'is_maintenance',
     ];
 
     protected $casts = [
         'marketplaces' => 'array',
         'social_media' => 'array',
         'seo_settings' => 'array',
+        'system_settings' => 'array',
+        'is_maintenance' => 'boolean',
     ];
 }

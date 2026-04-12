@@ -20,6 +20,7 @@ class SettingController extends Controller
         if (request()->routeIs('admin.setting.branding')) $section = 'branding';
         if (request()->routeIs('admin.setting.marketplace')) $section = 'marketplace';
         if (request()->routeIs('admin.setting.seo')) $section = 'seo';
+        if (request()->routeIs('admin.setting.sistem')) $section = 'sistem';
 
         return view('admin.settings.index', compact('setting', 'section'));
     }
@@ -51,6 +52,7 @@ class SettingController extends Controller
 
         Cache::forget('public.footer.setting');
         Cache::forget('public.whatsapp_setting');
+        Cache::forget('global.settings');
 
         return back()->with('status', 'Setting berhasil disimpan.');
     }
@@ -89,6 +91,7 @@ class SettingController extends Controller
 
         Cache::forget('public.footer.setting');
         Cache::forget('public.whatsapp_setting');
+        Cache::forget('global.settings');
 
         return back()->with('status', 'Setting berhasil diperbarui.');
     }
@@ -130,6 +133,14 @@ class SettingController extends Controller
             'seo_settings.yandex_verification' => ['nullable', 'string', 'max:255'],
             'seo_settings.robots' => ['nullable', 'string', 'max:50'],
             'seo_settings.author' => ['nullable', 'string', 'max:100'],
+            'is_maintenance' => ['nullable', 'boolean'],
+            'system_settings' => ['nullable', 'array'],
+            'system_settings.maintenance_message' => ['nullable', 'string', 'max:500'],
+            'system_settings.google_analytics_id' => ['nullable', 'string', 'max:50'],
+            'system_settings.facebook_pixel_id' => ['nullable', 'string', 'max:50'],
+            'system_settings.announcement_enabled' => ['nullable', 'boolean'],
+            'system_settings.announcement_text' => ['nullable', 'string', 'max:255'],
+            'system_settings.announcement_url' => ['nullable', 'string', 'max:255'],
         ]);
     }
 

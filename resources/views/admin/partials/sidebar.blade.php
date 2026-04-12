@@ -292,6 +292,17 @@
                     @endif
                     <span>SEO</span>
                 </a>
+                <a href="{{ route('admin.setting.sistem') }}"
+                   class="flex items-center rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 relative overflow-hidden group"
+                   @class([
+                       'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/20' => request()->routeIs('admin.setting.sistem'),
+                       'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-gray-800' => !request()->routeIs('admin.setting.sistem'),
+                   ])>
+                    @if(request()->routeIs('admin.setting.sistem'))
+                        <div class="absolute left-0 inset-y-1.5 w-0.5 bg-blue-300/80 rounded-r-full"></div>
+                    @endif
+                    <span>Konfigurasi Sistem</span>
+                </a>
             </div>
         @endif
     </nav>

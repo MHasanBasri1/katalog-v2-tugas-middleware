@@ -132,8 +132,54 @@
     @livewireStyles
     @stack('meta')
     @stack('styles')
+
+    {{-- System Marketing & Tracking --}}
+    @if($setting && isset($setting->system_settings['google_analytics_id']))
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ $setting->system_settings['google_analytics_id'] }}"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '{{ $setting->system_settings['google_analytics_id'] }}');
+        </script>
+    @endif
+
+    @if($setting && isset($setting->system_settings['facebook_pixel_id']))
+        <script>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '{{ $setting->system_settings['facebook_pixel_id'] }}');
+        fbq('track', 'PageView');
+        </script>
+        <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id={{ $setting->system_settings['facebook_pixel_id'] }}&ev=PageView&noscript=1"/></noscript>
+    @endif
 </head>
 <body class="m-0 min-h-screen text-gray-800 font-['Plus_Jakarta_Sans'] antialiased overflow-x-hidden relative selection:bg-primary/10 selection:text-primary">
+    {{-- Announcement Bar Integration --}}
+    @if($setting && ($setting->system_settings['announcement_enabled'] ?? false))
+        <div class="relative bg-gradient-to-r from-amber-500 to-amber-600 text-white p-2.5 text-center overflow-hidden z-[200]">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-center gap-3">
+                <span class="inline-flex items-center gap-2 group cursor-default">
+                    <span class="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span>
+                    <span class="text-[11px] font-black uppercase tracking-widest">{!! $setting->system_settings['announcement_text'] !!}</span>
+                </span>
+                @if(!empty($setting->system_settings['announcement_url']))
+                    <a href="{{ $setting->system_settings['announcement_url'] }}" class="inline-flex items-center gap-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-md px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all duration-300 hover:scale-105 active:scale-95 border border-white/20">
+                        Cek Sekarang <i class="fas fa-arrow-right text-[8px]"></i>
+                    </a>
+                @endif
+            </div>
+            <div class="absolute -bottom-4 -left-4 w-16 h-16 bg-white/10 rounded-full blur-2xl"></div>
+            <div class="absolute -top-4 -right-4 w-16 h-16 bg-black/5 rounded-full blur-2xl"></div>
+        </div>
+    @endif
+
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-[9999] focus:p-4 focus:bg-white focus:text-primary" aria-label="Skip to content">Skip to content</a>
     <!-- Clean Retail Background -->
     <div class="fixed inset-0 -z-20 bg-gray-50/50 pointer-events-none"></div>
