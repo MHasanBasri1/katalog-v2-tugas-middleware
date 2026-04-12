@@ -32,24 +32,27 @@ use App\Http\Controllers\Admin\LogController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/admin/login', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('/admin/login', [AuthenticatedSessionController::class, 'store']);
+    Route::post('/admin/login', [AuthenticatedSessionController::class, 'store'])->middleware('throttle:5,1');
     Route::get('/admin/lupa-password', [AdminPasswordResetLinkController::class, 'create'])->name('admin.password.request');
-    Route::post('/admin/lupa-password', [AdminPasswordResetLinkController::class, 'store'])->name('admin.password.email');
+    Route::post('/admin/lupa-password', [AdminPasswordResetLinkController::class, 'store'])->name('admin.password.email')->middleware('throttle:3,1');
     Route::get('/admin/reset-password/{token}', [AdminNewPasswordController::class, 'create'])->name('admin.password.reset');
-    Route::post('/admin/reset-password', [AdminNewPasswordController::class, 'store'])->name('admin.password.store');
+    Route::post('/admin/reset-password', [AdminNewPasswordController::class, 'store'])->name('admin.password.store')->middleware('throttle:5,1');
+
     Route::get('/masuk', [UserAuthController::class, 'showLoginForm'])->name('user.login');
-    Route::post('/masuk', [UserAuthController::class, 'login'])->name('user.login.store');
+    Route::post('/masuk', [UserAuthController::class, 'login'])->name('user.login.store')->middleware('throttle:5,1');
     Route::get('/auth/google/redirect', [UserGoogleAuthController::class, 'redirect'])->name('user.google.redirect');
     Route::get('/auth/google/callback', [UserGoogleAuthController::class, 'callback'])->name('user.google.callback');
     Route::get('/verifikasi-device/{token}', UserDeviceVerificationController::class)
         ->middleware('throttle:6,1')
         ->name('user.device.verify');
+        
     Route::get('/lupa-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
-    Route::post('/lupa-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
+    Route::post('/lupa-password', [PasswordResetLinkController::class, 'store'])->name('password.email')->middleware('throttle:3,1');
     Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
-    Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.store');
+    Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.store')->middleware('throttle:5,1');
+    
     Route::get('/daftar', [UserAuthController::class, 'showRegisterForm'])->name('user.register');
-    Route::post('/daftar', [UserAuthController::class, 'register'])->name('user.register.store');
+    Route::post('/daftar', [UserAuthController::class, 'register'])->name('user.register.store')->middleware('throttle:5,1');
 });
 
 Route::redirect('/login', '/masuk', 301);
@@ -85,150 +88,150 @@ Route::middleware(['auth', 'role:user', 'verified'])->group(function () {
     Route::delete('/profil-saya/favorit/{productId}', [PanelController::class, 'destroyFavorite'])->name('user.favorite.destroy');
 });
 
-Route::get('/', [App\Http\Controllers\Public\HomeController::class, 'index'])->name('home');
+Route::middleware(['throttle:60,1'])->group(function () {
+    Route::get('/', [App\Http\Controllers\Public\HomeController::class, 'index'])->name('home');
 
-Route::get('/kategori', [App\Http\Controllers\Public\CategoryController::class, 'index'])->name('kategori');
-Route::get('/kategori/{slug}', [App\Http\Controllers\Public\CategoryController::class, 'show'])->name('kategori.detail');
+    Route::get('/kategori', [App\Http\Controllers\Public\CategoryController::class, 'index'])->name('kategori');
+    Route::get('/kategori/{slug}', [App\Http\Controllers\Public\CategoryController::class, 'show'])->name('kategori.detail');
 
-Route::get('/produk', function () {
-    return view('frontend.produk');
-})->name('katalog');
+    Route::get('/produk', function () {
+        return view('frontend.produk');
+    })->name('katalog');
 
-Route::redirect('/katalog', '/produk', 301);
+    Route::get('/produk/{slug}', [App\Http\Controllers\Public\ProductController::class, 'show'])->name('produk.detail');
 
-Route::get('/produk/{slug}', [App\Http\Controllers\Public\ProductController::class, 'show'])->name('produk.detail');
+    Route::get('/blog', function (Request $request) {
+        $canonical = route('blog.index');
+        $seoTitle = 'Blog - Kataloque';
+        $seoDescription = 'Artikel terbaru Kataloque seputar tips belanja online, gadget, dan rekomendasi produk.';
+        $selectedCategory = (string) $request->query('kategori', '');
+        $selectedTag = (string) $request->query('tag', '');
 
-Route::get('/blog', function (Request $request) {
-    $canonical = route('blog.index');
-    $seoTitle = 'Blog - Kataloque';
-    $seoDescription = 'Artikel terbaru Kataloque seputar tips belanja online, gadget, dan rekomendasi produk.';
-    $selectedCategory = (string) $request->query('kategori', '');
-    $selectedTag = (string) $request->query('tag', '');
+        $postQuery = Blog::query()
+            ->with(['category:id,name,slug', 'tags:id,name,slug'])
+            ->where('is_published', true)
+            ->when(
+                $selectedCategory !== '',
+                fn ($query) => $query->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('slug', $selectedCategory))
+            )
+            ->when(
+                $selectedTag !== '',
+                fn ($query) => $query->whereHas('tags', fn ($tagQuery) => $tagQuery->where('slug', $selectedTag))
+            );
 
-    $postQuery = Blog::query()
-        ->with(['category:id,name,slug', 'tags:id,name,slug'])
-        ->where('is_published', true)
-        ->when(
-            $selectedCategory !== '',
-            fn ($query) => $query->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('slug', $selectedCategory))
-        )
-        ->when(
-            $selectedTag !== '',
-            fn ($query) => $query->whereHas('tags', fn ($tagQuery) => $tagQuery->where('slug', $selectedTag))
-        );
+        $ogImage = (clone $postQuery)
+            ->orderByDesc('published_at')
+            ->value('cover_image') ?: 'https://picsum.photos/seed/kataloque-blog/1200/630';
 
-    $ogImage = (clone $postQuery)
-        ->orderByDesc('published_at')
-        ->value('cover_image') ?: 'https://picsum.photos/seed/kataloque-blog/1200/630';
+        $posts = $postQuery
+            ->orderByDesc('published_at')
+            ->paginate(9)
+            ->withQueryString();
 
-    $posts = $postQuery
-        ->orderByDesc('published_at')
-        ->paginate(9)
-        ->withQueryString();
+        $categories = BlogCategory::query()->orderBy('name')->get(['id', 'name', 'slug']);
+        $tags = BlogTag::query()->orderBy('name')->get(['id', 'name', 'slug']);
 
-    $categories = BlogCategory::query()->orderBy('name')->get(['id', 'name', 'slug']);
-    $tags = BlogTag::query()->orderBy('name')->get(['id', 'name', 'slug']);
+        return view('frontend.blog', compact(
+            'posts',
+            'canonical',
+            'seoTitle',
+            'seoDescription',
+            'ogImage',
+            'categories',
+            'tags',
+            'selectedCategory',
+            'selectedTag'
+        ));
+    })->name('blog.index');
 
-    return view('frontend.blog', compact(
-        'posts',
-        'canonical',
-        'seoTitle',
-        'seoDescription',
-        'ogImage',
-        'categories',
-        'tags',
-        'selectedCategory',
-        'selectedTag'
-    ));
-})->name('blog.index');
+    Route::get('/blog/{slug}', function (string $slug) {
+        $post = Blog::query()
+            ->with(['category:id,name,slug', 'tags:id,name,slug'])
+            ->where('slug', $slug)
+            ->where('is_published', true)
+            ->firstOrFail();
 
-Route::get('/blog/{slug}', function (string $slug) {
-    $post = Blog::query()
-        ->with(['category:id,name,slug', 'tags:id,name,slug'])
-        ->where('slug', $slug)
-        ->where('is_published', true)
-        ->firstOrFail();
+        $canonical = route('blog.detail', $post->slug);
+        $seoTitle = "{$post->title} - Blog Kataloque";
+        $seoDescription = $post->excerpt;
+        $ogImage = $post->cover_image;
 
-    $canonical = route('blog.detail', $post->slug);
-    $seoTitle = "{$post->title} - Blog Kataloque";
-    $seoDescription = $post->excerpt;
-    $ogImage = $post->cover_image;
+        $relatedPosts = Blog::query()
+            ->with(['category:id,name,slug'])
+            ->where('is_published', true)
+            ->where('id', '!=', $post->id)
+            ->when(
+                $post->category_id,
+                fn ($query) => $query->where('category_id', $post->category_id)
+            )
+            ->orderByDesc('published_at')
+            ->take(3)
+            ->get();
 
-    $relatedPosts = Blog::query()
-        ->with(['category:id,name,slug'])
-        ->where('is_published', true)
-        ->where('id', '!=', $post->id)
-        ->when(
-            $post->category_id,
-            fn ($query) => $query->where('category_id', $post->category_id)
-        )
-        ->orderByDesc('published_at')
-        ->take(3)
-        ->get();
+        return view('frontend.blog-detail', compact('post', 'relatedPosts', 'canonical', 'seoTitle', 'seoDescription', 'ogImage'));
+    })->name('blog.detail');
 
-    return view('frontend.blog-detail', compact('post', 'relatedPosts', 'canonical', 'seoTitle', 'seoDescription', 'ogImage'));
-})->name('blog.detail');
+    Route::get('/sitemap.xml', function () {
+        $products = Product::query()
+            ->select('slug', 'updated_at')
+            ->where('status', true)
+            ->latest('updated_at')
+            ->get();
 
-Route::get('/sitemap.xml', function () {
-    $products = Product::query()
-        ->select('slug', 'updated_at')
-        ->where('status', true)
-        ->latest('updated_at')
-        ->get();
+        $categories = Category::query()
+            ->select('slug', 'updated_at')
+            ->latest('updated_at')
+            ->get();
 
-    $categories = Category::query()
-        ->select('slug', 'updated_at')
-        ->latest('updated_at')
-        ->get();
+        $blogs = Blog::query()
+            ->select('slug', 'updated_at')
+            ->where('is_published', true)
+            ->latest('updated_at')
+            ->get();
 
-    $blogs = Blog::query()
-        ->select('slug', 'updated_at')
-        ->where('is_published', true)
-        ->latest('updated_at')
-        ->get();
+        $staticPages = StaticPage::query()
+            ->select('slug', 'updated_at')
+            ->where('is_published', true)
+            ->latest('updated_at')
+            ->get();
 
-    $staticPages = StaticPage::query()
-        ->select('slug', 'updated_at')
-        ->where('is_published', true)
-        ->latest('updated_at')
-        ->get();
+        $siteLastmod = $products
+            ->pluck('updated_at')
+            ->merge($categories->pluck('updated_at'))
+            ->merge($blogs->pluck('updated_at'))
+            ->merge($staticPages->pluck('updated_at'))
+            ->filter()
+            ->max();
 
-    $siteLastmod = $products
-        ->pluck('updated_at')
-        ->merge($categories->pluck('updated_at'))
-        ->merge($blogs->pluck('updated_at'))
-        ->merge($staticPages->pluck('updated_at'))
-        ->filter()
-        ->max();
+        $generatedAt = now();
 
-    $generatedAt = now();
+        return response()
+            ->view('frontend.sitemap', compact('products', 'categories', 'blogs', 'staticPages', 'siteLastmod', 'generatedAt'))
+            ->header('Content-Type', 'application/xml; charset=UTF-8');
+    })->name('sitemap');
 
-    return response()
-        ->view('frontend.sitemap', compact('products', 'categories', 'blogs', 'staticPages', 'siteLastmod', 'generatedAt'))
-        ->header('Content-Type', 'application/xml; charset=UTF-8');
-})->name('sitemap');
+    Route::get('/robots.txt', function () {
+        $content = "User-agent: *\nAllow: /\n\nSitemap: " . route('sitemap') . "\n";
 
-Route::get('/robots.txt', function () {
-    $content = "User-agent: *\nAllow: /\n\nSitemap: " . route('sitemap') . "\n";
+        return response($content, 200, [
+            'Content-Type' => 'text/plain; charset=UTF-8',
+        ]);
+    });
 
-    return response($content, 200, [
-        'Content-Type' => 'text/plain; charset=UTF-8',
-    ]);
+    Route::get('/{slug}', function (string $slug) {
+        $page = StaticPage::query()
+            ->where('slug', $slug)
+            ->where('is_published', true)
+            ->firstOrFail();
+
+        $canonical = route('halaman.show', $page->slug);
+        $seoTitle = "{$page->title} - Kataloque";
+        $seoDescription = $page->excerpt ?: str($page->content)->limit(155)->toString();
+        $ogImage = 'https://picsum.photos/seed/kataloque-static-page/1200/630';
+
+        return view('frontend.static-page', compact('page', 'canonical', 'seoTitle', 'seoDescription', 'ogImage'));
+    })->name('halaman.show');
 });
-
-Route::get('/{slug}', function (string $slug) {
-    $page = StaticPage::query()
-        ->where('slug', $slug)
-        ->where('is_published', true)
-        ->firstOrFail();
-
-    $canonical = route('halaman.show', $page->slug);
-    $seoTitle = "{$page->title} - Kataloque";
-    $seoDescription = $page->excerpt ?: str($page->content)->limit(155)->toString();
-    $ogImage = 'https://picsum.photos/seed/kataloque-static-page/1200/630';
-
-    return view('frontend.static-page', compact('page', 'canonical', 'seoTitle', 'seoDescription', 'ogImage'));
-})->name('halaman.show');
 
 Route::middleware(['auth', 'role:admin', 'log.activity'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
