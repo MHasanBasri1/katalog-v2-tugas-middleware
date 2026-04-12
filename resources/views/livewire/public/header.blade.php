@@ -359,19 +359,48 @@
                                 $userAvatar = auth()->user()->avatar_url;
                             @endphp
                             <div class="flex items-center gap-2">
-                                <a href="{{ url('/profil-saya?tab=favorit') }}"
-                                    class="w-9 h-9 flex items-center justify-center text-gray-400 border-2 border-gray-100 rounded-lg relative">
-                                    <i class="far fa-bell text-lg"></i>
-                                    <span class="absolute top-1.5 right-1.5 h-2 w-2 bg-primary rounded-full ring-2 ring-white"></span>
-                                </a>
-                                <a href="{{ $panelRoute }}"
-                                    class="w-9 h-9 flex items-center justify-center {{ $isAdmin ? 'text-rose-600 border-rose-500/20 bg-rose-50' : 'text-primary border-primary/20 bg-primary/5' }} border-2 rounded-lg shrink-0 overflow-hidden">
-                                    @if($userAvatar)
-                                        <img src="{{ $userAvatar }}" alt="Profile" class="w-full h-full object-cover">
-                                    @else
-                                        <i class="fas {{ $isAdmin ? 'fa-user-shield' : 'fa-user-circle' }} text-lg"></i>
-                                    @endif
-                                </a>
+                                {{-- Mobile Notification Dropdown --}}
+                                <div x-data="{ open: false }" class="relative">
+                                    <button @click="open = !open" @click.away="open = false"
+                                        class="w-9 h-9 flex items-center justify-center text-gray-400 border-2 border-gray-100 rounded-lg relative focus:outline-none"
+                                        aria-label="Notifikasi">
+                                        <i class="far fa-bell text-lg"></i>
+                                        <span class="absolute top-1.5 right-1.5 h-2 w-2 bg-primary rounded-full ring-2 ring-white"></span>
+                                    </button>
+
+                                    {{-- Mobile Notification Popup --}}
+                                    <div x-show="open" x-transition:enter="transition ease-out duration-200"
+                                        x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                                        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                        x-transition:leave="transition ease-in duration-150"
+                                        x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                        x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                                        class="absolute right-0 mt-2 w-72 bg-white border border-gray-100 rounded-2xl shadow-2xl py-3 z-[110] overflow-hidden"
+                                        x-cloak>
+                                        <div class="px-5 py-2 mb-2 border-b border-gray-50 flex items-center justify-between">
+                                            <span class="text-xs font-black text-gray-800 uppercase tracking-wider">Notifikasi</span>
+                                            <span class="text-[10px] font-bold text-gray-400">Terbaru</span>
+                                        </div>
+
+                                        <div class="px-2 space-y-1 max-h-80 overflow-y-auto">
+                                            @forelse($this->notificationItems as $item)
+                                                <a href="{{ $item['url'] }}"
+                                                    class="block px-4 py-3 hover:bg-gray-50 rounded-xl transition-colors border-b border-gray-50 last:border-0">
+                                                    <div class="flex items-center gap-2 mb-1">
+                                                        <span class="text-[9px] font-black bg-primary/10 text-primary px-1.5 py-0.5 rounded uppercase">Update</span>
+                                                        <span class="text-[9px] font-medium text-gray-400">{{ $item['time'] }}</span>
+                                                    </div>
+                                                    <div class="text-[12px] font-bold text-gray-800 truncate">{{ $item['name'] }}</div>
+                                                    <div class="text-[11px] font-medium text-gray-500">Admin baru saja memperbarui produk ini.</div>
+                                                </a>
+                                            @empty
+                                                <div class="px-5 py-8 text-center">
+                                                    <p class="text-[11px] font-medium text-gray-400">Belum ada notifikasi baru.</p>
+                                                </div>
+                                            @endforelse
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         @endif
                     </div>

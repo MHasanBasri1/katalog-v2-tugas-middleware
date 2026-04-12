@@ -160,11 +160,8 @@ Route::middleware(['web', 'throttle:60,1'])->group(function () {
             ->with(['category:id,name,slug'])
             ->where('is_published', true)
             ->where('id', '!=', $post->id)
-            ->when(
-                $post->category_id,
-                fn ($query) => $query->where('category_id', $post->category_id)
-            )
-            ->orderByDesc('published_at')
+            ->orderByRaw('CASE WHEN category_id = ? THEN 0 ELSE 1 END', [$post->category_id])
+            ->latest('published_at')
             ->take(3)
             ->get();
 
