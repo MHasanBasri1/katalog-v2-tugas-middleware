@@ -96,12 +96,30 @@
                     </div>
 
                     {{-- Quick Share Icon (Mobile & Desktop) --}}
+                    {{-- Quick Share (Native Share + Clipboard Fallback) --}}
                     <div class="ml-auto">
-                        <a href="#share-section"
+                        <button 
+                            @click="
+                                if (navigator.share) {
+                                    navigator.share({
+                                        title: '{{ addslashes($post->title) }}',
+                                        text: 'Baca artikel menarik ini: {{ addslashes($post->title) }}',
+                                        url: window.location.href
+                                    }).catch(err => {
+                                        if (err.name !== 'AbortError') {
+                                            navigator.clipboard.writeText(window.location.href);
+                                            window.dispatchEvent(new CustomEvent('alert', { detail: { message: 'Link disalin!', type: 'success' } }));
+                                        }
+                                    });
+                                } else {
+                                    navigator.clipboard.writeText(window.location.href);
+                                    window.dispatchEvent(new CustomEvent('alert', { detail: { message: 'Link disalin!', type: 'success' } }));
+                                }
+                            "
                             class="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 text-gray-400 flex items-center justify-center hover:bg-primary/5 hover:text-primary transition-all group"
                             title="Bagikan Artikel">
                             <i class="fas fa-share-alt text-sm group-hover:scale-110 transition-transform"></i>
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
