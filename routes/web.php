@@ -171,51 +171,9 @@ Route::middleware(['throttle:60,1'])->group(function () {
         return view('frontend.blog-detail', compact('post', 'relatedPosts', 'canonical', 'seoTitle', 'seoDescription', 'ogImage'));
     })->name('blog.detail');
 
-    Route::get('/sitemap.xml', function () {
-        $products = Product::query()
-            ->select('slug', 'updated_at')
-            ->where('status', true)
-            ->latest('updated_at')
-            ->get();
-
-        $categories = Category::query()
-            ->select('slug', 'updated_at')
-            ->latest('updated_at')
-            ->get();
-
-        $blogs = Blog::query()
-            ->select('slug', 'updated_at')
-            ->where('is_published', true)
-            ->latest('updated_at')
-            ->get();
-
-        $staticPages = StaticPage::query()
-            ->select('slug', 'updated_at')
-            ->where('is_published', true)
-            ->latest('updated_at')
-            ->get();
-
-        $siteLastmod = $products
-            ->pluck('updated_at')
-            ->merge($categories->pluck('updated_at'))
-            ->merge($blogs->pluck('updated_at'))
-            ->merge($staticPages->pluck('updated_at'))
-            ->filter()
-            ->max();
-
-        $generatedAt = now();
-
-        return response()
-            ->view('frontend.sitemap', compact('products', 'categories', 'blogs', 'staticPages', 'siteLastmod', 'generatedAt'))
-            ->header('Content-Type', 'application/xml; charset=UTF-8');
-    })->name('sitemap');
-
     Route::get('/robots.txt', function () {
-        $content = "User-agent: *\nAllow: /\n\nSitemap: " . route('sitemap') . "\n";
-
-        return response($content, 200, [
-            'Content-Type' => 'text/plain; charset=UTF-8',
-        ]);
+        return response("User-agent: *\nAllow: /\n\nSitemap: " . url('/sitemap.xml'))
+            ->header('Content-Type', 'text/plain');
     });
 
     Route::get('/{slug}', function (string $slug) {

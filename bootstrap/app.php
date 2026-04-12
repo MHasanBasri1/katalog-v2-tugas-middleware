@@ -34,6 +34,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 : route('user.login');
         });
     })
+    ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule): void {
+        $schedule->command('sitemap:generate')->daily();
+    })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();
