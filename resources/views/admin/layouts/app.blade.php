@@ -24,6 +24,11 @@
     @stack('styles')
 </head>
 <body class="m-0 h-full bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-['Plus_Jakarta_Sans'] antialiased overflow-x-hidden">
+    @if($setting->is_maintenance)
+        <div class="fixed top-0 inset-x-0 z-[250] bg-rose-600 text-white text-[10px] font-black uppercase tracking-[0.2em] py-1.5 px-4 text-center">
+            <i class="ti ti-tool me-2"></i> Mode Pemeliharaan Sedang Aktif — Pengunjung Tidak Bisa Mengakses Katalog
+        </div>
+    @endif
     <div class="min-h-screen flex max-w-full overflow-x-hidden" x-data>
         <div
             x-show="$store.sidebar.isMobileOpen"

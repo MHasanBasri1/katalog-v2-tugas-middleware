@@ -17,9 +17,8 @@ class CheckMaintenanceMode
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $setting = Cache::remember(
+        $setting = Cache::rememberForever(
             'global.settings',
-            now()->addMinutes(15),
             fn () => Setting::query()->first()
         );
 

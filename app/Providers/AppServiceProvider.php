@@ -20,9 +20,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         \Illuminate\Support\Facades\View::composer('*', function ($view) {
-            $setting = \Illuminate\Support\Facades\Cache::remember(
+            $setting = \Illuminate\Support\Facades\Cache::rememberForever(
                 'global.settings',
-                now()->addMinutes(15),
                 fn () => \App\Models\Setting::query()->first()
             );
             $view->with('setting', $setting);
