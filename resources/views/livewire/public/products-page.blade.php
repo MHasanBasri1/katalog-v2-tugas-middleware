@@ -58,21 +58,40 @@
     </div>
     @endif
 
-    <div class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
+    <div wire:loading.remove wire:target="search, categorySlug" class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
         @forelse($products as $product)
             <x-product-card :product="$product" :compactViews="$compactViews" />
         @empty
             <div class="col-span-full py-16 text-center bg-white rounded-[2rem] border border-gray-100 shadow-sm">
-                <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100">
-                    <i class="fas fa-box-open text-3xl text-gray-300"></i>
+                <div class="w-48 h-48 mx-auto mb-4 flex items-center justify-center">
+                    <lottie-player src="https://lottie.host/801648a8-b61a-4d37-9750-f8c5b0451e60/a3W60nE6Zt.json" background="transparent" speed="1" style="width: 200px; height: 200px;" loop autoplay></lottie-player>
                 </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2">Produk Tidak Ditemukan</h3>
-                <p class="text-gray-500 max-w-md mx-auto mb-6">Kami tidak dapat menemukan produk yang sesuai dengan pencarian atau filter Anda.</p>
-                <button wire:click="clearFilters" class="mt-6 px-6 py-2.5 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors shadow-md shadow-primary/20">
+                <h3 class="text-xl font-bold text-gray-800 mb-2 font-primary uppercase tracking-tight">Opps! Produk Tidak Ditemukan</h3>
+                <p class="text-gray-500 max-w-md mx-auto mb-6 text-sm font-medium">Kami tidak dapat menemukan produk yang sesuai dengan pencarian atau filter Anda.</p>
+                <button wire:click="clearFilters" class="px-8 py-3 bg-primary text-white font-black rounded-xl hover:bg-primary-dark transition-all duration-300 shadow-lg shadow-primary/20 flex items-center gap-2 mx-auto">
+                    <i class="fas fa-undo text-xs"></i>
                     Tampilkan Semua Produk
                 </button>
             </div>
         @endforelse
+    </div>
+
+    {{-- Skeleton Loading --}}
+    <div wire:loading.grid wire:target="search, categorySlug" class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
+        @for($i = 0; $i < 10; $i++)
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col h-full animate-pulse transition-all">
+                <div class="aspect-square w-full skeleton"></div>
+                <div class="p-4 space-y-4 flex-1">
+                    <div class="h-3 w-1/3 skeleton rounded-full"></div>
+                    <div class="h-5 w-full skeleton rounded-lg"></div>
+                    <div class="h-4 w-2/3 skeleton rounded-lg"></div>
+                    <div class="pt-4 flex gap-3">
+                        <div class="h-10 flex-1 skeleton rounded-xl"></div>
+                        <div class="h-10 w-10 skeleton rounded-xl"></div>
+                    </div>
+                </div>
+            </div>
+        @endfor
     </div>
 
     @if($products->hasPages())

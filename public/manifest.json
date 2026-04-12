@@ -1,0 +1,17 @@
+{
+    "name": "Kataloque Product Catalog",
+    "short_name": "Kataloque",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#2563eb",
+    "description": "Premium Product Catalog with Advanced Search and Real-time Updates.",
+    "icons": [
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

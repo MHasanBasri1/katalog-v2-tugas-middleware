@@ -70,21 +70,20 @@ class ProductsPage extends Component
 
         $selectedCategory = $categories->firstWhere('slug', $this->categorySlug);
 
-        $products = Product::query()
-            ->select('id', 'category_id', 'name', 'slug', 'price', 'original_price', 'sold_count', 'rating_avg', 'rating_count')
+        // Use Scout search if search term is provided, otherwise fallback to standard query
+        $productsQuery = $searchTerm !== '' 
+            ? Product::search($searchTerm) 
+            : Product::query();
+
+        $products = $productsQuery
             ->where('status', true)
-            ->when($searchTerm !== '', function ($query) use ($searchTerm) {
-                $query->where(function ($subQuery) use ($searchTerm) {
-                    $subQuery->where('name', 'like', '%' . $searchTerm . '%')
-                        ->orWhere('description', 'like', '%' . $searchTerm . '%');
-                });
+            ->when($selectedCategory, function ($query) use ($selectedCategory) {
+                return $query->where('category_id', $selectedCategory->id);
             })
-            ->when($selectedCategory, fn ($query) => $query->where('category_id', $selectedCategory->id))
-            ->with([
+            ->query(fn ($query) => $query->with([
                 'category:id,name,slug,icon',
                 'primaryImage:id,product_id,image',
-            ])
-            ->orderByDesc('id')
+            ])->orderByDesc('id'))
             ->paginate(8);
 
         return view('livewire.public.products-page', [

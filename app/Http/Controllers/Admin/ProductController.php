@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\MarketplaceLink;
 use App\Models\Product;
 use App\Models\Setting;
+use App\Services\ProductService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,22 +22,21 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductController extends Controller
 {
+    public function __construct(
+        protected ProductService $productService
+    ) {}
+
     public function index(Request $request): View
     {
-        $products = Product::query()
-            ->with(['category:id,name', 'marketplaceLinks:id,product_id,marketplace,url'])
-            ->when(
-                $request->filled('category_id'),
-                fn ($query) => $query->where('category_id', $request->integer('category_id'))
-            )
-            ->when(
-                $request->filled('q'),
-                fn ($query) => $query->where(function($q) use ($request) {
-                    $q->where('name', 'like', '%' . $request->q . '%')
-                      ->orWhere('slug', 'like', '%' . $request->q . '%');
-                })
-            )
-            ->latest('id')
+        $productsQuery = $request->filled('q') 
+            ? Product::search($request->q) 
+            : Product::query();
+
+        $products = $productsQuery
+            ->when($request->filled('category_id'), function($query) use ($request) {
+                return $query->where('category_id', $request->integer('category_id'));
+            })
+            ->query(fn($query) => $query->with(['category:id,name', 'marketplaceLinks:id,product_id,marketplace,url'])->latest('id'))
             ->paginate(15)
             ->withQueryString();
 
@@ -58,18 +58,13 @@ class ProductController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $data = $this->validatePayload($request);
-        $links = $data['marketplace_links'] ?? [];
-        $images = $request->file('images') ?: [];
-        unset($data['marketplace_links']);
+        $payload = $this->validatePayload($request);
+        $payload['slug'] = $this->productService->makeUniqueSlug($payload['slug'] ?: $payload['name']);
 
-        $data['slug'] = $this->makeUniqueSlug($data['slug'] ?: $data['name']);
+        $product = Product::query()->create($payload);
 
-        DB::transaction(function () use ($data, $links, $images) {
-            $product = Product::query()->create($data);
-            $this->syncMarketplaceLinks($product, $links);
-            $this->syncProductImages($product, $images);
-        });
+        $this->productService->syncProductImages($product, $request->file('images', []));
+        $this->productService->syncMarketplaceLinks($product, $payload['marketplace_links'] ?? []);
 
         $this->clearProductCaches();
 
@@ -104,18 +99,16 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $produk): RedirectResponse
     {
-        $data = $this->validatePayload($request, $produk->id);
-        $links = $data['marketplace_links'] ?? [];
-        $images = $request->file('images') ?: [];
-        unset($data['marketplace_links']);
+        $payload = $this->validatePayload($request, $produk->id);
+        
+        if (trim((string) ($payload['slug'] ?? '')) === '') {
+            $payload['slug'] = $this->productService->makeUniqueSlug($payload['name'], $produk->id);
+        }
 
-        $data['slug'] = $this->makeUniqueSlug($data['slug'] ?: $data['name'], $produk->id);
+        $produk->update($payload);
 
-        DB::transaction(function () use ($produk, $data, $links, $images) {
-            $produk->update($data);
-            $this->syncMarketplaceLinks($produk, $links);
-            $this->syncProductImages($produk, $images);
-        });
+        $this->productService->syncProductImages($produk, $request->file('images', []));
+        $this->productService->syncMarketplaceLinks($produk, $payload['marketplace_links'] ?? []);
 
         $this->clearProductCaches();
 
@@ -195,10 +188,6 @@ class ProductController extends Controller
         while (($row = fgetcsv($handle)) !== false) {
             $lineNumber++;
 
-            if ($this->isCsvRowEmpty($row)) {
-                continue;
-            }
-
             $row = array_pad($row, count($headers), null);
             $payloadRaw = array_combine($headers, array_slice($row, 0, count($headers)));
 
@@ -207,7 +196,7 @@ class ProductController extends Controller
                 continue;
             }
 
-            $payload = $this->mapCsvRowToPayload($payloadRaw);
+            $payload = $this->productService->preparePayloadFromCsvRow($payloadRaw);
 
             $validator = Validator::make($payload, [
                 'category_id' => ['required', 'integer', 'exists:categories,id'],
@@ -237,11 +226,11 @@ class ProductController extends Controller
             $links = $data['marketplace_links'] ?? [];
             unset($data['marketplace_links']);
 
-            $data['slug'] = $this->makeUniqueSlug($data['slug'] ?: $data['name']);
+            $data['slug'] = $this->productService->makeUniqueSlug($data['slug'] ?: $data['name']);
 
             DB::transaction(function () use ($data, $links) {
                 $product = Product::query()->create($data);
-                $this->syncMarketplaceLinks($product, $links);
+                $this->productService->syncMarketplaceLinks($product, $links);
             });
 
             $createdCount++;
@@ -415,7 +404,7 @@ class ProductController extends Controller
         // If primary was deleted, set another one as primary if available
         if ($isPrimary) {
             $nextImage = $produk->images()->first();
-            if ($nextImage instanceof \App\Models\ProductImage) {
+            if ($nextImage instanceof ProductImage) {
                 $nextImage->update(['is_primary' => true]);
             }
         }
@@ -447,69 +436,6 @@ class ProductController extends Controller
         ]);
     }
 
-    private function syncProductImages(Product $product, array $images): void
-    {
-        if (empty($images)) {
-            return;
-        }
-
-        foreach ($images as $image) {
-            $path = $image->store('products', 'public');
-            $product->images()->create([
-                'image' => $path,
-                'is_primary' => ! $product->images()->exists(),
-            ]);
-        }
-    }
-
-    private function makeUniqueSlug(string $value, ?int $ignoreId = null): string
-    {
-        $base = Str::slug($value) ?: 'produk';
-        $slug = $base;
-        $counter = 1;
-
-        while (
-            Product::query()
-                ->where('slug', $slug)
-                ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
-                ->exists()
-        ) {
-            $slug = $base.'-'.$counter++;
-        }
-
-        return $slug;
-    }
-
-    private function syncMarketplaceLinks(Product $product, array $links): void
-    {
-        $normalized = collect($links)
-            ->map(function ($item) {
-                return [
-                    'marketplace' => trim((string) ($item['marketplace'] ?? '')),
-                    'url' => trim((string) ($item['url'] ?? '')),
-                ];
-            })
-            ->filter(fn ($item) => $item['marketplace'] !== '' && $item['url'] !== '')
-            ->unique('marketplace')
-            ->values();
-
-        $keepMarketplaces = $normalized->pluck('marketplace')->all();
-
-        $product->marketplaceLinks()
-            ->whereNotIn('marketplace', $keepMarketplaces ?: ['__none__'])
-            ->delete();
-
-        foreach ($normalized as $item) {
-            MarketplaceLink::query()->updateOrCreate(
-                [
-                    'product_id' => $product->id,
-                    'marketplace' => $item['marketplace'],
-                ],
-                ['url' => $item['url']]
-            );
-        }
-    }
-
     private function isCsvRowEmpty(array $row): bool
     {
         foreach ($row as $value) {
@@ -519,106 +445,5 @@ class ProductController extends Controller
         }
 
         return true;
-    }
-
-    private function mapCsvRowToPayload(array $row): array
-    {
-        $categoryId = $this->resolveCategoryId($row);
-
-        return [
-            'category_id' => $categoryId,
-            'name' => trim((string) ($row['name'] ?? '')),
-            'slug' => trim((string) ($row['slug'] ?? '')) ?: null,
-            'description' => trim((string) ($row['description'] ?? '')) ?: null,
-            'price' => $this->toNullableNumber($row['price'] ?? null),
-            'original_price' => $this->toNullableNumber($row['original_price'] ?? null),
-            'status' => $this->toBooleanValue($row['status'] ?? '1', true),
-            'sold_count' => $this->toIntegerValue($row['sold_count'] ?? 0, 0),
-            'likes_count' => $this->toIntegerValue($row['likes_count'] ?? 0, 0),
-            'rating_avg' => $this->toNullableNumber($row['rating_avg'] ?? 0) ?? 0,
-            'rating_count' => $this->toIntegerValue($row['rating_count'] ?? 0, 0),
-            'is_featured' => $this->toBooleanValue($row['is_featured'] ?? '0', false),
-            'show_in_promo' => $this->toBooleanValue($row['show_in_promo'] ?? '0', false),
-            'marketplace_links' => $this->collectMarketplaceLinks($row),
-        ];
-    }
-
-    private function resolveCategoryId(array $row): ?int
-    {
-        $categoryIdRaw = trim((string) ($row['category_id'] ?? ''));
-        if ($categoryIdRaw !== '' && is_numeric($categoryIdRaw)) {
-            return (int) $categoryIdRaw;
-        }
-
-        $categorySlug = trim((string) ($row['category_slug'] ?? ''));
-        if ($categorySlug !== '') {
-            return Category::query()
-                ->where('slug', Str::slug($categorySlug))
-                ->value('id');
-        }
-
-        $categoryName = trim((string) ($row['category_name'] ?? ''));
-        if ($categoryName !== '') {
-            return Category::query()
-                ->whereRaw('LOWER(name) = ?', [Str::lower($categoryName)])
-                ->value('id');
-        }
-
-        return null;
-    }
-
-    private function collectMarketplaceLinks(array $row): array
-    {
-        $map = [
-            'Shopee' => trim((string) ($row['shopee_url'] ?? '')),
-            'Tokopedia' => trim((string) ($row['tokopedia_url'] ?? '')),
-            'Lazada' => trim((string) ($row['lazada_url'] ?? '')),
-            'Blibli' => trim((string) ($row['blibli_url'] ?? '')),
-            'Tiktok Shop' => trim((string) ($row['tiktok_shop_url'] ?? '')),
-        ];
-
-        return collect($map)
-            ->filter(fn ($url) => $url !== '')
-            ->map(fn ($url, $marketplace) => ['marketplace' => $marketplace, 'url' => $url])
-            ->values()
-            ->all();
-    }
-
-    private function toBooleanValue(mixed $value, bool $default): bool
-    {
-        $normalized = Str::lower(trim((string) $value));
-        if ($normalized === '') {
-            return $default;
-        }
-
-        if (in_array($normalized, ['1', 'true', 'yes', 'y', 'aktif', 'published'], true)) {
-            return true;
-        }
-
-        if (in_array($normalized, ['0', 'false', 'no', 'n', 'nonaktif', 'draft'], true)) {
-            return false;
-        }
-
-        return $default;
-    }
-
-    private function toIntegerValue(mixed $value, int $default): int
-    {
-        $normalized = trim((string) $value);
-        if ($normalized === '' || ! is_numeric($normalized)) {
-            return $default;
-        }
-
-        return (int) $normalized;
-    }
-
-    private function toNullableNumber(mixed $value): ?float
-    {
-        $normalized = trim((string) $value);
-        if ($normalized === '' || ! is_numeric($normalized)) {
-            return null;
-        }
-
-        return (float) $normalized;
     }
 }

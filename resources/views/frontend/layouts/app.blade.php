@@ -34,6 +34,7 @@
     <meta name="twitter:image" content="@yield('twitter_image', trim($__env->yieldContent('og_image', ($setting->seo_settings['og_image'] ?? 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&h=630&auto=format&fit=crop'))))">
     
     <link rel="icon" type="image/x-icon" href="{{ $setting->favicon ?? asset('favicon.ico') }}">
+    <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
@@ -43,6 +44,13 @@
     {{-- High-performance font loading --}}
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js');
+            });
+        }
+    </script>
     <script type="application/ld+json">
     {
         "@@context": "https://schema.org",
@@ -359,6 +367,7 @@
     @endif
 
     @livewireScripts
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
