@@ -130,7 +130,7 @@ class UserGoogleAuthController extends Controller
 
         if ($user && ($user->is_admin || $user->hasRole('admin'))) {
             return redirect()->route('user.login')->withErrors([
-                'email' => 'Akun admin harus login dari halaman /admin/login.',
+                'email' => trans('auth.failed'),
             ]);
         }
 

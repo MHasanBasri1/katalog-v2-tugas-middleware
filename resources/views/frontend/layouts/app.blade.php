@@ -199,7 +199,7 @@
             !function (f, b, e, v, n, t, s) {
                 if (f.fbq) return; n = f.fbq = function () {
                     n.callMethod ?
-                    n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+                        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
                 };
                 if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
                 n.queue = []; t = b.createElement(e); t.async = !0;
@@ -343,7 +343,7 @@
                 @else
                     <i class="fas fa-user-circle text-lg" aria-hidden="true"></i>
                 @endif
-                <span class="text-[10px] font-bold">Profil</span>
+                <span class="text-[10px] font-bold">Akun</span>
             </a>
         </div>
     </div>
@@ -428,7 +428,8 @@
                     </div>
                 </div>
                 <div class="flex flex-col">
-                    <span class="text-[9px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-1">Support</span>
+                    <span
+                        class="text-[9px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-1">Support</span>
                     <span class="text-[12px] font-black text-gray-800 leading-none">Bantuan</span>
                 </div>
             </a>

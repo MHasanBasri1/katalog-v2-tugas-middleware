@@ -75,7 +75,7 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => 'Akun ini tidak memiliki akses admin.',
+                'email' => trans('auth.failed'),
             ]);
         }
 

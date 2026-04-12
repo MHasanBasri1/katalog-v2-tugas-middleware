@@ -58,7 +58,7 @@
                         <div class="relative w-full">
                             <input id="desktopSearchInput" wire:model.live.debounce.300ms="search"
                                 wire:keydown.enter="goToSearch" type="search"
-                                placeholder="Cari brand, produk, atau seller"
+                                placeholder="Cari produk atau brand..."
                                 class="w-full bg-gray-50 border border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/5 rounded-lg outline-none transition-all text-sm placeholder:text-gray-400 font-medium h-10 px-4 pr-20"
                                 aria-label="Cari Produk">
                             
@@ -326,7 +326,7 @@
                         <div class="relative flex-1">
                             <input id="mobileSearchInput" wire:model.live.debounce.300ms="search"
                                 wire:keydown.enter="goToSearch" type="text"
-                                placeholder="Cari brand, produk, atau seller"
+                                placeholder="Cari produk atau brand..."
                                 class="w-full bg-gray-50 border border-gray-200 focus:border-primary rounded-lg outline-none transition text-[13px] font-semibold text-gray-700 placeholder:text-gray-400 h-9 px-3 pr-16"
                                 aria-label="Cari Produk">
 

@@ -41,7 +41,7 @@ class UserAuthController extends Controller
             $request->session()->regenerateToken();
 
             return back()->withErrors([
-                'email' => 'Akun admin harus login dari halaman /admin/login.',
+                'email' => trans('auth.failed'),
             ])->onlyInput('email');
         }
 
