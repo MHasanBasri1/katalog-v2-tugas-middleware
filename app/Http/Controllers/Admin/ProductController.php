@@ -28,17 +28,24 @@ class ProductController extends Controller
 
     public function index(Request $request): View
     {
-        $productsQuery = $request->filled('q') 
-            ? Product::search($request->q) 
-            : Product::query();
-
-        $products = $productsQuery
-            ->when($request->filled('category_id'), function($query) use ($request) {
-                return $query->where('category_id', $request->integer('category_id'));
-            })
-            ->query(fn($query) => $query->with(['category:id,name', 'marketplaceLinks:id,product_id,marketplace,url'])->latest('id'))
-            ->paginate(15)
-            ->withQueryString();
+        if ($request->filled('q')) {
+            $products = Product::search($request->q)
+                ->when($request->filled('category_id'), function ($query) use ($request) {
+                    return $query->where('category_id', $request->integer('category_id'));
+                })
+                ->query(fn ($query) => $query->with(['category:id,name', 'marketplaceLinks:id,product_id,marketplace,url'])->latest('id'))
+                ->paginate(15)
+                ->withQueryString();
+        } else {
+            $products = Product::query()
+                ->when($request->filled('category_id'), function ($query) use ($request) {
+                    return $query->where('category_id', $request->integer('category_id'));
+                })
+                ->with(['category:id,name', 'marketplaceLinks:id,product_id,marketplace,url'])
+                ->latest('id')
+                ->paginate(15)
+                ->withQueryString();
+        }
 
         $categories = Category::query()->orderBy('name')->get(['id', 'name']);
 

@@ -71,20 +71,30 @@ class ProductsPage extends Component
         $selectedCategory = $categories->firstWhere('slug', $this->categorySlug);
 
         // Use Scout search if search term is provided, otherwise fallback to standard query
-        $productsQuery = $searchTerm !== '' 
-            ? Product::search($searchTerm) 
-            : Product::query();
-
-        $products = $productsQuery
-            ->where('status', true)
-            ->when($selectedCategory, function ($query) use ($selectedCategory) {
-                return $query->where('category_id', $selectedCategory->id);
-            })
-            ->query(fn ($query) => $query->with([
-                'category:id,name,slug,icon',
-                'primaryImage:id,product_id,image',
-            ])->orderByDesc('id'))
-            ->paginate(8);
+        if ($searchTerm !== '') {
+            $products = Product::search($searchTerm)
+                ->where('status', 1)
+                ->when($selectedCategory, function ($query) use ($selectedCategory) {
+                    return $query->where('category_id', $selectedCategory->id);
+                })
+                ->query(fn ($query) => $query->with([
+                    'category:id,name,slug,icon',
+                    'primaryImage:id,product_id,image',
+                ])->orderByDesc('id'))
+                ->paginate(8);
+        } else {
+            $products = Product::query()
+                ->where('status', true)
+                ->when($selectedCategory, function ($query) use ($selectedCategory) {
+                    return $query->where('category_id', $selectedCategory->id);
+                })
+                ->with([
+                    'category:id,name,slug,icon',
+                    'primaryImage:id,product_id,image',
+                ])
+                ->orderByDesc('id')
+                ->paginate(8);
+        }
 
         return view('livewire.public.products-page', [
             'products' => $products,
