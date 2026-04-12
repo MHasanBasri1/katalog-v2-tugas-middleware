@@ -325,6 +325,116 @@
             </div>
         @endif
 
+        @if($section === 'navigasi')
+            <!-- Navigation Card -->
+            <div class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <!-- Trending Keywords -->
+                <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm" x-data="{ 
+                    items: {{ json_encode($setting->trending_keywords ?? [['keyword' => '', 'url' => '']]) }},
+                    addItem() { this.items.push({ keyword: '', url: '' }); },
+                    removeItem(index) { this.items.splice(index, 1); }
+                }">
+                    <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                            <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Trending Keywords (Header Tag)</h3>
+                        </div>
+                        <button type="button" @click="addItem()" class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 px-6 py-2.5 rounded-xl border border-blue-100 dark:border-blue-900/30 transition-all shadow-sm">
+                            <i class="ti ti-plus text-xs"></i>
+                            Tambah Keyword
+                        </button>
+                    </div>
+                    <div class="p-8 space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <template x-for="(item, index) in items" :key="index">
+                                <div class="flex items-center gap-3 bg-gray-50/50 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700 rounded-2xl p-3">
+                                    <div class="flex-1 space-y-2">
+                                        <input type="text" :name="'trending_keywords['+index+'][keyword]'" x-model="item.keyword" placeholder="Keyword (ex: iPhone 15 Pro)"
+                                            class="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl px-4 py-2 text-xs font-bold">
+                                        <input type="text" :name="'trending_keywords['+index+'][url]'" x-model="item.url" placeholder="URL Target (kosongkan untuk pencarian otomatis)"
+                                            class="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl px-4 py-2 text-[10px] font-medium text-gray-400">
+                                    </div>
+                                    <button type="button" @click="removeItem(index)" class="p-2 text-gray-300 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl transition-all">
+                                        <i class="ti ti-trash text-base"></i>
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Header Navigation -->
+                <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm" x-data="{ 
+                    items: {{ json_encode($setting->header_navigation ?? [['label' => '', 'url' => '']]) }},
+                    addItem() { this.items.push({ label: '', url: '' }); },
+                    removeItem(index) { this.items.splice(index, 1); }
+                }">
+                    <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-1.5 h-6 bg-indigo-600 rounded-full"></div>
+                            <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Menu Navigasi Header (Top Bar)</h3>
+                        </div>
+                        <button type="button" @click="addItem()" class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 px-6 py-2.5 rounded-xl border border-indigo-100 dark:border-indigo-900/30 transition-all shadow-sm">
+                            <i class="ti ti-plus text-xs"></i>
+                            Tambah Menu
+                        </button>
+                    </div>
+                    <div class="p-8 space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <template x-for="(item, index) in items" :key="index">
+                                <div class="flex items-center gap-3 bg-gray-50/50 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700 rounded-2xl p-3">
+                                    <div class="flex-1 space-y-2">
+                                        <input type="text" :name="'header_navigation['+index+'][label]'" x-model="item.label" placeholder="Label Menu (ex: Tentang Kami)"
+                                            class="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl px-4 py-2 text-xs font-bold">
+                                        <input type="text" :name="'header_navigation['+index+'][url]'" x-model="item.url" placeholder="URL Target"
+                                            class="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl px-4 py-2 text-[10px] font-medium text-gray-400">
+                                    </div>
+                                    <button type="button" @click="removeItem(index)" class="p-2 text-gray-300 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl transition-all">
+                                        <i class="ti ti-trash text-base"></i>
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Quick Links -->
+                <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm" x-data="{ 
+                    items: {{ json_encode($setting->footer_navigation ?? [['label' => '', 'url' => '']]) }},
+                    addItem() { this.items.push({ label: '', url: '' }); },
+                    removeItem(index) { this.items.splice(index, 1); }
+                }">
+                    <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-1.5 h-6 bg-emerald-600 rounded-full"></div>
+                            <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Quick Links Footer (Tautan Cepat)</h3>
+                        </div>
+                        <button type="button" @click="addItem()" class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 px-6 py-2.5 rounded-xl border border-emerald-100 dark:border-emerald-900/30 transition-all shadow-sm">
+                            <i class="ti ti-plus text-xs"></i>
+                            Tambah Link
+                        </button>
+                    </div>
+                    <div class="p-8 space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <template x-for="(item, index) in items" :key="index">
+                                <div class="flex items-center gap-3 bg-gray-50/50 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700 rounded-2xl p-3">
+                                    <div class="flex-1 space-y-2">
+                                        <input type="text" :name="'footer_navigation['+index+'][label]'" x-model="item.label" placeholder="Label Link"
+                                            class="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl px-4 py-2 text-xs font-bold">
+                                        <input type="text" :name="'footer_navigation['+index+'][url]'" x-model="item.url" placeholder="URL Target"
+                                            class="w-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl px-4 py-2 text-[10px] font-medium text-gray-400">
+                                    </div>
+                                    <button type="button" @click="removeItem(index)" class="p-2 text-gray-300 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl transition-all">
+                                        <i class="ti ti-trash text-base"></i>
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         @if($section === 'seo')
             <div class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <!-- Meta Information Group -->

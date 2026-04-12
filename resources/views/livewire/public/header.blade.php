@@ -34,9 +34,9 @@
                             class="fas fa-headset text-[10px]"></i> Kataloque Care</a>
                 </div>
                 <div class="flex items-center gap-5">
-                    <a href="#" class="hover:text-primary transition-colors">Tentang Kami</a>
-                    <a href="{{ url('/blog') }}" class="hover:text-primary transition-colors">Blog & Edukasi</a>
-                    <a href="#" class="hover:text-primary transition-colors">Cara Order</a>
+                    @foreach($topMenus as $menu)
+                        <a href="{{ $menu['url'] }}" class="hover:text-primary transition-colors">{{ $menu['label'] }}</a>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -380,13 +380,10 @@
                     <div class="relative w-full overflow-hidden h-7">
                         <div class="swiper trending-swiper !overflow-visible">
                             <div class="swiper-wrapper !ease-linear">
-                                @php
-                                    $trendingKeywords = ['iPhone 15 Pro', 'Samsung S24 Ultra', 'MacBook Pro M3', 'Sony WH-1000XM5', 'Logitech G Pro', 'iPad Pro M2', 'Sony Alpha A7', 'DJI Mini 4 Pro'];
-                                @endphp
-                                @foreach($trendingKeywords as $keyword)
+                                @foreach($trendingKeywords as $item)
                                     <div class="swiper-slide !w-auto">
-                                        <a href="{{ route('katalog', ['q' => $keyword]) }}"
-                                            class="block text-[10px] font-bold text-gray-500 px-2.5 py-1 bg-gray-50 border border-gray-100 rounded-md whitespace-nowrap transition-colors hover:text-primary">{{ $keyword }}</a>
+                                        <a href="{{ $item['url'] ?: route('katalog', ['q' => $item['keyword']]) }}"
+                                            class="block text-[10px] font-bold text-gray-500 px-2.5 py-1 bg-gray-50 border border-gray-100 rounded-md whitespace-nowrap transition-colors hover:text-primary">{{ $item['keyword'] }}</a>
                                     </div>
                                 @endforeach
                             </div>
@@ -446,12 +443,9 @@
                 {{-- TRENDING LINKS / KEYWORDS --}}
                 <div class="flex items-center gap-4 ml-6 text-[12px] font-medium text-gray-500 overflow-hidden">
                     <span class="hidden lg:block text-gray-300">|</span>
-                    @php
-                        $trending = ['iPhone 15 Pro', 'Samsung S24 Ultra', 'MacBook Pro M3', 'Logitech G Pro', 'Sony WH-1000XM5', 'iPad Pro M2'];
-                    @endphp
-                    @foreach($trending as $link)
-                        <a href="{{ route('katalog') }}?q={{ urlencode($link) }}"
-                            class="hover:text-primary transition-colors whitespace-nowrap">{{ $link }}</a>
+                    @foreach($trendingKeywords as $item)
+                        <a href="{{ $item['url'] ?: route('katalog', ['q' => $item['keyword']]) }}"
+                            class="hover:text-primary transition-colors whitespace-nowrap">{{ $item['keyword'] }}</a>
                         @if(!$loop->last)
                             <span class="text-gray-200 font-light hidden lg:block">|</span>
                         @endif

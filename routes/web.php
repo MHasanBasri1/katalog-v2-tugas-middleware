@@ -204,6 +204,7 @@ Route::middleware(['auth', 'role:admin', 'log.activity'])->prefix('admin')->name
         Route::get('/', [SettingController::class, 'index'])->name('index');
         Route::get('/branding', [SettingController::class, 'index'])->name('branding');
         Route::get('/marketplace', [SettingController::class, 'index'])->name('marketplace');
+        Route::get('/navigasi', [SettingController::class, 'index'])->name('navigasi');
         Route::get('/seo', [SettingController::class, 'index'])->name('seo');
         Route::get('/sistem', [SettingController::class, 'index'])->name('sistem');
         Route::put('/', [SettingController::class, 'update'])->name('update');

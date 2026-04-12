@@ -23,14 +23,10 @@ class Header extends Component
         'notifications-updated' => '$refresh'
     ];
 
-    public array $menus = [
-        ['label' => 'Beranda', 'icon' => 'fa-home', 'url' => '/', 'route' => 'home'],
-        ['label' => 'Blog', 'icon' => 'fa-newspaper', 'url' => '/blog', 'route' => 'blog.*'],
-        ['label' => 'Tentang Kami', 'icon' => 'fa-store', 'url' => '/tentang-kami', 'route' => null],
-        ['label' => 'Cara Pesan', 'icon' => 'fa-cart-arrow-down', 'url' => '/cara-pesan', 'route' => null],
-        ['label' => 'Pembayaran', 'icon' => 'fa-credit-card', 'url' => '/pembayaran', 'route' => null],
-        ['label' => 'Lokasi Toko', 'icon' => 'fa-map-marker-alt', 'url' => '/lokasi-toko', 'route' => null],
-    ];
+    public array $trendingKeywords = [];
+    public array $topMenus = [];
+
+    public array $menus = [];
 
     public function mount(): void
     {
@@ -52,6 +48,42 @@ class Header extends Component
                 ])
                 ->all()
         );
+
+        $setting = Cache::remember('global.settings', now()->addDay(), fn() => \App\Models\Setting::first());
+        
+        // Trending Keywords
+        if ($setting && !empty($setting->trending_keywords)) {
+            $this->trendingKeywords = $setting->trending_keywords;
+        } else {
+            $this->trendingKeywords = [
+                ['keyword' => 'iPhone 15 Pro', 'url' => null],
+                ['keyword' => 'Samsung S24 Ultra', 'url' => null],
+                ['keyword' => 'MacBook Pro M3', 'url' => null],
+                ['keyword' => 'Sony WH-1000XM5', 'url' => null],
+                ['keyword' => 'Logitech G Pro', 'url' => null],
+                ['keyword' => 'iPad Pro M2', 'url' => null],
+            ];
+        }
+
+        // Top Bar Menus
+        if ($setting && !empty($setting->header_navigation)) {
+            $this->topMenus = $setting->header_navigation;
+        } else {
+            $this->topMenus = [
+                ['label' => 'Tentang Kami', 'url' => '/tentang-kami'],
+                ['label' => 'Blog & Edukasi', 'url' => '/blog'],
+                ['label' => 'Cara Order', 'url' => '/cara-pesan'],
+            ];
+        }
+
+        // Sidebar/Mobile Menus (keep current default if not set, or we can use the same as top bar)
+        $this->menus = [
+            ['label' => 'Beranda', 'icon' => 'fa-home', 'url' => '/', 'route' => 'home'],
+            ['label' => 'Blog', 'icon' => 'fa-newspaper', 'url' => '/blog', 'route' => 'blog.*'],
+            ['label' => 'Tentang Kami', 'icon' => 'fa-store', 'url' => '/tentang-kami', 'route' => null],
+            ['label' => 'Cara Pesan', 'icon' => 'fa-cart-arrow-down', 'url' => '/cara-pesan', 'route' => null],
+            ['label' => 'Pembayaran', 'icon' => 'fa-credit-card', 'url' => '/pembayaran', 'route' => null],
+        ];
     }
 
     public function clearNotifications(): void

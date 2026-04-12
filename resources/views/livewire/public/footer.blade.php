@@ -59,10 +59,16 @@
             <div class="space-y-6">
                 <h4 class="text-gray-900 font-bold text-sm tracking-wide">Tautan Cepat</h4>
                 <ul class="space-y-3 text-sm font-medium">
-                    <li><a href="{{ url('/tentang-kami') }}" class="text-gray-500 hover:text-blue-600 transition-colors">Tentang Kami</a></li>
-                    <li><a href="{{ url('/blog') }}" class="text-gray-500 hover:text-blue-600 transition-colors">Blog</a></li>
-                    <li><a href="{{ url('/cara-pesan') }}" class="text-gray-500 hover:text-blue-600 transition-colors">Cara Belanja</a></li>
-                    <li><a href="{{ url('/pembayaran') }}" class="text-gray-500 hover:text-blue-600 transition-colors">Metode Pembayaran</a></li>
+                    @if($setting && !empty($setting->footer_navigation))
+                        @foreach($setting->footer_navigation as $link)
+                            <li><a href="{{ $link['url'] }}" class="text-gray-500 hover:text-blue-600 transition-colors">{{ $link['label'] }}</a></li>
+                        @endforeach
+                    @else
+                        <li><a href="{{ url('/tentang-kami') }}" class="text-gray-500 hover:text-blue-600 transition-colors">Tentang Kami</a></li>
+                        <li><a href="{{ url('/blog') }}" class="text-gray-500 hover:text-blue-600 transition-colors">Blog</a></li>
+                        <li><a href="{{ url('/cara-pesan') }}" class="text-gray-500 hover:text-blue-600 transition-colors">Cara Belanja</a></li>
+                        <li><a href="{{ url('/pembayaran') }}" class="text-gray-500 hover:text-blue-600 transition-colors">Metode Pembayaran</a></li>
+                    @endif
                 </ul>
             </div>
 

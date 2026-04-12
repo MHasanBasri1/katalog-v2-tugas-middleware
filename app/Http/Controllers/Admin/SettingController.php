@@ -19,6 +19,7 @@ class SettingController extends Controller
         $section = 'umum';
         if (request()->routeIs('admin.setting.branding')) $section = 'branding';
         if (request()->routeIs('admin.setting.marketplace')) $section = 'marketplace';
+        if (request()->routeIs('admin.setting.navigasi')) $section = 'navigasi';
         if (request()->routeIs('admin.setting.seo')) $section = 'seo';
         if (request()->routeIs('admin.setting.sistem')) $section = 'sistem';
 
@@ -44,6 +45,24 @@ class SettingController extends Controller
             $data['marketplaces'] = array_filter($data['marketplaces'], function ($url) {
                 return !empty($url);
             });
+        }
+
+        if (isset($data['header_navigation'])) {
+            $data['header_navigation'] = array_values(array_filter($data['header_navigation'], function ($item) {
+                return !empty($item['label']);
+            }));
+        }
+
+        if (isset($data['footer_navigation'])) {
+            $data['footer_navigation'] = array_values(array_filter($data['footer_navigation'], function ($item) {
+                return !empty($item['label']);
+            }));
+        }
+
+        if (isset($data['trending_keywords'])) {
+            $data['trending_keywords'] = array_values(array_filter($data['trending_keywords'], function ($item) {
+                return !empty($item['keyword']);
+            }));
         }
 
         $data = $this->handleFiles($request, $data);
@@ -84,6 +103,24 @@ class SettingController extends Controller
             });
         }
 
+        if (isset($data['header_navigation'])) {
+            $data['header_navigation'] = array_values(array_filter($data['header_navigation'], function ($item) {
+                return !empty($item['label']);
+            }));
+        }
+
+        if (isset($data['footer_navigation'])) {
+            $data['footer_navigation'] = array_values(array_filter($data['footer_navigation'], function ($item) {
+                return !empty($item['label']);
+            }));
+        }
+
+        if (isset($data['trending_keywords'])) {
+            $data['trending_keywords'] = array_values(array_filter($data['trending_keywords'], function ($item) {
+                return !empty($item['keyword']);
+            }));
+        }
+
         $data = $this->handleFiles($request, $data, $setting);
         
         $setting->fill($data);
@@ -122,6 +159,15 @@ class SettingController extends Controller
             'social_media' => ['nullable', 'array'],
             'social_media.*.platform' => ['nullable', 'string'],
             'social_media.*.username' => ['nullable', 'string'],
+            'header_navigation' => ['nullable', 'array'],
+            'header_navigation.*.label' => ['nullable', 'string', 'max:50'],
+            'header_navigation.*.url' => ['nullable', 'string', 'max:255'],
+            'footer_navigation' => ['nullable', 'array'],
+            'footer_navigation.*.label' => ['nullable', 'string', 'max:50'],
+            'footer_navigation.*.url' => ['nullable', 'string', 'max:255'],
+            'trending_keywords' => ['nullable', 'array'],
+            'trending_keywords.*.keyword' => ['nullable', 'string', 'max:50'],
+            'trending_keywords.*.url' => ['nullable', 'string', 'max:255'],
             'seo_settings' => ['nullable', 'array'],
             'seo_settings.seo_title' => ['nullable', 'string', 'max:255'],
             'seo_settings.seo_keywords' => ['nullable', 'string', 'max:500'],
