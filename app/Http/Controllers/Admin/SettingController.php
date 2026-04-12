@@ -119,6 +119,17 @@ class SettingController extends Controller
             'social_media' => ['nullable', 'array'],
             'social_media.*.platform' => ['nullable', 'string'],
             'social_media.*.username' => ['nullable', 'string'],
+            'seo_settings' => ['nullable', 'array'],
+            'seo_settings.seo_title' => ['nullable', 'string', 'max:255'],
+            'seo_settings.seo_keywords' => ['nullable', 'string', 'max:500'],
+            'seo_settings.seo_description' => ['nullable', 'string', 'max:500'],
+            'seo_settings.og_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'seo_settings.twitter_card' => ['nullable', 'string', 'max:50'],
+            'seo_settings.google_verification' => ['nullable', 'string', 'max:255'],
+            'seo_settings.bing_verification' => ['nullable', 'string', 'max:255'],
+            'seo_settings.yandex_verification' => ['nullable', 'string', 'max:255'],
+            'seo_settings.robots' => ['nullable', 'string', 'max:50'],
+            'seo_settings.author' => ['nullable', 'string', 'max:100'],
         ]);
     }
 
@@ -138,6 +149,16 @@ class SettingController extends Controller
             }
             $path = $request->file('favicon')->store('settings', 'public');
             $data['favicon'] = '/storage/' . $path;
+        }
+
+        if ($request->hasFile('seo_settings.og_image')) {
+            $seo = $data['seo_settings'] ?? [];
+            if ($setting && isset($setting->seo_settings['og_image']) && !str_starts_with($setting->seo_settings['og_image'], 'http')) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $setting->seo_settings['og_image']));
+            }
+            $path = $request->file('seo_settings.og_image')->store('settings', 'public');
+            $seo['og_image'] = '/storage/' . $path;
+            $data['seo_settings'] = $seo;
         }
 
         return $data;

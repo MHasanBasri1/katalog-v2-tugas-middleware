@@ -21,23 +21,54 @@
   "image": @js($galleryImages),
   "description": "{{ $seoDescription }}",
   "sku": "PROD-{{ $product->id }}",
+  "mpn": "{{ $product->slug }}",
   "brand": {
     "@@type": "Brand",
-    "name": "Kataloque"
+    "name": "{{ $setting->shop_name ?? 'Kataloque' }}"
   },
   "offers": {
     "@@type": "Offer",
     "url": "{{ url()->current() }}",
     "priceCurrency": "IDR",
-    "price": "{{ $product->price }}",
+    "price": "{{ (float) $product->price }}",
+    "priceValidUntil": "{{ now()->addYear()->format('Y-m-d') }}",
     "availability": "https://schema.org/InStock",
-    "itemCondition": "https://schema.org/NewCondition"
+    "itemCondition": "https://schema.org/NewCondition",
+    "availability": "https://schema.org/InStock"
   },
   "aggregateRating": {
     "@@type": "AggregateRating",
     "ratingValue": "{{ number_format((float) $product->rating_avg, 1) }}",
-    "reviewCount": "{{ $product->sold_count ?: 1 }}"
+    "reviewCount": "{{ $product->rating_count ?: 1 }}"
   }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "BreadcrumbList",
+  "itemListElement": [{
+    "@@type": "ListItem",
+    "position": 1,
+    "name": "Beranda",
+    "item": "{{ route('home') }}"
+  },{
+    "@@type": "ListItem",
+    "position": 2,
+    "name": "Produk",
+    "item": "{{ route('katalog') }}"
+  }@if($product->category),{
+    "@@type": "ListItem",
+    "position": 3,
+    "name": "{{ $product->category->name }}",
+    "item": "{{ route('kategori.detail', $product->category->slug) }}"
+  }@endif,{
+    "@@type": "ListItem",
+    "position": {{ $product->category ? 4 : 3 }},
+    "name": "{{ $product->name }}",
+    "item": "{{ url()->current() }}"
+  }]
 }
 </script>
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-1 md:pt-5 pb-8 space-y-6">

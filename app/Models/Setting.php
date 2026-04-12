@@ -23,10 +23,12 @@ class Setting extends Model
         'favicon',
         'marketplaces',
         'social_media',
+        'seo_settings',
     ];
 
     protected $casts = [
         'marketplaces' => 'array',
         'social_media' => 'array',
+        'seo_settings' => 'array',
     ];
 }

@@ -3,25 +3,37 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Kataloque - Katalog Produk Modern & Terpercaya')</title>
-    <meta name="description" content="@yield('meta_description', 'Kataloque adalah katalog produk modern dengan pencarian cepat, kategori lengkap, dan detail produk terbaik untuk kebutuhan harian Anda.')">
-    <meta name="robots" content="@yield('meta_robots', 'index,follow,max-image-preview:large')">
-    <meta name="author" content="Kataloque">
+    
+    {{-- SEO Optimization --}}
+    <title>@yield('title', ($setting->seo_settings['seo_title'] ?? $setting->shop_name ?? 'Kataloque') . ' - Katalog Produk Modern')</title>
+    <meta name="description" content="@yield('meta_description', $setting->shop_description ?? 'Kataloque adalah katalog produk modern dengan pencarian cepat.')">
+    <meta name="keywords" content="@yield('meta_keywords', $setting->seo_settings['seo_keywords'] ?? 'katalog, belanja, ecommerce')">
+    <meta name="robots" content="@yield('meta_robots', $setting->seo_settings['robots'] ?? 'index, follow')">
+    <meta name="author" content="@yield('meta_author', $setting->seo_settings['author'] ?? $setting->shop_name ?? 'Kataloque')">
     <link rel="canonical" href="@yield('canonical', url()->current())">
     <meta name="theme-color" content="#2563eb">
 
+    {{-- Search Console Verifications --}}
+    @if($setting && isset($setting->seo_settings['google_verification'])) <meta name="google-site-verification" content="{{ $setting->seo_settings['google_verification'] }}"> @endif
+    @if($setting && isset($setting->seo_settings['bing_verification'])) <meta name="msvalidate.01" content="{{ $setting->seo_settings['bing_verification'] }}"> @endif
+    @if($setting && isset($setting->seo_settings['yandex_verification'])) <meta name="yandex-verification" content="{{ $setting->seo_settings['yandex_verification'] }}"> @endif
+
+    {{-- Open Graph / Facebook --}}
     <meta property="og:type" content="@yield('og_type', 'website')">
-    <meta property="og:site_name" content="Kataloque">
-    <meta property="og:title" content="@yield('og_title', trim($__env->yieldContent('title', 'Kataloque - Katalog Produk Modern & Terpercaya')))">
-    <meta property="og:description" content="@yield('og_description', trim($__env->yieldContent('meta_description', 'Kataloque adalah katalog produk modern dengan pencarian cepat, kategori lengkap, dan detail produk terbaik untuk kebutuhan harian Anda.')))">
+    <meta property="og:site_name" content="{{ $setting->shop_name ?? 'Kataloque' }}">
+    <meta property="og:title" content="@yield('og_title', trim($__env->yieldContent('title', ($setting->seo_settings['seo_title'] ?? $setting->shop_name ?? 'Kataloque'))))">
+    <meta property="og:description" content="@yield('og_description', trim($__env->yieldContent('meta_description', $setting->shop_description ?? 'Kataloque adalah katalog produk modern.')))">
     <meta property="og:url" content="@yield('og_url', trim($__env->yieldContent('canonical', url()->current())))">
-    <meta property="og:image" content="@yield('og_image', 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&h=630&auto=format&fit=crop')">
+    <meta property="og:image" content="@yield('og_image', ($setting->seo_settings['og_image'] ?? 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&h=630&auto=format&fit=crop'))">
     <meta property="og:locale" content="id_ID">
 
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('twitter_title', trim($__env->yieldContent('title', 'Kataloque - Katalog Produk Modern & Terpercaya')))">
-    <meta name="twitter:description" content="@yield('twitter_description', trim($__env->yieldContent('meta_description', 'Kataloque adalah katalog produk modern dengan pencarian cepat, kategori lengkap, dan detail produk terbaik untuk kebutuhan harian Anda.')))">
-    <meta name="twitter:image" content="@yield('twitter_image', trim($__env->yieldContent('og_image', 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&h=630&auto=format&fit=crop')))">
+    {{-- Twitter --}}
+    <meta name="twitter:card" content="@yield('twitter_card', $setting->seo_settings['twitter_card'] ?? 'summary_large_image')">
+    <meta name="twitter:title" content="@yield('twitter_title', trim($__env->yieldContent('title', ($setting->seo_settings['seo_title'] ?? $setting->shop_name ?? 'Kataloque'))))">
+    <meta name="twitter:description" content="@yield('twitter_description', trim($__env->yieldContent('meta_description', $setting->shop_description ?? 'Kataloque adalah katalog produk modern.')))">
+    <meta name="twitter:image" content="@yield('twitter_image', trim($__env->yieldContent('og_image', ($setting->seo_settings['og_image'] ?? 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1200&h=630&auto=format&fit=crop'))))">
+    
+    <link rel="icon" type="image/x-icon" href="{{ $setting->favicon ?? asset('favicon.ico') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
@@ -32,17 +44,47 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
     <script type="application/ld+json">
-        {
-            "@@context": "https://schema.org",
-            "@@type": "WebSite",
-            "name": "Kataloque",
-            "url": "{{ url('/') }}",
-            "potentialAction": {
-                "@@type": "SearchAction",
-                "target": "{{ route('katalog') }}?q={search_term_string}",
-                "query-input": "required name=search_term_string"
+    {
+        "@@context": "https://schema.org",
+        "@@graph": [
+            {
+                "@@type": "Organization",
+                "@@id": "{{ url('/') }}/#organization",
+                "name": "{{ $setting->shop_name ?? 'Kataloque' }}",
+                "url": "{{ url('/') }}",
+                "logo": {
+                    "@@type": "ImageObject",
+                    "url": "{{ str_starts_with($setting->shop_logo ?? '', 'http') ? $setting->shop_logo : url($setting->shop_logo ?? 'logo.png') }}"
+                },
+                "contactPoint": {
+                    "@@type": "ContactPoint",
+                    "telephone": "{{ $setting->phone ?? $setting->whatsapp ?? '' }}",
+                    "contactType": "customer service",
+                    "areaServed": "ID",
+                    "availableLanguage": "Indonesian"
+                },
+                "sameAs": [
+                    @if($setting->social_media)
+                        @foreach($setting->social_media as $index => $social)
+                            "{{ $social['username'] }}"{{ $index < count($setting->social_media) - 1 ? ',' : '' }}
+                        @endforeach
+                    @endif
+                ]
+            },
+            {
+                "@@type": "WebSite",
+                "@@id": "{{ url('/') }}/#website",
+                "url": "{{ url('/') }}",
+                "name": "{{ $setting->shop_name ?? 'Kataloque' }}",
+                "publisher": { "@@id": "{{ url('/') }}/#organization" },
+                "potentialAction": {
+                    "@@type": "SearchAction",
+                    "target": "{{ route('katalog') }}?q={search_term_string}",
+                    "query-input": "required name=search_term_string"
+                }
             }
-        }
+        ]
+    }
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.35.0/tabler-icons.min.css">

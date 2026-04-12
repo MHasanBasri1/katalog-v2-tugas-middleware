@@ -326,22 +326,136 @@
         @endif
 
         @if($section === 'seo')
-            <!-- SEO Integration Card -->
-            <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
-                    <div class="w-1.5 h-6 bg-indigo-600 rounded-full"></div>
-                    <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">SEO & Metadata</h3>
-                </div>
-                <div class="p-8 space-y-6">
-                    <div>
-                        <label class="block text-[10px] font-black text-gray-400 mb-2 uppercase tracking-widest">Global Meta Description</label>
-                        <textarea name="shop_description" rows="4" placeholder="Masukan deskripsi singkat untuk Google..."
-                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 rounded-2xl outline-none transition-all duration-300 text-[11px] font-medium p-4 leading-relaxed">{{ old('shop_description', $setting->shop_description) }}</textarea>
+            <div class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <!-- Meta Information Group -->
+                <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+                    <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
+                        <div class="w-1.5 h-6 bg-indigo-600 rounded-full"></div>
+                        <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Informasi Meta Utama</h3>
                     </div>
-                    <div>
-                        <label class="block text-[10px] font-black text-gray-400 mb-2 uppercase tracking-widest">Footer Copy (Copyright)</label>
-                        <input type="text" name="footer_text" value="{{ old('footer_text', $setting->footer_text) }}" placeholder="© 2024 Kataloque."
-                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 rounded-2xl outline-none transition-all duration-300 text-[11px] font-medium p-4">
+                    <div class="p-8 space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">SEO Title Bar / Meta Title</label>
+                                <input type="text" name="seo_settings[seo_title]" value="{{ old('seo_settings.seo_title', $setting->seo_settings['seo_title'] ?? '') }}" placeholder="Kataloque - Digital Catalog & Marketplace"
+                                    class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">Global Meta Keywords</label>
+                                <input type="text" name="seo_settings[seo_keywords]" value="{{ old('seo_settings.seo_keywords', $setting->seo_settings['seo_keywords'] ?? '') }}" placeholder="katalog, belanja, ecommerce, online shop"
+                                    class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">Global Meta Description</label>
+                            <textarea name="shop_description" rows="3" placeholder="Masukan deskripsi singkat untuk Google..."
+                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4 leading-relaxed">{{ old('shop_description', $setting->shop_description) }}</textarea>
+                            <p class="mt-2 text-[10px] text-gray-400">Deskripsi ini akan muncul di hasil pencarian Google (Ideal: 150-160 karakter).</p>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">Footer Copy (Copyright)</label>
+                            <input type="text" name="footer_text" value="{{ old('footer_text', $setting->footer_text) }}" placeholder="© 2024 Kataloque."
+                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Shared Image & Cards -->
+                <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+                    <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
+                        <div class="w-1.5 h-6 bg-rose-500 rounded-full"></div>
+                        <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Pencitraan Sosial (Open Graph)</h3>
+                    </div>
+                    <div class="p-8 space-y-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                            <div x-data="{ ogPreview: null }">
+                                <label class="block text-[10px] font-black text-gray-400 mb-4 uppercase tracking-widest">Shared Image (WA/FB/Twitter)</label>
+                                <input type="file" name="seo_settings[og_image]" class="hidden" x-ref="og_photo" x-on:change="
+                                        const reader = new FileReader();
+                                        reader.onload = (e) => { ogPreview = e.target.result; };
+                                        reader.readAsDataURL($refs.og_photo.files[0]);
+                                ">
+                                <div class="relative group w-full aspect-video rounded-3xl bg-gray-50/50 dark:bg-gray-800/30 border-2 border-dashed border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center overflow-hidden transition-all duration-300 hover:border-rose-500 hover:bg-white dark:hover:bg-gray-800 shadow-inner"
+                                        x-on:click.prevent="$refs.og_photo.click()" style="cursor: pointer;">
+                                    
+                                    <div class="absolute inset-0 flex items-center justify-center" x-show="ogPreview || '{{ $setting->seo_settings['og_image'] ?? '' }}'">
+                                        <img :src="ogPreview ?? '{{ $setting->seo_settings['og_image'] ?? '' }}'" class="w-full h-full object-cover" alt="OG Preview">
+                                        <div class="absolute inset-0 bg-gray-900/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-300 backdrop-blur-[2px]">
+                                            <div class="bg-white/90 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-lg">Ganti Preview</div>
+                                        </div>
+                                    </div>
+
+                                    <div x-show="!ogPreview && !'{{ $setting->seo_settings['og_image'] ?? '' }}'" class="text-center">
+                                        <i class="ti ti-share-off text-3xl text-gray-300 mb-2"></i>
+                                        <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-tight px-6">Upload Gambar Berbagi<br><span class="opacity-50">(Ideal: 1200x630px)</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">Twitter Card Type</label>
+                                    <select name="seo_settings[twitter_card]" 
+                                        class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-rose-500 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4">
+                                        <option value="summary" @selected(($setting->seo_settings['twitter_card'] ?? '') === 'summary')>Summary</option>
+                                        <option value="summary_large_image" @selected(($setting->seo_settings['twitter_card'] ?? '') === 'summary_large_image')>Summary with Large Image</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">Author / Pemilik</label>
+                                    <input type="text" name="seo_settings[author]" value="{{ old('seo_settings.author', $setting->seo_settings['author'] ?? '') }}" placeholder="Kataloque Studio"
+                                        class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-rose-500 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Webmaster Verification Card -->
+                <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+                    <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
+                        <div class="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                        <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Verifikasi Webmaster (Search Console)</h3>
+                    </div>
+                    <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest flex items-center gap-2">
+                                <i class="ti ti-brand-google text-blue-600"></i>
+                                Google Search Console
+                            </label>
+                            <input type="text" name="seo_settings[google_verification]" value="{{ old('seo_settings.google_verification', $setting->seo_settings['google_verification'] ?? '') }}" placeholder="A-B-C-123"
+                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-emerald-500 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest flex items-center gap-2">
+                                <i class="ti ti-brand-bing text-blue-400"></i>
+                                Bing Webmaster
+                            </label>
+                            <input type="text" name="seo_settings[bing_verification]" value="{{ old('seo_settings.bing_verification', $setting->seo_settings['bing_verification'] ?? '') }}" placeholder="A-B-C-123"
+                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-emerald-500 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest flex items-center gap-2">
+                                <i class="ti ti-letter-y text-red-600"></i>
+                                Yandex Webmaster
+                            </label>
+                            <input type="text" name="seo_settings[yandex_verification]" value="{{ old('seo_settings.yandex_verification', $setting->seo_settings['yandex_verification'] ?? '') }}" placeholder="A-B-C-123"
+                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-emerald-500 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Robots Config Card -->
+                <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm p-8 overflow-hidden">
+                    <div class="flex items-center gap-6">
+                        <div class="flex-1">
+                            <h4 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest">Robots Indexing</h4>
+                            <p class="text-[10px] text-gray-500 mt-1 uppercase tracking-wider">Tentukan apakah website ini boleh di-crawl oleh mesin pencari.</p>
+                        </div>
+                        <select name="seo_settings[robots]" 
+                            class="bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl px-6 py-2.5 text-[11px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-indigo-600/20 transition-all">
+                            <option value="index, follow" @selected(($setting->seo_settings['robots'] ?? '') === 'index, follow')>Index, Follow</option>
+                            <option value="noindex, nofollow" @selected(($setting->seo_settings['robots'] ?? '') === 'noindex, nofollow')>No-Index (Private)</option>
+                        </select>
                     </div>
                 </div>
             </div>
