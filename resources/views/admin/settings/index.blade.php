@@ -67,8 +67,85 @@
                         <textarea name="shop_address" rows="3" placeholder="Jl. Raya Utama No. 123, Jakarta..."
                             class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4 resize-none leading-relaxed">{{ old('shop_address', $setting->shop_address) }}</textarea>
                     </div>
+                </div>
+            </div>
+        @endif
 
-                    <div class="pt-8 border-t border-gray-100 dark:border-gray-800" x-data="{ 
+        @if($section === 'branding')
+            <!-- Branding Assets Card -->
+            <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
+                    <div class="w-1.5 h-6 bg-amber-500 rounded-full"></div>
+                    <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Aset Visual & Branding</h3>
+                </div>
+                <div class="p-8 space-y-12">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <!-- Logo Upload -->
+                        <div x-data="{ photoName: null, photoPreview: null }">
+                            <label class="block text-[10px] font-black text-gray-400 mb-4 uppercase tracking-widest">Logo Utama (Light/Dark)</label>
+                            <input type="file" name="shop_logo" class="hidden" x-ref="photo" x-on:change="
+                                    photoName = $refs.photo.files[0].name;
+                                    const reader = new FileReader();
+                                    reader.onload = (e) => {
+                                        photoPreview = e.target.result;
+                                    };
+                                    reader.readAsDataURL($refs.photo.files[0]);
+                            ">
+                            <div class="relative group w-full aspect-video rounded-3xl bg-gray-50/50 dark:bg-gray-800/30 border-2 border-dashed border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center overflow-hidden transition-all duration-300 hover:border-blue-600 hover:bg-white dark:hover:bg-gray-800"
+                                    x-on:click.prevent="$refs.photo.click()" style="cursor: pointer;">
+                                
+                                <div class="absolute inset-0 flex items-center justify-center" x-show="photoPreview || '{{ $setting->shop_logo }}'">
+                                    <img :src="photoPreview ?? '{{ $setting->shop_logo }}'" class="max-w-[70%] max-h-[70%] object-contain drop-shadow-md" alt="Logo Preview">
+                                    <div class="absolute inset-0 bg-gray-900/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-300 backdrop-blur-[2px]">
+                                        <div class="bg-white/90 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-lg">Ganti Logo</div>
+                                    </div>
+                                </div>
+
+                                <div x-show="!photoPreview && !'{{ $setting->shop_logo }}'" class="text-center animate-pulse">
+                                    <i class="ti ti-camera-plus text-3xl text-gray-300 mb-2"></i>
+                                    <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">Pilih Logo</p>
+                                </div>
+                            </div>
+                            @error('shop_logo') <p class="mt-2 text-xs text-rose-600 font-medium">{{ $message }}</p> @enderror
+                        </div>
+
+                        <!-- Favicon Upload -->
+                        <div x-data="{ favName: null, favPreview: null }">
+                            <label class="block text-[10px] font-black text-gray-400 mb-4 uppercase tracking-widest">Icon Browser (Favicon)</label>
+                            <input type="file" name="favicon" class="hidden" x-ref="favicon_photo" x-on:change="
+                                    favName = $refs.favicon_photo.files[0].name;
+                                    const reader = new FileReader();
+                                    reader.onload = (e) => {
+                                        favPreview = e.target.result;
+                                    };
+                                    reader.readAsDataURL($refs.favicon_photo.files[0]);
+                            ">
+                            <div class="flex flex-col sm:flex-row items-center gap-6">
+                                <div class="relative group w-24 h-24 rounded-2xl bg-white dark:bg-gray-800 border-2 border-dashed border-gray-200 dark:border-gray-700 flex items-center justify-center overflow-hidden transition-all hover:border-blue-600 shadow-sm"
+                                        x-on:click.prevent="$refs.favicon_photo.click()" style="cursor: pointer;">
+                                    
+                                    <div class="absolute inset-0 flex items-center justify-center" x-show="favPreview || '{{ $setting->favicon }}'">
+                                        <img :src="favPreview ?? '{{ $setting->favicon }}'" class="w-12 h-12 object-contain" alt="Favicon Preview">
+                                        <div class="absolute inset-0 bg-gray-900/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                            <i class="ti ti-pencil text-white"></i>
+                                        </div>
+                                    </div>
+
+                                    <div x-show="!favPreview && !'{{ $setting->favicon }}'" class="text-gray-300">
+                                        <i class="ti ti-world text-2xl"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="text-[11px] font-bold text-gray-700 dark:text-gray-200 mb-2">Sangat Penting!</h4>
+                                    <p class="text-[10px] text-gray-400 leading-relaxed">Gunakan format <span class="font-mono text-gray-900 dark:text-white">.ico</span> atau <span class="font-mono text-gray-900 dark:text-white">.png</span> transparan. Ukuran ideal 32x32 piksel.</p>
+                                </div>
+                            </div>
+                            @error('favicon') <p class="mt-2 text-xs text-rose-600 font-medium">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    <!-- Social Media Section -->
+                    <div class="pt-10 border-t border-gray-100 dark:border-gray-800" x-data="{ 
                         socials: {{ json_encode($setting->social_media ?? [
                             ['platform' => 'instagram', 'username' => $setting->instagram ?? ''],
                             ['platform' => 'facebook', 'username' => $setting->facebook ?? '']
@@ -80,14 +157,14 @@
                             this.socials.splice(index, 1);
                         }
                     }">
-                        <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center justify-between mb-8">
                             <div class="flex items-center gap-3">
                                 <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
-                                <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Media Sosial</h3>
+                                <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Eksistensi Media Sosial</h3>
                             </div>
-                            <button type="button" @click="addSocial()" class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 px-4 py-2 rounded-xl transition-all">
+                            <button type="button" @click="addSocial()" class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 px-6 py-2.5 rounded-xl border border-blue-100 dark:border-blue-900/30 transition-all shadow-sm">
                                 <i class="ti ti-plus text-xs"></i>
-                                Tambah Sosmed
+                                Tambah Platform
                             </button>
                         </div>
 
@@ -150,82 +227,6 @@
                                     </div>
                                 </div>
                             </template>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
-
-        @if($section === 'branding')
-            <!-- Branding Assets Card -->
-            <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
-                    <div class="w-1.5 h-6 bg-amber-500 rounded-full"></div>
-                    <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Aset Visual & Branding</h3>
-                </div>
-                <div class="p-8">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                        <!-- Logo Upload -->
-                        <div x-data="{ photoName: null, photoPreview: null }">
-                            <label class="block text-[10px] font-black text-gray-400 mb-4 uppercase tracking-widest">Logo Utama (Light/Dark)</label>
-                            <input type="file" name="shop_logo" class="hidden" x-ref="photo" x-on:change="
-                                    photoName = $refs.photo.files[0].name;
-                                    const reader = new FileReader();
-                                    reader.onload = (e) => {
-                                        photoPreview = e.target.result;
-                                    };
-                                    reader.readAsDataURL($refs.photo.files[0]);
-                            ">
-                            <div class="relative group w-full aspect-video rounded-3xl bg-gray-50/50 dark:bg-gray-800/30 border-2 border-dashed border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center overflow-hidden transition-all duration-300 hover:border-blue-600 hover:bg-white dark:hover:bg-gray-800"
-                                 x-on:click.prevent="$refs.photo.click()" style="cursor: pointer;">
-                                
-                                <div class="absolute inset-0 flex items-center justify-center" x-show="photoPreview || '{{ $setting->shop_logo }}'">
-                                    <img :src="photoPreview ?? '{{ $setting->shop_logo }}'" class="max-w-[70%] max-h-[70%] object-contain drop-shadow-md" alt="Logo Preview">
-                                    <div class="absolute inset-0 bg-gray-900/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-300 backdrop-blur-[2px]">
-                                        <div class="bg-white/90 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-lg">Ganti Logo</div>
-                                    </div>
-                                </div>
-
-                                <div x-show="!photoPreview && !'{{ $setting->shop_logo }}'" class="text-center animate-pulse">
-                                    <i class="ti ti-camera-plus text-3xl text-gray-300 mb-2"></i>
-                                    <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">Pilih Logo</p>
-                                </div>
-                            </div>
-                            @error('shop_logo') <p class="mt-2 text-xs text-rose-600 font-medium">{{ $message }}</p> @enderror
-                        </div>
-
-                        <!-- Favicon Upload -->
-                        <div x-data="{ favName: null, favPreview: null }">
-                            <label class="block text-[10px] font-black text-gray-400 mb-4 uppercase tracking-widest">Icon Browser (Favicon)</label>
-                            <input type="file" name="favicon" class="hidden" x-ref="favicon_photo" x-on:change="
-                                    favName = $refs.favicon_photo.files[0].name;
-                                    const reader = new FileReader();
-                                    reader.onload = (e) => {
-                                        favPreview = e.target.result;
-                                    };
-                                    reader.readAsDataURL($refs.favicon_photo.files[0]);
-                            ">
-                            <div class="flex flex-col sm:flex-row items-center gap-6">
-                                <div class="relative group w-24 h-24 rounded-2xl bg-white dark:bg-gray-800 border-2 border-dashed border-gray-200 dark:border-gray-700 flex items-center justify-center overflow-hidden transition-all hover:border-blue-600 shadow-sm"
-                                     x-on:click.prevent="$refs.favicon_photo.click()" style="cursor: pointer;">
-                                    
-                                    <div class="absolute inset-0 flex items-center justify-center" x-show="favPreview || '{{ $setting->favicon }}'">
-                                        <img :src="favPreview ?? '{{ $setting->favicon }}'" class="w-12 h-12 object-contain" alt="Favicon Preview">
-                                        <div class="absolute inset-0 bg-gray-900/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                            <i class="ti ti-pencil text-white"></i>
-                                        </div>
-                                    </div>
-
-                                    <div x-show="!favPreview && !'{{ $setting->favicon }}'" class="text-gray-300">
-                                        <i class="ti ti-world text-2xl"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-1">
-                                    <h4 class="text-[11px] font-bold text-gray-700 dark:text-gray-200 mb-2">Sangat Penting!</h4>
-                                    <p class="text-[10px] text-gray-400 leading-relaxed">Gunakan format <span class="font-mono text-gray-900 dark:text-white">.ico</span> atau <span class="font-mono text-gray-900 dark:text-white">.png</span> transparan. Ukuran ideal 32x32 piksel.</p>
-                                </div>
-                            </div>
-                            @error('favicon') <p class="mt-2 text-xs text-rose-600 font-medium">{{ $message }}</p> @enderror
                         </div>
                     </div>
                 </div>
