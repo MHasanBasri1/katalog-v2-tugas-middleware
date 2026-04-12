@@ -17,18 +17,16 @@
 
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
         @forelse($categories as $category)
-            <a href="{{ route('kategori.detail', $category->slug) }}" class="group relative bg-white rounded-2xl border border-gray-200 p-4 md:p-6 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 flex flex-col items-center text-center gap-2 md:gap-3 overflow-hidden">
-                <div class="absolute inset-x-0 -bottom-2 h-1/2 bg-gradient-to-t from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
-                
-                <div class="w-12 h-12 md:w-16 md:h-16 flex-none rounded-2xl bg-gray-50 flex items-center justify-center group-hover:bg-primary group-hover:scale-[1.10] transition-transform duration-300 shadow-sm border border-gray-200 group-hover:border-primary">
-                    <i class="fas {{ $category->icon ?: 'fa-layer-group' }} text-lg md:text-2xl text-gray-400 group-hover:text-white transition-colors duration-300"></i>
+            <a href="{{ route('kategori.detail', $category->slug) }}" class="group relative bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-100 dark:border-gray-800 p-6 shadow-sm hover:shadow-2xl hover:shadow-blue-200/50 transition-all duration-300 flex flex-col items-center text-center gap-4 overflow-hidden">
+                <div class="w-16 h-16 md:w-20 md:h-20 flex-none rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center border border-blue-100 dark:border-blue-800 group-hover:scale-110 transition-transform duration-500 shadow-inner">
+                    <i class="fas {{ $category->icon ?: 'fa-layer-group' }} text-2xl md:text-3xl text-blue-600"></i>
                 </div>
                 
-                <h3 class="font-black text-gray-800 text-xs md:text-lg leading-snug group-hover:text-primary transition-colors flex-1">{{ $category->name }}</h3>
-                <p class="text-[10px] md:text-xs font-medium text-gray-500 bg-gray-50 px-2.5 py-1 rounded-full group-hover:bg-primary/10 group-hover:text-primary-dark transition-colors">{{ number_format($category->active_products_count) }} Produk</p>
+                <h3 class="font-black text-gray-900 dark:text-white text-sm md:text-lg leading-tight group-hover:text-blue-600 transition-colors uppercase tracking-tight">{{ $category->name }}</h3>
+                <p class="text-[9px] md:text-xs font-black text-blue-600 bg-blue-50 dark:bg-blue-900/30 px-3 py-1.5 rounded-full uppercase tracking-widest">{{ number_format($category->active_products_count) }} Produk</p>
                 
                 <div class="absolute bottom-0 translate-y-full group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 inset-x-0 pb-3 md:pb-4 flex justify-center w-full">
-                    <span class="inline-flex items-center gap-1.5 text-[9px] md:text-xs font-bold text-white bg-primary px-3 md:px-4 py-1.5 rounded-full shadow-md">
+                    <span class="inline-flex items-center gap-1.5 text-[9px] md:text-xs font-bold text-white bg-blue-600 px-3 md:px-4 py-1.5 rounded-full shadow-md">
                         Lihat Produk <i class="fas fa-arrow-right text-[8px] md:text-[10px]"></i>
                     </span>
                 </div>

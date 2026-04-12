@@ -57,6 +57,7 @@
                         'fa-user', 'fa-users', 'fa-address-card', 'fa-id-card', 'fa-building', 'fa-store', 'fa-shop', 'fa-cart-shopping', 'fa-money-bill-wave', 'fa-credit-card', 'fa-wallet',
                         'fa-phone', 'fa-envelope', 'fa-comment', 'fa-paper-plane', 'fa-share-nodes', 'fa-magnifying-glass', 'fa-gear', 'fa-trash', 'fa-check', 'fa-xmark'
                     ],
+                    colors: [],
                     get filteredIcons() {
                         if (!this.search) return this.icons;
                         return this.icons.filter(i => i.toLowerCase().includes(this.search.toLowerCase()));
@@ -68,16 +69,13 @@
                         <div class="space-y-6">
                             <!-- Icon Selection -->
                             <div class="space-y-4">
-                                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white dark:bg-gray-950 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
-                                    <div class="space-y-1">
-                                        <div class="flex items-center gap-2">
-                                            <div class="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
-                                            <label class="block text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest">Kepustakaan Icon</label>
-                                        </div>
-                                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider pl-4">Pilih visual yang mewakili kategori</p>
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-gray-950 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <div class="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+                                        <label class="block text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest">Pilih Icon</label>
                                     </div>
                                     
-                                    <div class="relative flex-1 lg:max-w-md group">
+                                    <div class="relative flex-1 group">
                                         <div class="absolute inset-y-0 left-0 flex items-center justify-center text-gray-400 group-focus-within:text-blue-600 transition-colors" style="width: 44px;">
                                             <i class="fas fa-search text-xs"></i>
                                         </div>
@@ -123,22 +121,9 @@
                                 <input type="hidden" name="icon" :value="icon">
                             </div>
 
-                            <!-- Color Palette Selection -->
-                            <div>
-                                <label class="block text-[10px] font-black text-gray-400 mb-3 uppercase tracking-widest">Tema Warna</label>
-                                <div class="grid grid-cols-4 gap-2">
-                                    <template x-for="c in colors" :key="c.name">
-                                        <button type="button" @click="textColor = c.text; bgColor = c.bg" 
-                                            class="p-3 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-1 group"
-                                            :class="(textColor === c.text && bgColor === c.bg) ? 'border-blue-600 bg-blue-50/50 dark:bg-blue-900/10' : 'border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700'">
-                                            <div class="w-6 h-6 rounded-full shadow-inner" :class="c.bg + ' ' + c.text.replace('text-', 'bg-').replace('-600', '-500')"></div>
-                                            <span class="text-[9px] font-bold text-gray-400 group-hover:text-gray-600 transition-colors uppercase" x-text="c.name"></span>
-                                        </button>
-                                    </template>
-                                </div>
-                                <input type="hidden" name="text_color" :value="textColor">
-                                <input type="hidden" name="color" :value="bgColor">
-                            </div>
+                            {{-- Hidden Fixed Colors (Keeping for DB consistency if needed) --}}
+                            <input type="hidden" name="text_color" value="text-blue-600">
+                            <input type="hidden" name="color" value="bg-blue-50">
                         </div>
 
                         <!-- Right: Real-time Preview -->
@@ -146,12 +131,11 @@
                             <label class="block text-[10px] font-black text-gray-400 mb-3 uppercase tracking-widest">Pratinjau (Preview)</label>
                             <div class="p-8 bg-gray-50/50 dark:bg-gray-800/30 rounded-[2.5rem] border-2 border-dashed border-gray-200 dark:border-gray-800 flex flex-col items-center justify-center gap-6 min-h-[200px]">
                                 <!-- Large Dynamic Badge -->
-                                <div class="p-8 rounded-[2rem] shadow-xl transition-all duration-500 transform hover:scale-110 flex flex-col items-center gap-4"
-                                    :class="bgColor">
-                                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-inner bg-white/40 backdrop-blur-sm" :class="textColor">
+                                <div class="p-8 rounded-[2rem] shadow-xl transition-all duration-500 transform hover:scale-110 flex flex-col items-center gap-4 bg-blue-50 dark:bg-blue-900/10">
+                                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-inner bg-white/40 backdrop-blur-sm text-blue-600">
                                         <i class="fas" :class="icon"></i>
                                     </div>
-                                    <span class="text-sm font-black uppercase tracking-widest" :class="textColor" x-text="$refs.nameInput.value || 'Nama Kategori'"></span>
+                                    <span class="text-sm font-black uppercase tracking-widest text-blue-600" x-text="$refs.nameInput.value || 'Nama Kategori'"></span>
                                 </div>
                                 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">Tampilan di Menu & Filter</p>
                             </div>

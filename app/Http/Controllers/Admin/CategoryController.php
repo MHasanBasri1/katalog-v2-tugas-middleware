@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Cache;
 
 class CategoryController extends Controller
 {
@@ -53,6 +54,9 @@ class CategoryController extends Controller
 
         Category::query()->create($data);
 
+        // Clear public caches
+        $this->clearHomeCaches();
+
         if ($request->input('action') === 'save_and_another') {
             return redirect()->route('admin.kategori.create')->with('status', 'Kategori berhasil ditambahkan. Silahkan tambah kategori lainnya.');
         }
@@ -90,6 +94,9 @@ class CategoryController extends Controller
 
         $kategori->update($data);
 
+        // Clear public caches
+        $this->clearHomeCaches();
+
         return redirect()->route('admin.kategori.index')->with('status', 'Kategori berhasil diperbarui.');
     }
 
@@ -100,6 +107,9 @@ class CategoryController extends Controller
         }
 
         $kategori->delete();
+
+        // Clear public caches
+        $this->clearHomeCaches();
 
         return redirect()->route('admin.kategori.index')->with('status', 'Kategori berhasil dihapus.');
     }
@@ -157,5 +167,13 @@ class CategoryController extends Controller
         }
 
         return $slug;
+    }
+
+    private function clearHomeCaches(): void
+    {
+        Cache::forget('public.home.categories_all');
+        Cache::forget('public.home.bestseller_products');
+        Cache::forget('public.home.flashsale_products');
+        Cache::forget('public.home.new_products');
     }
 }

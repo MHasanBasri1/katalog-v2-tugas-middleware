@@ -244,10 +244,10 @@
                                 @if($category->slug)
                                     <div class="swiper-slide !w-auto">
                                         <a href="{{ route('kategori.detail', $category->slug) }}" class="group flex flex-col items-center gap-3 text-center w-20 md:w-28">
-                                            <div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-gray-50 flex items-center justify-center border border-gray-200 group-hover:border-primary group-hover:bg-primary/5 transition-all shadow-sm group-hover:shadow-md">
-                                                <i class="fas {{ $category->icon ?: 'fa-layer-group' }} text-base md:text-lg text-primary group-hover:scale-110 transition-transform"></i>
+                                            <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-blue-50 dark:bg-blue-900/10 flex items-center justify-center border border-blue-100/50 dark:border-blue-800/50 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-blue-200/50 transition-all duration-300">
+                                                <i class="fas {{ $category->icon ?: 'fa-layer-group' }} text-lg md:text-2xl text-blue-600"></i>
                                             </div>
-                                            <span class="text-[10px] md:text-sm font-bold text-gray-700 group-hover:text-primary transition-colors line-clamp-1 truncate w-full px-1">{{ $category->name }}</span>
+                                            <span class="text-[10px] md:text-xs font-black text-gray-700 dark:text-gray-300 uppercase tracking-tight group-hover:text-blue-600 transition-colors line-clamp-1 truncate w-full px-1">{{ $category->name }}</span>
                                         </a>
                                     </div>
                                 @endif
