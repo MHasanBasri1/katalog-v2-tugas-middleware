@@ -45,6 +45,7 @@
         }
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.35.0/tabler-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
     <style>
@@ -259,7 +260,7 @@
                 </div>
             </div>
             <div class="flex flex-col">
-                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.1em] leading-none mb-1">Agents Care</span>
+                <span class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.1em] leading-none mb-1">Kataloque Care</span>
                 <span class="text-sm font-extrabold text-gray-800 leading-none">Chat Sekarang</span>
             </div>
             

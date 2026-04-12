@@ -9,9 +9,50 @@
                     {{ $setting?->shop_description ?? 'Satu destinasi untuk semua kebutuhan gaya hidup Anda. Belanja cerdas, cepat, dan aman hanya di Kataloque.' }}
                 </p>
                 <div class="flex gap-4">
-                    <a href="#" class="text-gray-500 hover:text-blue-600 transition-colors" aria-label="Facebook Kataloque"><i class="fab fa-facebook-square text-xl" aria-hidden="true"></i></a>
-                    <a href="#" class="text-gray-500 hover:text-black transition-colors" aria-label="Instagram Kataloque"><i class="fab fa-instagram text-xl" aria-hidden="true"></i></a>
-                    <a href="#" class="text-gray-500 hover:text-blue-400 transition-colors" aria-label="Twitter Kataloque"><i class="fab fa-twitter text-xl" aria-hidden="true"></i></a>
+                    @if($setting?->social_media)
+                        @foreach($setting->social_media as $social)
+                            @php
+                                $icon = match($social['platform']) {
+                                    'facebook' => 'ti ti-brand-facebook',
+                                    'instagram' => 'ti ti-brand-instagram',
+                                    'twitter' => 'ti ti-brand-twitter',
+                                    'tiktok' => 'ti ti-brand-tiktok',
+                                    'youtube' => 'ti ti-brand-youtube',
+                                    'website' => 'ti ti-world',
+                                    default => 'ti ti-link'
+                                };
+                                $color = match($social['platform']) {
+                                    'facebook' => 'text-blue-600',
+                                    'instagram' => 'text-pink-600',
+                                    'twitter' => 'text-blue-400',
+                                    'tiktok' => 'text-black dark:text-white',
+                                    'youtube' => 'text-red-600',
+                                    'website' => 'text-emerald-600',
+                                    default => 'text-blue-600'
+                                };
+                                $url = $social['username'];
+                                if ($social['platform'] === 'instagram' && !Str::startsWith($url, 'http')) $url = "https://instagram.com/" . ltrim($url, '@');
+                                if ($social['platform'] === 'facebook' && !Str::startsWith($url, 'http')) $url = "https://facebook.com/" . $url;
+                                if ($social['platform'] === 'twitter' && !Str::startsWith($url, 'http')) $url = "https://twitter.com/" . ltrim($url, '@');
+                                if ($social['platform'] === 'tiktok' && !Str::startsWith($url, 'http')) $url = "https://tiktok.com/@" . ltrim($url, '@');
+                                if ($social['platform'] === 'youtube' && !Str::startsWith($url, 'http')) $url = "https://youtube.com/" . $url;
+                            @endphp
+                            <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" class="{{ $color }} hover:scale-110 transition-transform block" aria-label="{{ ucfirst($social['platform']) }}">
+                                <i class="{{ $icon }} text-2xl" aria-hidden="true"></i>
+                            </a>
+                        @endforeach
+                    @else
+                        @if($setting?->facebook)
+                            <a href="{{ Str::startsWith($setting->facebook, 'http') ? $setting->facebook : 'https://facebook.com/' . $setting->facebook }}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:scale-110 transition-transform" aria-label="Facebook">
+                                <i class="ti ti-brand-facebook text-2xl" aria-hidden="true"></i>
+                            </a>
+                        @endif
+                        @if($setting?->instagram)
+                            <a href="{{ Str::startsWith($setting->instagram, 'http') ? $setting->instagram : 'https://instagram.com/' . ltrim($setting->instagram, '@') }}" target="_blank" rel="noopener noreferrer" class="text-pink-600 hover:scale-110 transition-transform" aria-label="Instagram">
+                                <i class="ti ti-brand-instagram text-2xl" aria-hidden="true"></i>
+                            </a>
+                        @endif
+                    @endif
                 </div>
             </div>
 

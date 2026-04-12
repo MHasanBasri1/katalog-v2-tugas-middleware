@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 
 class SettingController extends Controller
 {
@@ -31,9 +32,19 @@ class SettingController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validatePayload($request);
+
+        if (isset($data['social_media'])) {
+            $data['social_media'] = array_values(array_filter($data['social_media'], function ($item) {
+                return !empty($item['username']);
+            }));
+        }
+
         $data = $this->handleFiles($request, $data);
         
         Setting::query()->updateOrCreate(['id' => 1], $data);
+
+        Cache::forget('public.footer.setting');
+        Cache::forget('public.whatsapp_setting');
 
         return back()->with('status', 'Setting berhasil disimpan.');
     }
@@ -48,12 +59,24 @@ class SettingController extends Controller
         return redirect()->route('admin.setting.index');
     }
 
-    public function update(Request $request, Setting $setting): RedirectResponse
+    public function update(Request $request): RedirectResponse
     {
+        $setting = Setting::query()->firstOrNew(['id' => 1]);
         $data = $this->validatePayload($request);
+        
+        if (isset($data['social_media'])) {
+            $data['social_media'] = array_values(array_filter($data['social_media'], function ($item) {
+                return !empty($item['username']);
+            }));
+        }
+
         $data = $this->handleFiles($request, $data, $setting);
         
-        $setting->update($data);
+        $setting->fill($data);
+        $setting->save();
+
+        Cache::forget('public.footer.setting');
+        Cache::forget('public.whatsapp_setting');
 
         return back()->with('status', 'Setting berhasil diperbarui.');
     }
@@ -81,6 +104,9 @@ class SettingController extends Controller
             'footer_text' => ['nullable', 'string', 'max:255'],
             'favicon' => ['nullable', 'image', 'mimes:jpeg,png,jpg,svg,ico,webp', 'max:1024'],
             'marketplaces' => ['nullable', 'array'],
+            'social_media' => ['nullable', 'array'],
+            'social_media.*.platform' => ['nullable', 'string'],
+            'social_media.*.username' => ['nullable', 'string'],
         ]);
     }
 

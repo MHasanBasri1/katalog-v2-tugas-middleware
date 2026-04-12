@@ -29,7 +29,7 @@
 
         @if($section === 'umum')
             <!-- Shop Identity Card -->
-            <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
                     <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
                     <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Konfigurasi Identitas</h3>
@@ -56,14 +56,9 @@
                                 class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-emerald-600 mb-2.5 uppercase tracking-widest">WhatsApp Business</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-emerald-500">
-                                    <i class="ti ti-brand-whatsapp text-xl"></i>
-                                </div>
-                                <input type="text" name="whatsapp" value="{{ old('whatsapp', $setting->whatsapp) }}" placeholder="+62..."
-                                    class="w-full bg-emerald-50/30 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/20 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4 pl-12 text-emerald-700 dark:text-emerald-400">
-                            </div>
+                            <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">WhatsApp Business</label>
+                            <input type="text" name="whatsapp" value="{{ old('whatsapp', $setting->whatsapp) }}" placeholder="+62..."
+                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4">
                         </div>
                     </div>
 
@@ -73,16 +68,88 @@
                             class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4 resize-none leading-relaxed">{{ old('shop_address', $setting->shop_address) }}</textarea>
                     </div>
 
-                    <div class="pt-6 border-t border-gray-100 dark:border-gray-800 flex flex-wrap gap-4">
-                        <div class="flex-1 space-y-1.5">
-                            <label class="block text-[10px] font-black text-pink-600 uppercase tracking-widest">Instagram Username</label>
-                            <input type="text" name="instagram" value="{{ old('instagram', $setting->instagram) }}" placeholder="Username"
-                                class="w-full bg-pink-50/30 dark:bg-pink-900/10 border border-pink-100 dark:border-pink-900/20 focus:border-pink-600 rounded-xl p-3 text-xs font-bold text-pink-700">
+                    <div class="pt-8 border-t border-gray-100 dark:border-gray-800" x-data="{ 
+                        socials: {{ json_encode($setting->social_media ?? [
+                            ['platform' => 'instagram', 'username' => $setting->instagram ?? ''],
+                            ['platform' => 'facebook', 'username' => $setting->facebook ?? '']
+                        ]) }},
+                        addSocial() {
+                            this.socials.push({ platform: 'instagram', username: '' });
+                        },
+                        removeSocial(index) {
+                            this.socials.splice(index, 1);
+                        }
+                    }">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                                <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Media Sosial</h3>
+                            </div>
+                            <button type="button" @click="addSocial()" class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 px-4 py-2 rounded-xl transition-all">
+                                <i class="ti ti-plus text-xs"></i>
+                                Tambah Sosmed
+                            </button>
                         </div>
-                        <div class="flex-1 space-y-1.5">
-                            <label class="block text-[10px] font-black text-blue-700 uppercase tracking-widest">Facebook Page ID</label>
-                            <input type="text" name="facebook" value="{{ old('facebook', $setting->facebook) }}" placeholder="Page ID"
-                                class="w-full bg-blue-50/30 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/20 focus:border-blue-700 rounded-xl p-3 text-xs font-bold text-blue-800">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <template x-for="(social, index) in socials" :key="index">
+                                <div x-data="{ open: false }" 
+                                     class="group relative bg-gray-50/50 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 transition-all duration-300 hover:border-blue-600/30 hover:bg-white dark:hover:bg-gray-900"
+                                     :class="open ? 'z-[150] ring-2 ring-blue-600/10 bg-white dark:bg-gray-900' : 'z-10'">
+                                    <div class="flex items-center gap-4">
+                                        <!-- Modern Custom Dropdown -->
+                                        <div class="relative flex-shrink-0">
+                                            <button type="button" @click="open = !open" @click.away="open = false" 
+                                                class="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm hover:border-blue-500 transition-all">
+                                                <template x-if="social.platform === 'instagram'"><i class="ti ti-brand-instagram text-pink-600"></i></template>
+                                                <template x-if="social.platform === 'facebook'"><i class="ti ti-brand-facebook text-blue-600"></i></template>
+                                                <template x-if="social.platform === 'twitter'"><i class="ti ti-brand-twitter text-blue-400"></i></template>
+                                                <template x-if="social.platform === 'tiktok'"><i class="ti ti-brand-tiktok text-gray-900 dark:text-white"></i></template>
+                                                <template x-if="social.platform === 'youtube'"><i class="ti ti-brand-youtube text-red-600"></i></template>
+                                                <template x-if="social.platform === 'website'"><i class="ti ti-world text-gray-600"></i></template>
+                                                <span class="text-[10px] font-black uppercase tracking-widest text-gray-700 dark:text-gray-300" x-text="social.platform"></span>
+                                                <i class="ti ti-chevron-down text-[10px] text-gray-400 transition-transform" :class="open ? 'rotate-180' : ''"></i>
+                                            </button>
+                                            
+                                            <div x-show="open" 
+                                                 x-transition:enter="transition ease-out duration-100"
+                                                 x-transition:enter-start="opacity-0 scale-95"
+                                                 x-transition:enter-end="opacity-100 scale-100"
+                                                 class="absolute left-0 mt-2 w-40 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-xl z-50 overflow-hidden"
+                                                 x-cloak>
+                                                <div class="p-1">
+                                                    <template x-for="p in ['instagram', 'facebook', 'twitter', 'tiktok', 'youtube', 'website']">
+                                                        <button type="button" @click="social.platform = p; open = false" 
+                                                            class="flex items-center gap-3 w-full px-3 py-2 text-left rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                                            <i :class="{
+                                                                'ti ti-brand-instagram text-pink-600': p === 'instagram',
+                                                                'ti ti-brand-facebook text-blue-600': p === 'facebook',
+                                                                'ti ti-brand-twitter text-blue-400': p === 'twitter',
+                                                                'ti ti-brand-tiktok text-gray-900 dark:text-white': p === 'tiktok',
+                                                                'ti ti-brand-youtube text-red-600': p === 'youtube',
+                                                                'ti ti-world text-gray-600': p === 'website'
+                                                            }" class="text-base"></i>
+                                                            <span class="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400" x-text="p"></span>
+                                                        </button>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                            <input type="hidden" :name="'social_media['+index+'][platform]'" x-model="social.platform">
+                                        </div>
+
+                                        <div class="h-8 w-px bg-gray-100 dark:bg-gray-800"></div>
+
+                                        <div class="flex-1">
+                                            <input type="text" :name="'social_media['+index+'][username]'" x-model="social.username" placeholder="Username / ID / URL"
+                                                class="w-full bg-transparent border-none focus:ring-0 text-xs font-bold p-0 text-gray-900 dark:text-white placeholder-gray-400">
+                                        </div>
+
+                                        <button type="button" @click="removeSocial(index)" class="p-2 text-gray-300 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl transition-all">
+                                            <i class="ti ti-trash text-base"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                     </div>
                 </div>

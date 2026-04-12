@@ -22,9 +22,11 @@ class Setting extends Model
         'footer_text',
         'favicon',
         'marketplaces',
+        'social_media',
     ];
 
     protected $casts = [
         'marketplaces' => 'array',
+        'social_media' => 'array',
     ];
 }
