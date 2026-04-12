@@ -51,39 +51,61 @@
                     icon: '{{ old('icon', $category->icon) }}',
                     textColor: '{{ old('text_color', $category->text_color) }}',
                     bgColor: '{{ old('color', $category->color) }}',
+                    search: '',
                     icons: [
-                        'fa-layer-group', 'fa-laptop', 'fa-mobile-screen', 'fa-shirt', 'fa-utensils', 
-                        'fa-bag-shopping', 'fa-couch', 'fa-basketball', 'fa-briefcase-medical',
-                        'fa-car', 'fa-camera', 'fa-gamepad', 'fa-gift', 'fa-glasses', 'fa-headphones',
-                        'fa-house', 'fa-key', 'fa-lightbulb', 'fa-microchip', 'fa-music', 'fa-paw',
-                        'fa-plug', 'fa-print', 'fa-scissors', 'fa-shoe-prints', 'fa-tags', 'fa-tv',
-                        'fa-watch', 'fa-wrench', 'fa-book', 'fa-heart', 'fa-star', 'fa-gem'
+                        'fa-layer-group', 'fa-laptop', 'fa-mobile-screen', 'fa-tablet-screen-button', 'fa-desktop', 'fa-tv', 'fa-headphones', 'fa-camera', 'fa-video', 'fa-gamepad', 'fa-mouse', 'fa-keyboard', 'fa-microchip', 'fa-plug', 'fa-bolt', 'fa-battery-full',
+                        'fa-shirt', 'fa-socks', 'fa-glasses', 'fa-hat-cowboy', 'fa-shoe-prints', 'fa-bag-shopping', 'fa-suitcase', 'fa-gem', 'fa-watch', 'fa-tags', 'fa-tag',
+                        'fa-utensils', 'fa-bowl-food', 'fa-burger', 'fa-pizza-slice', 'fa-mug-hot', 'fa-wine-glass', 'fa-ice-cream', 'fa-apple-whole', 'fa-carrot', 'fa-bread-slice', 'fa-egg', 'fa-fish',
+                        'fa-house', 'fa-couch', 'fa-bed', 'fa-bath', 'fa-toilet', 'fa-shower', 'fa-lightbulb', 'fa-door-open', 'fa-key', 'fa-lock', 'fa-broom', 'fa-bucket', 'fa-screwdriver-wrench', 'fa-hammer', 'fa-paint-roller',
+                        'fa-car', 'fa-motorcycle', 'fa-bicycle', 'fa-truck', 'fa-bus', 'fa-plane', 'fa-ship', 'fa-train', 'fa-gas-pump', 'fa-map-pin', 'fa-compass',
+                        'fa-heart', 'fa-star', 'fa-gift', 'fa-balloon', 'fa-cake-candles', 'fa-crown', 'fa-medal', 'fa-trophy', 'fa-basketball', 'fa-football', 'fa-volleyball', 'fa-table-tennis-paddle-ball',
+                        'fa-briefcase-medical', 'fa-stethoscope', 'fa-pills', 'fa-hospital', 'fa-user-doctor', 'fa-mask-face', 'fa-bandage',
+                        'fa-book', 'fa-graduation-cap', 'fa-pencil', 'fa-pen-nib', 'fa-marker', 'fa-compass-drafting', 'fa-microscope', 'fa-flask', 'fa-brain',
+                        'fa-music', 'fa-guitar', 'fa-microphone', 'fa-drum', 'fa-trumpet', 'fa-compact-disc', 'fa-film', 'fa-clapperboard',
+                        'fa-paw', 'fa-dog', 'fa-cat', 'fa-fish-fins', 'fa-cow', 'fa-horse', 'fa-leaf', 'fa-tree', 'fa-seedling', 'fa-cloud-sun', 'fa-snowflake', 'fa-umbrella',
+                        'fa-user', 'fa-users', 'fa-address-card', 'fa-id-card', 'fa-building', 'fa-store', 'fa-shop', 'fa-cart-shopping', 'fa-money-bill-wave', 'fa-credit-card', 'fa-wallet',
+                        'fa-phone', 'fa-envelope', 'fa-comment', 'fa-paper-plane', 'fa-share-nodes', 'fa-magnifying-glass', 'fa-gear', 'fa-trash', 'fa-check', 'fa-xmark'
                     ],
-                    colors: [
-                        { text: 'text-blue-600', bg: 'bg-blue-50', name: 'Biru' },
-                        { text: 'text-emerald-600', bg: 'bg-emerald-50', name: 'Hijau' },
-                        { text: 'text-rose-600', bg: 'bg-rose-50', name: 'Merah' },
-                        { text: 'text-amber-600', bg: 'bg-amber-50', name: 'Kuning' },
-                        { text: 'text-violet-600', bg: 'bg-violet-50', name: 'Ungu' },
-                        { text: 'text-slate-600', bg: 'bg-slate-50', name: 'Abu-abu' },
-                        { text: 'text-pink-600', bg: 'bg-pink-50', name: 'Pink' },
-                        { text: 'text-indigo-600', bg: 'bg-indigo-50', name: 'Indigo' }
-                    ]
+                    get filteredIcons() {
+                        if (!this.search) return this.icons;
+                        return this.icons.filter(i => i.toLowerCase().includes(this.search.toLowerCase()));
+                    }
                 }" class="space-y-6">
                     <!-- Visual Picker Layout -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                         <!-- Left: Selection -->
                         <div class="space-y-6">
                             <!-- Icon Selection -->
-                            <div>
-                                <label class="block text-[10px] font-black text-gray-400 mb-3 uppercase tracking-widest">Pilih Icon Kategori</label>
-                                <div class="grid grid-cols-6 sm:grid-cols-8 gap-2 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-800 max-h-48 overflow-y-auto custom-scrollbar">
-                                    <template x-for="i in icons" :key="i">
+                            <div class="space-y-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-800">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-1.5 h-4 bg-blue-600 rounded-full"></div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest">Pilih Icon Kategori</label>
+                                    </div>
+                                    <div class="relative w-full sm:w-56">
+                                        <i class="ti ti-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                                        <input type="text" x-model="search" placeholder="Cari icon (misal: laptop, car)..." 
+                                            class="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl pl-9 pr-3 py-2 text-[11px] font-bold outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all duration-300">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-6 sm:grid-cols-8 gap-2.5 p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 max-h-64 overflow-y-auto custom-scrollbar shadow-inner">
+                                    <template x-for="i in filteredIcons" :key="i">
                                         <button type="button" @click="icon = i" 
-                                            class="w-full aspect-square rounded-xl flex items-center justify-center text-sm transition-all duration-200 border-2"
-                                            :class="icon === i ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200' : 'bg-white dark:bg-gray-900 border-transparent text-gray-400 hover:border-gray-200 dark:hover:border-gray-700 hover:text-gray-600'">
+                                            :title="i.replace('fa-', '').replace('-', ' ')"
+                                            class="w-full aspect-square rounded-xl flex items-center justify-center text-sm transition-all duration-300 border-2 group relative"
+                                            :class="icon === i ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200 scale-95' : 'bg-gray-50 dark:bg-gray-800 border-transparent text-gray-400 hover:border-blue-600/30 hover:text-blue-600 hover:bg-blue-50/50'">
                                             <i class="fas" :class="i"></i>
+                                            <span class="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-900 text-white text-[9px] font-bold rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50" x-text="i.replace('fa-', '').replace('-', ' ')"></span>
                                         </button>
+                                    </template>
+                                    <template x-if="filteredIcons.length === 0">
+                                        <div class="col-span-full py-10 text-center">
+                                            <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gray-50 dark:bg-gray-800 text-gray-400 mb-3">
+                                                <i class="ti ti-search-off text-2xl"></i>
+                                            </div>
+                                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">Icon tidak ditemukan<br><span class="opacity-50 font-medium">Coba kata kunci lain</span></p>
+                                        </div>
                                     </template>
                                 </div>
                                 <input type="hidden" name="icon" :value="icon">
