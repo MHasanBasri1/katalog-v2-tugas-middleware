@@ -226,95 +226,19 @@
         @endif
 
         @if ($canSystem)
-            <button
-                type="button"
-                @click="toggleGroup('openSystem')"
-                class="w-full flex items-center rounded-2xl px-3 py-2.5 text-sm font-bold transition-all duration-300 group relative overflow-hidden"
-                :class="$store.sidebar.isSidebarForceExpanded ? '' : 'justify-center'"
-                @class([
-                    'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30' => $isSystemActive,
-                    'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-900 hover:shadow-sm hover:text-blue-600 dark:hover:text-blue-400 border border-transparent hover:border-gray-100 dark:hover:border-gray-800' => ! $isSystemActive,
-                ])
-            >
+            <a href="{{ route('admin.setting.index') }}"
+               class="flex items-center rounded-2xl px-3 py-2.5 text-sm font-bold transition-all duration-300 group relative overflow-hidden"
+               :class="$store.sidebar.isSidebarForceExpanded ? '' : 'justify-center'"
+               @class([
+                   'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30' => $isSystemActive,
+                   'text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-gray-900 hover:shadow-sm hover:text-blue-600 dark:hover:text-blue-400 border border-transparent hover:border-gray-100 dark:hover:border-gray-800' => ! $isSystemActive,
+               ])>
                 @if($isSystemActive)
                     <div class="absolute left-0 inset-y-2 w-1 bg-blue-400 rounded-r-full shadow-[0_0_10px_rgba(96,165,250,0.8)]"></div>
                 @endif
                 <i class="ti ti-settings text-xl group-hover:scale-110 transition-transform"></i>
                 <span x-show="$store.sidebar.isSidebarForceExpanded" x-cloak class="ml-3">Pengaturan</span>
-                <i x-show="$store.sidebar.isSidebarForceExpanded" x-cloak class="ti ti-chevron-down ml-auto text-[10px] opacity-50 transition-transform" :class="openSystem ? 'rotate-180' : ''"></i>
-            </button>
-            <div x-show="$store.sidebar.isSidebarForceExpanded && openSystem" 
-                 x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="opacity-0 -translate-y-2"
-                 x-transition:enter-end="opacity-100 translate-y-0"
-                 class="space-y-1 pr-1 mt-0.5 ml-7 border-l border-gray-100 dark:border-gray-800">
-                <a href="{{ route('admin.setting.index') }}"
-                   class="flex items-center rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 relative overflow-hidden group"
-                   @class([
-                       'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/20' => request()->routeIs('admin.setting.index'),
-                       'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-gray-800' => !request()->routeIs('admin.setting.index'),
-                   ])>
-                    @if(request()->routeIs('admin.setting.index'))
-                        <div class="absolute left-0 inset-y-1.5 w-0.5 bg-blue-300/80 rounded-r-full"></div>
-                    @endif
-                    <span>Umum</span>
-                </a>
-                <a href="{{ route('admin.setting.branding') }}"
-                   class="flex items-center rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 relative overflow-hidden group"
-                   @class([
-                       'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/20' => request()->routeIs('admin.setting.branding'),
-                       'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-gray-800' => !request()->routeIs('admin.setting.branding'),
-                   ])>
-                    @if(request()->routeIs('admin.setting.branding'))
-                        <div class="absolute left-0 inset-y-1.5 w-0.5 bg-blue-300/80 rounded-r-full"></div>
-                    @endif
-                    <span>Branding</span>
-                </a>
-                <a href="{{ route('admin.setting.marketplace') }}"
-                   class="flex items-center rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 relative overflow-hidden group"
-                   @class([
-                       'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/20' => request()->routeIs('admin.setting.marketplace'),
-                       'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-gray-800' => !request()->routeIs('admin.setting.marketplace'),
-                   ])>
-                    @if(request()->routeIs('admin.setting.marketplace'))
-                        <div class="absolute left-0 inset-y-1.5 w-0.5 bg-blue-300/80 rounded-r-full"></div>
-                    @endif
-                    <span>Marketplace</span>
-                </a>
-                <a href="{{ route('admin.setting.navigasi') }}"
-                   class="flex items-center rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 relative overflow-hidden group"
-                   @class([
-                       'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/20' => request()->routeIs('admin.setting.navigasi'),
-                       'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-gray-800' => !request()->routeIs('admin.setting.navigasi'),
-                   ])>
-                    @if(request()->routeIs('admin.setting.navigasi'))
-                        <div class="absolute left-0 inset-y-1.5 w-0.5 bg-blue-300/80 rounded-r-full"></div>
-                    @endif
-                    <span>Navigasi</span>
-                </a>
-                <a href="{{ route('admin.setting.seo') }}"
-                   class="flex items-center rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 relative overflow-hidden group"
-                   @class([
-                       'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/20' => request()->routeIs('admin.setting.seo'),
-                       'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-gray-800' => !request()->routeIs('admin.setting.seo'),
-                   ])>
-                    @if(request()->routeIs('admin.setting.seo'))
-                        <div class="absolute left-0 inset-y-1.5 w-0.5 bg-blue-300/80 rounded-r-full"></div>
-                    @endif
-                    <span>SEO</span>
-                </a>
-                <a href="{{ route('admin.setting.sistem') }}"
-                   class="flex items-center rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 relative overflow-hidden group"
-                   @class([
-                       'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/20' => request()->routeIs('admin.setting.sistem'),
-                       'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-gray-800' => !request()->routeIs('admin.setting.sistem'),
-                   ])>
-                    @if(request()->routeIs('admin.setting.sistem'))
-                        <div class="absolute left-0 inset-y-1.5 w-0.5 bg-blue-300/80 rounded-r-full"></div>
-                    @endif
-                    <span>Konfigurasi Sistem</span>
-                </a>
-            </div>
+            </a>
         @endif
     </nav>
 

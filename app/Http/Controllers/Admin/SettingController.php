@@ -16,14 +16,7 @@ class SettingController extends Controller
     {
         $setting = Setting::query()->firstOrNew(['id' => 1]);
         
-        $section = 'umum';
-        if (request()->routeIs('admin.setting.branding')) $section = 'branding';
-        if (request()->routeIs('admin.setting.marketplace')) $section = 'marketplace';
-        if (request()->routeIs('admin.setting.navigasi')) $section = 'navigasi';
-        if (request()->routeIs('admin.setting.seo')) $section = 'seo';
-        if (request()->routeIs('admin.setting.sistem')) $section = 'sistem';
-
-        return view('admin.settings.index', compact('setting', 'section'));
+        return view('admin.settings.index', compact('setting'));
     }
 
     public function create(): RedirectResponse

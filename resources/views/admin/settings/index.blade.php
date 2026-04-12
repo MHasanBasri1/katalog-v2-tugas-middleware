@@ -9,25 +9,56 @@
     <nav class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-6">
         <a href="{{ route('admin.dashboard') }}" class="hover:text-blue-600 transition-colors">Admin</a>
         <i class="ti ti-chevron-right text-[10px]"></i>
-        <a href="{{ route('admin.setting.index') }}" class="hover:text-blue-600 transition-colors">Pengaturan</a>
-        <i class="ti ti-chevron-right text-[10px]"></i>
-        <span class="text-gray-900 dark:text-white font-black">{{ ucfirst($section) }}</span>
+        <span class="text-gray-900 dark:text-white font-black">Pengaturan Toko</span>
     </nav>
 
     @if (session('status'))
-        <div class="rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 px-4 py-3 text-sm font-semibold flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300 shadow-sm shadow-emerald-100 dark:shadow-none">
+        <div class="rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 px-4 py-3 text-sm font-semibold flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300 shadow-sm shadow-emerald-100 dark:shadow-none mb-6">
             <i class="ti ti-check bg-emerald-600 text-white rounded-full p-1 text-[10px]"></i>
             {{ session('status') }}
         </div>
     @endif
 
-    <form method="POST" action="{{ $setting->exists ? route('admin.setting.update', $setting) : route('admin.setting.store') }}" enctype="multipart/form-data" class="space-y-6" id="settings-form">
-        @csrf
-        @if ($setting->exists)
-            @method('PUT')
-        @endif
+    <div x-data="{ 
+        activeTab: new URLSearchParams(window.location.search).get('tab') || 'umum',
+        setTab(tab) {
+            this.activeTab = tab;
+            const url = new URL(window.location);
+            url.searchParams.set('tab', tab);
+            window.history.pushState({}, '', url);
+        }
+    }">
+        <!-- Settings Tabs -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-4 mb-6 no-scrollbar border-b border-gray-100 dark:border-gray-800">
+            @php
+                $tabs = [
+                    'umum' => ['label' => 'Umum', 'icon' => 'ti ti-settings'],
+                    'branding' => ['label' => 'Branding', 'icon' => 'ti ti-palette'],
+                    'marketplace' => ['label' => 'Marketplace', 'icon' => 'ti ti-shopping-cart'],
+                    'navigasi' => ['label' => 'Navigasi', 'icon' => 'ti ti-map-2'],
+                    'seo' => ['label' => 'SEO', 'icon' => 'ti ti-search'],
+                    'sistem' => ['label' => 'Sistem', 'icon' => 'ti ti-server'],
+                ];
+            @endphp
 
-        @if($section === 'umum')
+            @foreach($tabs as $key => $tab)
+                <button type="button" @click="setTab('{{ $key }}')" 
+                    class="flex items-center gap-2.5 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 border"
+                    :class="activeTab === '{{ $key }}' ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/30' : 'bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 text-gray-400 hover:text-blue-600 hover:border-blue-100 dark:hover:border-blue-900/30'">
+                    <i class="{{ $tab['icon'] }} text-sm"></i>
+                    {{ $tab['label'] }}
+                </button>
+            @endforeach
+        </div>
+
+        <form method="POST" action="{{ $setting->exists ? route('admin.setting.update', $setting) : route('admin.setting.store') }}" enctype="multipart/form-data" class="space-y-6" id="settings-form">
+            @csrf
+            @if ($setting->exists)
+                @method('PUT')
+            @endif
+
+            <!-- Section: UMUM -->
+            <div x-show="activeTab === 'umum'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
             <!-- Shop Identity Card -->
             <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
@@ -69,9 +100,10 @@
                     </div>
                 </div>
             </div>
-        @endif
+        </div> <!-- End Section: UMUM -->
 
-        @if($section === 'branding')
+        <!-- Section: BRANDING -->
+        <div x-show="activeTab === 'branding'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
             <!-- Branding Assets Card -->
             <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
@@ -231,9 +263,11 @@
                     </div>
                 </div>
             </div>
-        @endif
 
-        @if($section === 'marketplace')
+        </div> <!-- End Section: BRANDING -->
+
+        <!-- Section: MARKETPLACE -->
+        <div x-show="activeTab === 'marketplace'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
             <!-- Marketplaces Card -->
             <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
@@ -323,9 +357,11 @@
                     </div>
                 </div>
             </div>
-        @endif
 
-        @if($section === 'navigasi')
+        </div> <!-- End Section: MARKETPLACE -->
+
+        <!-- Section: NAVIGASI -->
+        <div x-show="activeTab === 'navigasi'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
             <!-- Navigation Card -->
             <div class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <!-- Trending Keywords -->
@@ -433,9 +469,11 @@
                     </div>
                 </div>
             </div>
-        @endif
 
-        @if($section === 'seo')
+        </div> <!-- End Section: NAVIGASI -->
+
+        <!-- Section: SEO -->
+        <div x-show="activeTab === 'seo'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
             <div class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <!-- Meta Information Group -->
                 <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
@@ -568,9 +606,10 @@
                     </div>
                 </div>
             </div>
-        @endif
+        </div> <!-- End Section: SEO -->
 
-        @if($section === 'sistem')
+        <!-- Section: SISTEM -->
+        <div x-show="activeTab === 'sistem'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
             <div class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <!-- Maintenance Mode Card -->
                 <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
@@ -659,7 +698,8 @@
                     </div>
                 </div>
             </div>
-        @endif
+
+        </div> <!-- End Section: SISTEM -->
 
         <!-- Sticky Bottom Actions -->
         <div class="fixed bottom-0 right-0 z-[100] transition-all duration-300 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 p-4"
@@ -677,5 +717,6 @@
             </div>
         </div>
     </form>
+    </div>
 </div>
 @endsection
