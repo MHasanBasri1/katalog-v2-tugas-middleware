@@ -39,6 +39,12 @@ class SettingController extends Controller
             }));
         }
 
+        if (isset($data['marketplaces'])) {
+            $data['marketplaces'] = array_filter($data['marketplaces'], function ($url) {
+                return !empty($url);
+            });
+        }
+
         $data = $this->handleFiles($request, $data);
         
         Setting::query()->updateOrCreate(['id' => 1], $data);
@@ -68,6 +74,12 @@ class SettingController extends Controller
             $data['social_media'] = array_values(array_filter($data['social_media'], function ($item) {
                 return !empty($item['username']);
             }));
+        }
+
+        if (isset($data['marketplaces'])) {
+            $data['marketplaces'] = array_filter($data['marketplaces'], function ($url) {
+                return !empty($url);
+            });
         }
 
         $data = $this->handleFiles($request, $data, $setting);

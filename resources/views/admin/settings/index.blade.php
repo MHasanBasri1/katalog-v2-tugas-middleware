@@ -235,37 +235,91 @@
 
         @if($section === 'marketplace')
             <!-- Marketplaces Card -->
-            <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
                     <div class="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
                     <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Ekosistem Belanja</h3>
                 </div>
-                <div class="p-8 space-y-6">
-                    <div class="space-y-1.5">
-                        <label class="flex items-center gap-2 text-[10px] font-black text-[#EE4D2D] uppercase tracking-widest">
-                            <i class="ti ti-brand-shopee text-base"></i>
-                            Shopee Marketplace
-                        </label>
-                        <input type="url" name="marketplaces[shopee]" value="{{ old('marketplaces.shopee', $setting->marketplaces['shopee'] ?? '') }}" placeholder="https://shopee.co.id/toko-kamu"
-                            class="w-full bg-[#FEF6F4] dark:bg-[#EE4D2D]/5 border border-[#FADCD5] dark:border-[#EE4D2D]/10 focus:border-[#EE4D2D] focus:ring-4 focus:ring-[#EE4D2D]/10 rounded-2xl outline-none transition-all duration-300 text-[10px] font-bold p-4 text-[#EE4D2D]">
+                <div class="p-8" x-data="{ 
+                    marketplaces: {{ json_encode(collect($setting->marketplaces ?? [])->map(function($url, $key) { 
+                        return ['platform' => $key, 'url' => $url]; 
+                    })->values()->all() ?: [['platform' => 'shopee', 'url' => ''], ['platform' => 'tokopedia', 'url' => '']]) }},
+                    addMarketplace() {
+                        this.marketplaces.push({ platform: 'shopee', url: '' });
+                    },
+                    removeMarketplace(index) {
+                        this.marketplaces.splice(index, 1);
+                    }
+                }">
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex flex-col gap-1">
+                            <h4 class="text-[11px] font-black uppercase tracking-wider text-gray-400">Daftar Toko Online</h4>
+                            <p class="text-[10px] text-gray-400">Hubungkan toko anda ke berbagai ekosistem e-commerce.</p>
+                        </div>
+                        <button type="button" @click="addMarketplace()" class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 px-6 py-2.5 rounded-xl border border-emerald-100 dark:border-emerald-900/30 transition-all shadow-sm">
+                            <i class="ti ti-plus text-xs"></i>
+                            Tambah Toko
+                        </button>
                     </div>
 
-                    <div class="space-y-1.5">
-                        <label class="flex items-center gap-2 text-[10px] font-black text-[#03AC0E] uppercase tracking-widest">
-                            <i class="ti ti-brand-tokopedia text-base"></i>
-                            Tokopedia Store
-                        </label>
-                        <input type="url" name="marketplaces[tokopedia]" value="{{ old('marketplaces.tokopedia', $setting->marketplaces['tokopedia'] ?? '') }}" placeholder="https://tokopedia.com/toko-kamu"
-                            class="w-full bg-[#F1FCF2] dark:bg-[#03AC0E]/5 border border-[#DFF6E2] dark:border-[#03AC0E]/10 focus:border-[#03AC0E] focus:ring-4 focus:ring-[#03AC0E]/10 rounded-2xl outline-none transition-all duration-300 text-[10px] font-bold p-4 text-[#03AC0E]">
-                    </div>
+                    <div class="grid grid-cols-1 gap-4">
+                        <template x-for="(market, index) in marketplaces" :key="index">
+                            <div x-data="{ open: false }" 
+                                 class="group relative bg-gray-50/50 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 transition-all duration-300 hover:border-emerald-600/30 hover:bg-white dark:hover:bg-gray-900"
+                                 :class="open ? 'z-[150] ring-2 ring-emerald-600/10 bg-white dark:bg-gray-900' : 'z-10'">
+                                <div class="flex items-center gap-4">
+                                    <!-- Dynamic Platform Selector -->
+                                    <div class="relative flex-shrink-0">
+                                        <button type="button" @click="open = !open" @click.away="open = false" 
+                                            class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm hover:border-emerald-500 transition-all min-w-[140px]">
+                                            <template x-if="market.platform === 'shopee'"><i class="ti ti-brand-shopee text-[#EE4D2D] text-lg"></i></template>
+                                            <template x-if="market.platform === 'tokopedia'"><i class="ti ti-brand-tokopedia text-[#42B549] text-lg"></i></template>
+                                            <template x-if="market.platform === 'tiktok'"><i class="ti ti-brand-tiktok text-gray-900 dark:text-white text-lg"></i></template>
+                                            <template x-if="market.platform === 'lazada'"><i class="ti ti-shopping-cart text-[#0F146D] text-lg"></i></template>
+                                            <template x-if="market.platform === 'blibli'"><i class="ti ti-brand-blibli text-[#0095DC] text-lg"></i></template>
+                                            <span class="text-[10px] font-black uppercase tracking-widest text-gray-700 dark:text-gray-300" x-text="market.platform"></span>
+                                            <i class="ti ti-chevron-down text-[10px] text-gray-400 ms-auto transition-transform" :class="open ? 'rotate-180' : ''"></i>
+                                        </button>
+                                        
+                                        <div x-show="open" 
+                                             x-transition:enter="transition ease-out duration-100"
+                                             x-transition:enter-start="opacity-0 scale-95"
+                                             x-transition:enter-end="opacity-100 scale-100"
+                                             class="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-xl z-50 overflow-hidden"
+                                             x-cloak>
+                                            <div class="p-1">
+                                                <template x-for="p in ['shopee', 'tokopedia', 'tiktok', 'lazada', 'blibli']">
+                                                    <button type="button" @click="market.platform = p; open = false" 
+                                                        class="flex items-center gap-3 w-full px-3 py-2.5 text-left rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                                        <i :class="{
+                                                            'ti ti-brand-shopee text-[#EE4D2D]': p === 'shopee',
+                                                            'ti ti-brand-tokopedia text-[#42B549]': p === 'tokopedia',
+                                                            'ti ti-brand-tiktok text-gray-900 dark:text-white': p === 'tiktok',
+                                                            'ti ti-shopping-cart text-[#0F146D]': p === 'lazada',
+                                                            'ti ti-brand-blibli text-[#0095DC]': p === 'blibli'
+                                                        }" class="text-lg"></i>
+                                                        <span class="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400" x-text="p"></span>
+                                                    </button>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <!-- Hidden inputs to keep Laravel compatible with the current update logic -->
+                                        <input type="hidden" :name="'marketplaces['+market.platform+']'" x-model="market.url">
+                                    </div>
 
-                    <div class="space-y-1.5">
-                        <label class="flex items-center gap-2 text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest">
-                            <i class="ti ti-brand-tiktok text-base"></i>
-                            TikTok Shop
-                        </label>
-                        <input type="url" name="marketplaces[tiktok]" value="{{ old('marketplaces.tiktok', $setting->marketplaces['tiktok'] ?? '') }}" placeholder="https://tiktok.com/@kamu/shop"
-                            class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:border-gray-900 dark:focus:border-white focus:ring-4 focus:ring-gray-900/10 rounded-2xl outline-none transition-all duration-300 text-[10px] font-bold p-4">
+                                    <div class="h-8 w-px bg-gray-100 dark:bg-gray-800"></div>
+
+                                    <div class="flex-1">
+                                        <input type="url" x-model="market.url" placeholder="Paste link toko kamu di sini..."
+                                            class="w-full bg-transparent border-none focus:ring-0 text-xs font-bold p-0 text-gray-900 dark:text-white placeholder-gray-400">
+                                    </div>
+
+                                    <button type="button" @click="removeMarketplace(index)" class="p-2 text-gray-300 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl transition-all">
+                                        <i class="ti ti-trash text-base"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
                     </div>
                 </div>
             </div>

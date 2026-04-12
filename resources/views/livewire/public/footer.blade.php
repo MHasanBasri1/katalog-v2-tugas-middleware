@@ -85,14 +85,26 @@
                 <div class="space-y-4">
                     <h4 class="text-gray-900 font-bold text-sm tracking-wide">Marketplace</h4>
                     <div class="flex flex-wrap gap-2 text-gray-600">
-                        @php
-                            $shopeeUrl = $setting->marketplaces['shopee'] ?? '#';
-                            $tokopediaUrl = $setting->marketplaces['tokopedia'] ?? '#';
-                            $tiktokUrl = $setting->marketplaces['tiktok'] ?? '#';
-                        @endphp
-                        <a href="{{ $shopeeUrl }}" target="_blank" rel="noopener noreferrer" class="h-6 px-2 bg-white border border-gray-300 rounded text-[9px] flex items-center font-bold hover:bg-orange-50 hover:border-orange-500 hover:text-orange-600 transition-colors cursor-pointer">SHOPEE</a>
-                        <a href="{{ $tokopediaUrl }}" target="_blank" rel="noopener noreferrer" class="h-6 px-2 bg-white border border-gray-300 rounded text-[9px] flex items-center font-bold hover:bg-emerald-50 hover:border-emerald-500 hover:text-emerald-600 transition-colors cursor-pointer">TOKOPEDIA</a>
-                        <a href="{{ $tiktokUrl }}" target="_blank" rel="noopener noreferrer" class="h-6 px-2 bg-white border border-gray-300 rounded text-[9px] flex items-center font-bold hover:bg-gray-50 hover:border-black hover:text-black transition-colors cursor-pointer">TIKTOK</a>
+                        @if($setting?->marketplaces)
+                            @foreach($setting->marketplaces as $platform => $url)
+                                @php
+                                    $colorStyles = match($platform) {
+                                        'shopee' => 'hover:bg-orange-50 hover:border-[#EE4D2D] hover:text-[#EE4D2D]',
+                                        'tokopedia' => 'hover:bg-emerald-50 hover:border-[#42B549] hover:text-[#42B549]',
+                                        'tiktok' => 'hover:bg-gray-50 hover:border-black hover:text-black',
+                                        'lazada' => 'hover:bg-blue-50 hover:border-[#0F146D] hover:text-[#0F146D]',
+                                        'blibli' => 'hover:bg-blue-50 hover:border-[#0095DC] hover:text-[#0095DC]',
+                                        default => 'hover:bg-gray-100 hover:border-gray-500 hover:text-gray-700'
+                                    };
+                                @endphp
+                                <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" 
+                                   class="h-6 px-2 bg-white border border-gray-200 rounded text-[9px] flex items-center font-black shadow-sm {{ $colorStyles }} transition-all cursor-pointer uppercase tracking-tighter">
+                                   {{ $platform }}
+                                </a>
+                            @endforeach
+                        @else
+                            <span class="text-[10px] text-gray-400 font-medium italic">Belum ada marketplace terhubung.</span>
+                        @endif
                     </div>
                 </div>
                 <div class="space-y-4">
