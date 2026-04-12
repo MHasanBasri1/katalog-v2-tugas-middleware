@@ -101,7 +101,7 @@ class SettingController extends Controller
     private function validatePayload(Request $request): array
     {
         return $request->validate([
-            'shop_name' => ['required', 'string', 'max:255'],
+            'shop_name' => ['sometimes', 'required', 'string', 'max:255'],
             'shop_logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,svg,webp', 'max:2048'],
             'shop_description' => ['nullable', 'string'],
             'shop_address' => ['nullable', 'string'],

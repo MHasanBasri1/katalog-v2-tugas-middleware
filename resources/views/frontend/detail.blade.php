@@ -144,6 +144,7 @@
                                 'tokopedia' => ['name' => 'Tokopedia', 'icon' => 'fas fa-bag-shopping', 'color' => 'bg-[#42B549]', 'shadow' => 'hover:shadow-[#42B549]/30'],
                                 'lazada' => ['name' => 'Lazada', 'icon' => 'fas fa-heart', 'icon_class' => 'text-pink-500', 'color' => 'bg-[#0f146d]', 'shadow' => 'hover:shadow-[#0f146d]/30'],
                                 'blibli' => ['name' => 'Blibli', 'icon' => 'fas fa-shopping-basket', 'color' => 'bg-[#0095DC]', 'shadow' => 'hover:shadow-[#0095DC]/30'],
+                                'tiktok' => ['name' => 'TikTok', 'icon' => 'fab fa-tiktok', 'color' => 'bg-black', 'shadow' => 'hover:shadow-black/30'],
                                 'tiktok shop' => ['name' => 'TikTok Shop', 'icon' => 'fab fa-tiktok', 'color' => 'bg-black', 'shadow' => 'hover:shadow-black/30'],
                             ];
                         @endphp

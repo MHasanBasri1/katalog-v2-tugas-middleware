@@ -272,11 +272,11 @@
                                     <div class="relative flex-shrink-0">
                                         <button type="button" @click="open = !open" @click.away="open = false" 
                                             class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm hover:border-emerald-500 transition-all min-w-[140px]">
-                                            <template x-if="market.platform === 'shopee'"><i class="ti ti-brand-shopee text-[#EE4D2D] text-lg"></i></template>
-                                            <template x-if="market.platform === 'tokopedia'"><i class="ti ti-brand-tokopedia text-[#42B549] text-lg"></i></template>
-                                            <template x-if="market.platform === 'tiktok'"><i class="ti ti-brand-tiktok text-gray-900 dark:text-white text-lg"></i></template>
-                                            <template x-if="market.platform === 'lazada'"><i class="ti ti-shopping-cart text-[#0F146D] text-lg"></i></template>
-                                            <template x-if="market.platform === 'blibli'"><i class="ti ti-brand-blibli text-[#0095DC] text-lg"></i></template>
+                                            <template x-if="market.platform === 'shopee'"><i class="fas fa-shopping-bag text-[#EE4D2D] text-sm"></i></template>
+                                            <template x-if="market.platform === 'tokopedia'"><i class="fas fa-bag-shopping text-[#42B549] text-sm"></i></template>
+                                            <template x-if="market.platform === 'tiktok'"><i class="fab fa-tiktok text-gray-900 dark:text-white text-sm"></i></template>
+                                            <template x-if="market.platform === 'lazada'"><i class="fas fa-heart text-[#F3209B] text-sm"></i></template>
+                                            <template x-if="market.platform === 'blibli'"><i class="fas fa-shopping-basket text-[#0095DC] text-sm"></i></template>
                                             <span class="text-[10px] font-black uppercase tracking-widest text-gray-700 dark:text-gray-300" x-text="market.platform"></span>
                                             <i class="ti ti-chevron-down text-[10px] text-gray-400 ms-auto transition-transform" :class="open ? 'rotate-180' : ''"></i>
                                         </button>
@@ -292,12 +292,12 @@
                                                     <button type="button" @click="market.platform = p; open = false" 
                                                         class="flex items-center gap-3 w-full px-3 py-2.5 text-left rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                                                         <i :class="{
-                                                            'ti ti-brand-shopee text-[#EE4D2D]': p === 'shopee',
-                                                            'ti ti-brand-tokopedia text-[#42B549]': p === 'tokopedia',
-                                                            'ti ti-brand-tiktok text-gray-900 dark:text-white': p === 'tiktok',
-                                                            'ti ti-shopping-cart text-[#0F146D]': p === 'lazada',
-                                                            'ti ti-brand-blibli text-[#0095DC]': p === 'blibli'
-                                                        }" class="text-lg"></i>
+                                                            'fas fa-shopping-bag text-[#EE4D2D]': p === 'shopee',
+                                                            'fas fa-bag-shopping text-[#42B549]': p === 'tokopedia',
+                                                            'fab fa-tiktok text-gray-900 dark:text-white': p === 'tiktok',
+                                                            'fas fa-heart text-[#F3209B]': p === 'lazada',
+                                                            'fas fa-shopping-basket text-[#0095DC]': p === 'blibli'
+                                                        }" class="text-sm"></i>
                                                         <span class="text-[10px] font-black uppercase tracking-widest text-gray-600 dark:text-gray-400" x-text="p"></span>
                                                     </button>
                                                 </template>

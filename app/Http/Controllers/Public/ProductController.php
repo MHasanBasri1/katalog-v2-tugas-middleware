@@ -47,6 +47,10 @@ class ProductController extends Controller
             ? array_keys($marketplaces) 
             : array_map(fn($m) => Str::lower($m), $marketplaces);
 
+        // Normalize tiktok keys for better matching
+        if (in_array('tiktok', $activeLower) && !in_array('tiktok shop', $activeLower)) $activeLower[] = 'tiktok shop';
+        if (in_array('tiktok shop', $activeLower) && !in_array('tiktok', $activeLower)) $activeLower[] = 'tiktok';
+
         $marketplaceLinks = $product->marketplaceLinks
             ->filter(fn ($item) => in_array(Str::lower($item->marketplace), $activeLower, true))
             ->mapWithKeys(fn ($item) => [Str::lower($item->marketplace) => $item->url])
