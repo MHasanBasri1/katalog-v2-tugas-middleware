@@ -102,8 +102,61 @@
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6 space-y-5">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-4 mb-2">Statistik & Status</h3>
+            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6 space-y-5 relative overflow-hidden"
+                x-data="{ 
+                    loading: false,
+                    lastSync: '{{ $product->last_sync_at ? $product->last_sync_at->format('d/m/Y H:i') : '-' }}',
+                    totalReviews: {{ $product->reviews()->count() }},
+                    syncMarketplace() {
+                        this.loading = true;
+                        fetch('{{ route('admin.produk.sync-market', $product) }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.rating_avg !== undefined) {
+                                document.getElementsByName('rating_avg')[0].value = data.rating_avg;
+                                document.getElementsByName('rating_count')[0].value = data.rating_count;
+                                document.getElementsByName('sold_count')[0].value = data.sold_count;
+                                this.lastSync = data.last_sync_at;
+                                this.totalReviews = data.total_reviews;
+                                
+                                window.dispatchEvent(new CustomEvent('notify', {
+                                    detail: { message: data.message || 'Berhasil sinkronisasi!', type: 'success' }
+                                }));
+                            } else {
+                                window.dispatchEvent(new CustomEvent('notify', {
+                                    detail: { message: data.message || 'Gagal sinkronisasi data.', type: 'error' }
+                                }));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            window.dispatchEvent(new CustomEvent('notify', {
+                                detail: { message: 'Terjadi kesalahan saat menyambung ke server.', type: 'error' }
+                            }));
+                        })
+                        .finally(() => {
+                            this.loading = false;
+                        });
+                    }
+                }">
+
+                <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4 mb-2">
+                    <div class="flex flex-col">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-white">Statistik & Status</h3>
+                        <span class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">SINKRON: <span x-text="lastSync"></span></span>
+                    </div>
+                    <button type="button" @click="syncMarketplace()" :disabled="loading"
+                        class="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-lg text-[10px] font-black hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-all disabled:opacity-50">
+                        <i class="fas fa-sync" :class="loading ? 'fa-spin' : ''"></i>
+                        <span x-text="loading ? 'MENYINKRONKAN...' : 'AUTO SYNC DATA'"></span>
+                    </button>
+                </div>
                 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
@@ -128,6 +181,22 @@
                         <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Jumlah Rating</label>
                         <input type="number" name="rating_count" value="{{ old('rating_count', $product->rating_count) }}" min="0" required
                             class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Total Ulasan di Database</label>
+                        <div class="relative">
+                            <input type="number" readonly :value="totalReviews"
+                                class="w-full bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-xl text-sm font-bold text-blue-600 dark:text-blue-400 cursor-not-allowed">
+                            <div class="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400">JUMLAH BARIS</div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest text-blue-600">Limit Sync Ulasan</label>
+                        <input type="number" name="review_sync_limit" value="{{ old('review_sync_limit', $product->review_sync_limit) }}" min="1" max="50" required
+                            class="w-full bg-blue-50/50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-bold text-gray-900 dark:text-white">
                     </div>
                 </div>
 

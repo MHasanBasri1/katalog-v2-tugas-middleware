@@ -221,10 +221,32 @@
 
                     {{-- Reviews Tab --}}
                     <div x-show="activeTab === 'reviews'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
-                            <h3 class="text-lg font-black text-gray-900 tracking-tight uppercase">Ulasan Pembeli</h3>
+                        <div class="flex items-center justify-between gap-3 mb-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                                <h3 class="text-lg font-black text-gray-900 tracking-tight uppercase">Ulasan Pembeli</h3>
+                            </div>
+                            @if($product->last_sync_at)
+                                <div class="flex flex-col items-end">
+                                    <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Data Marketplace</div>
+                                    <div class="text-[10px] font-bold text-emerald-600">{{ $product->last_sync_at->diffForHumans() }}</div>
+                                </div>
+                            @endif
                         </div>
+
+                        @php
+                            $tokpedLink = $product->marketplaceLinks->where('marketplace', 'Tokopedia')->first();
+                        @endphp
+
+                        @if($tokpedLink)
+                            <div class="mb-6 flex">
+                                <a href="{{ $tokpedLink->url }}/review" target="_blank" 
+                                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-50 text-emerald-700 rounded-xl text-[11px] font-black border border-emerald-100 hover:bg-emerald-100 transition-all group">
+                                    <i class="fas fa-external-link-alt group-hover:rotate-12 transition-transform"></i>
+                                    LIHAT SEMUA ULASAN DI TOKOPEDIA
+                                </a>
+                            </div>
+                        @endif
                         
                         <div class="flex flex-col md:flex-row gap-8 items-start md:items-center p-6 bg-gray-50 rounded-2xl mb-8 border border-gray-100">
                             <div class="text-center md:px-8 md:border-r border-gray-200">
@@ -256,27 +278,27 @@
 
                         {{-- Dummy Review Items --}}
                         <div class="space-y-6">
-                            @php
-                                $dummies = [
-                                    ['name' => 'Andi Wijaya', 'date' => '2 hari yang lalu', 'rating' => 5, 'comment' => 'Barang sangat bagus, pengiriman cepat sekali. Recomended seller!'],
-                                    ['name' => 'Siti Aminah', 'date' => '1 minggu yang lalu', 'rating' => 5, 'comment' => 'Kualitas produk sangat baik, produk original. Harga produk sangat baik.'],
-                                ];
-                            @endphp
-                            @foreach($dummies as $rev)
+                            @forelse($product->reviews as $rev)
                                 <div class="pb-6 border-b border-gray-100 last:border-0">
                                     <div class="flex items-center gap-3 mb-3">
-                                        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">{{ substr($rev['name'], 0, 1) }}</div>
+                                        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">{{ substr($rev->reviewer_name, 0, 1) }}</div>
                                         <div>
-                                            <div class="text-sm font-bold text-gray-900">{{ $rev['name'] }}</div>
-                                            <div class="text-[10px] text-gray-400 font-medium">{{ $rev['date'] }}</div>
+                                            <div class="text-sm font-bold text-gray-900">{{ $rev->reviewer_name }}</div>
+                                            <div class="text-[10px] text-gray-400 font-medium">{{ $rev->review_date ?: $rev->created_at->diffForHumans() }}</div>
                                         </div>
                                         <div class="ml-auto flex items-center gap-1 text-[10px] text-amber-400">
-                                            @for($i=0; $i<$rev['rating']; $i++) <i class="fas fa-star"></i> @endfor
+                                            @for($i=0; $i<$rev->rating; $i++) <i class="fas fa-star"></i> @endfor
+                                            @for($i=$rev->rating; $i<5; $i++) <i class="fas fa-star text-gray-200"></i> @endfor
                                         </div>
                                     </div>
-                                    <p class="text-sm text-gray-600 leading-relaxed font-medium">{{ $rev['comment'] }}</p>
+                                    <p class="text-sm text-gray-600 leading-relaxed font-medium">{{ $rev->comment }}</p>
                                 </div>
-                            @endforeach
+                            @empty
+                                <div class="py-8 text-center">
+                                    <div class="text-gray-300 mb-2"><i class="fas fa-comment-slash text-4xl"></i></div>
+                                    <p class="text-sm text-gray-500 font-medium">Belum ada ulasan untuk produk ini.</p>
+                                </div>
+                            @endforelse
                         </div>
                     </div>
                 </div>

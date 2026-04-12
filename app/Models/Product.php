@@ -26,6 +26,9 @@ class Product extends Model
         'rating_count',
         'is_featured',
         'show_in_promo',
+        'is_sync_enabled',
+        'last_sync_at',
+        'review_sync_limit',
     ];
 
     protected $casts = [
@@ -34,9 +37,12 @@ class Product extends Model
         'status' => 'boolean',
         'is_featured' => 'boolean',
         'show_in_promo' => 'boolean',
+        'is_sync_enabled' => 'boolean',
         'rating_avg' => 'decimal:1',
         'views_count' => 'integer',
         'sold_count' => 'integer',
+        'last_sync_at' => 'datetime',
+        'review_sync_limit' => 'integer',
     ];
 
     public function category(): BelongsTo
@@ -62,5 +68,10 @@ class Product extends Model
     public function favorites(): HasMany
     {
         return $this->hasMany(Favorite::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(ProductReview::class)->latest();
     }
 }

@@ -48,7 +48,7 @@
                 {{-- DESKTOP HEADER (Visible on md and up) --}}
                 <div class="hidden md:flex items-center gap-6 w-full">
                     {{-- LOGO --}}
-                    <a href="{{ route('home') }}" class="flex items-center shrink-0" aria-label="Kataloque Beranda">
+                    <a href="/" class="flex items-center shrink-0" aria-label="Kataloque Beranda">
                         <img src="https://www.static-src.com/frontend/static/img/logo-blibli-blue.0f340eba.svg"
                             alt="Logo" class="h-9 w-auto">
                     </a>
@@ -433,9 +433,7 @@
                             @endif
                         @endforeach
                         <div class="mt-2 pt-2 border-t border-gray-50 px-2">
-                            <a href="{{ route('kategori') }}"
-                                class="flex items-center justify-center py-2 text-[12px] font-black text-primary bg-primary/5 rounded-lg hover:bg-primary/10 transition-all">Lihat
-                                Semua Kategori</a>
+                            <a href="/kategori" class="flex items-center justify-center py-2 text-[12px] font-black text-primary bg-primary/5 rounded-lg hover:bg-primary/10 transition-all">Lihat Semua Kategori</a>
                         </div>
                     </div>
                 </div>

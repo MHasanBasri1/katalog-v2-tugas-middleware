@@ -88,7 +88,7 @@ Route::middleware(['auth', 'role:user', 'verified'])->group(function () {
     Route::delete('/profil-saya/favorit/{productId}', [PanelController::class, 'destroyFavorite'])->name('user.favorite.destroy');
 });
 
-Route::middleware(['throttle:60,1'])->group(function () {
+Route::middleware(['web', 'throttle:60,1'])->group(function () {
     Route::get('/', [App\Http\Controllers\Public\HomeController::class, 'index'])->name('home');
 
     Route::get('/kategori', [App\Http\Controllers\Public\CategoryController::class, 'index'])->name('kategori');
@@ -232,6 +232,8 @@ Route::middleware(['auth', 'role:admin', 'log.activity'])->prefix('admin')->name
     Route::resource('/produk', ProductController::class)
         ->whereNumber('produk')
         ->middleware('permission:products.manage');
+    Route::post('/produk/{produk}/sync-market', [ProductController::class, 'syncMarketplace'])
+        ->name('produk.sync-market');
     Route::post('/produk/{produk}/images/{image}/set-primary', [ProductController::class, 'setPrimaryImage'])
         ->name('produk.images.set-primary');
     Route::delete('/produk/{produk}/images/{image}', [ProductController::class, 'deleteImage'])

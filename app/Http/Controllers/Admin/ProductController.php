@@ -18,6 +18,7 @@ use App\Models\ProductImage;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Process;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductController extends Controller
@@ -452,5 +453,75 @@ class ProductController extends Controller
         }
 
         return true;
+    }
+
+    public function syncMarketplace(Product $produk)
+    {
+        // Temukan tautan marketplace apa pun yang tersedia (prioritas: Tokopedia, Blibli, Shopee)
+        $link = $produk->marketplaceLinks()
+            ->whereIn('marketplace', ['Tokopedia', 'Blibli', 'Shopee', 'Lazada'])
+            ->orderByRaw("FIELD(marketplace, 'Tokopedia', 'Blibli', 'Shopee', 'Lazada')")
+            ->first();
+        
+        if (!$link || !$link->url) {
+            return response()->json(['message' => 'Tautan marketplace belum diisi untuk produk ini.'], 422);
+        }
+
+        $scraperPath = base_path('docs/tokped-scraper/src/single_product.cjs');
+        
+        // Ensure the directory exists
+        if (!file_exists($scraperPath)) {
+            return response()->json(['message' => 'Scraper script tidak ditemukan di: ' . $scraperPath], 500);
+        }
+
+        // Run Node.js through Laravel Process with dynamic limit
+        $limit = $produk->review_sync_limit ?: 5;
+        $result = Process::timeout(60)->run("node \"$scraperPath\" \"{$link->url}\" \"$limit\"");
+        if ($result->failed()) {
+            return response()->json([
+                'message' => 'Gagal menjalankan scraper.',
+                'error' => $result->errorOutput()
+            ], 500);
+        }
+
+        $data = json_decode($result->output(), true);
+
+        if (!$data || isset($data['error'])) {
+            return response()->json([
+                'message' => $data['error'] ?? 'Scraper tidak mengembalikan data valid.'
+            ], 500);
+        }
+
+        // Update product statistics
+        $produk->update([
+            'rating_avg' => $data['rating_avg'] ?? $produk->rating_avg,
+            'rating_count' => $data['rating_count'] ?? $produk->rating_count,
+            'sold_count' => $data['sold_count'] ?? $produk->sold_count,
+            'last_sync_at' => now(),
+        ]);
+
+        // Save reviews if present
+        if (!empty($data['reviews'])) {
+            \App\Models\ProductReview::where('product_id', $produk->id)->delete();
+            foreach ($data['reviews'] as $rev) {
+                \App\Models\ProductReview::create([
+                    'product_id' => $produk->id,
+                    'reviewer_name' => $rev['name'],
+                    'rating' => $rev['rating'],
+                    'comment' => $rev['comment'],
+                    'review_date' => $rev['date_text'],
+                    'source' => $link->marketplace,
+                ]);
+            }
+        }
+
+        return response()->json([
+            'rating_avg' => $produk->rating_avg,
+            'rating_count' => $produk->rating_count,
+            'sold_count' => $produk->sold_count,
+            'last_sync_at' => $produk->last_sync_at->format('d/m/Y H:i'),
+            'total_reviews' => $produk->reviews()->count(),
+            'message' => 'Berhasil sinkronisasi data dari ' . $link->marketplace
+        ]);
     }
 }

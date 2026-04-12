@@ -35,6 +35,7 @@ class ProductController extends Controller
                     ->orderByDesc('is_primary')
                     ->orderBy('id'),
                 'marketplaceLinks:id,product_id,marketplace,url',
+                'reviews',
             ])
             ->firstOrFail();
 
