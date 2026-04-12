@@ -77,15 +77,36 @@
                         <div class="space-y-6">
                             <!-- Icon Selection -->
                             <div class="space-y-4">
-                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-800">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-1.5 h-4 bg-blue-600 rounded-full"></div>
-                                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest">Pilih Icon Kategori</label>
+                                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white dark:bg-gray-950 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                                    <div class="space-y-1">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+                                            <label class="block text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest">Kepustakaan Icon</label>
+                                        </div>
+                                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider pl-4">Pilih visual yang mewakili kategori</p>
                                     </div>
-                                    <div class="relative w-full sm:w-56">
-                                        <i class="ti ti-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                                        <input type="text" x-model="search" placeholder="Cari icon (misal: laptop, car)..." 
-                                            class="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl pl-9 pr-3 py-2 text-[11px] font-bold outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 transition-all duration-300">
+                                    
+                                    <div class="relative flex-1 lg:max-w-md group">
+                                        <div class="absolute inset-y-0 left-0 flex items-center justify-center text-gray-400 group-focus-within:text-blue-600 transition-colors" style="width: 44px;">
+                                            <i class="fas fa-search text-xs"></i>
+                                        </div>
+                                        <input 
+                                            type="text" 
+                                            x-model="search"
+                                            placeholder="Cari icon (elektronik, baju, tas...)" 
+                                            class="w-full bg-gray-50/50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-2xl outline-none transition-all duration-500 text-sm font-medium placeholder:text-gray-400 shadow-sm"
+                                            style="padding: 0.75rem 1rem 0.75rem 44px;"
+                                        >
+                                        {{-- Clear Button --}}
+                                        <template x-if="search.length > 0">
+                                            <button 
+                                                type="button"
+                                                @click="search = ''"
+                                                class="absolute right-0 top-0 bottom-0 px-4 text-gray-400 hover:text-rose-500 transition-colors"
+                                            >
+                                                <i class="fas fa-circle-xmark"></i>
+                                            </button>
+                                        </template>
                                     </div>
                                 </div>
 
