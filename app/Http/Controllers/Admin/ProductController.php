@@ -467,7 +467,7 @@ class ProductController extends Controller
             return response()->json(['message' => 'Tautan marketplace belum diisi untuk produk ini.'], 422);
         }
 
-        $scraperPath = base_path('docs/tokped-scraper/src/single_product.cjs');
+        $scraperPath = base_path('tools/tokped-scraper/single_product.cjs');
         
         // Ensure the directory exists
         if (!file_exists($scraperPath)) {
