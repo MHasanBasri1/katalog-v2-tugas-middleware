@@ -114,11 +114,11 @@ class Header extends Component
     {
         $query = trim($this->search);
 
-        if ($query === '') {
+        if ($query === '' || mb_strlen($query) < 2) {
             return [];
         }
 
-        return Product::query()
+        $products = Product::query()
             ->select('name', 'slug')
             ->where('status', true)
             ->where(function ($builder) use ($query) {
@@ -131,8 +131,27 @@ class Header extends Component
             ->map(fn (Product $product) => [
                 'name' => $product->name,
                 'url' => route('produk.detail', $product->slug),
-            ])
-            ->all();
+                'type' => 'Produk',
+            ]);
+
+        $blogs = \App\Models\Blog::query()
+            ->select('title', 'slug')
+            ->where('is_published', true)
+            ->where(function ($builder) use ($query) {
+                $builder->where('title', 'like', '%' . $query . '%')
+                    ->orWhere('excerpt', 'like', '%' . $query . '%')
+                    ->orWhere('content', 'like', '%' . $query . '%');
+            })
+            ->latest('published_at')
+            ->limit(5)
+            ->get()
+            ->map(fn ($blog) => [
+                'name' => $blog->title,
+                'url' => route('blog.detail', $blog->slug),
+                'type' => 'Artikel',
+            ]);
+
+        return $products->concat($blogs)->all();
     }
 
     public function getFilteredCategoriesProperty(): array

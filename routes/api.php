@@ -7,9 +7,13 @@ use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\BlogController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\SearchController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
+    Route::get('/search', [SearchController::class, 'global'])->middleware('throttle:30,1');
     Route::get('/home', [HomeController::class, 'index']);
     Route::get('/home/promo-products', [HomeController::class, 'promoProducts']);
     Route::get('/home/popular-products', [HomeController::class, 'popularProducts']);
@@ -54,5 +58,14 @@ Route::prefix('v1')->group(function () {
         Route::post('/favorit', [FavoriteController::class, 'store']);
         Route::post('/favorit/toggle', [FavoriteController::class, 'toggle']);
         Route::delete('/favorit/{product}', [FavoriteController::class, 'destroy']);
+
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
     });
+
+    Route::get('/blogs', [BlogController::class, 'index']);
+    Route::get('/blogs/{slug}', [BlogController::class, 'show']);
+    Route::get('/blogs/{slug}/related', [BlogController::class, 'related']);
 });

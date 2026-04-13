@@ -146,7 +146,7 @@ class ProductController extends BaseApiController
             ->where('status', true)
             ->with($this->withRelations())
             ->when(
-                $request->filled('q'),
+                $request->filled('q') && mb_strlen($request->query('q')) >= 2,
                 fn (Builder $builder) => $builder->where(function (Builder $q) use ($request) {
                     $keyword = trim((string) $request->query('q'));
                     $q->where('name', 'like', '%' . $keyword . '%')
@@ -181,7 +181,13 @@ class ProductController extends BaseApiController
 
     private function withRelations(): array
     {
-        return ['category:id,name,slug,icon', 'primaryImage:id,product_id,image', 'images:id,product_id,image,is_primary', 'marketplaceLinks:id,product_id,marketplace,url'];
+        return [
+            'category:id,name,slug,icon',
+            'primaryImage:id,product_id,image',
+            'images:id,product_id,image,is_primary',
+            'marketplaceLinks:id,product_id,marketplace,url',
+            'reviews'
+        ];
     }
 
     private function applySorting(Builder $query, string $sort): void

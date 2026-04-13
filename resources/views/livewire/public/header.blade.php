@@ -58,9 +58,9 @@
                         <div class="relative w-full">
                             <input id="desktopSearchInput" wire:model.live.debounce.300ms="search"
                                 wire:keydown.enter="goToSearch" type="search"
-                                placeholder="Cari produk atau brand..."
+                                placeholder="Cari produk atau artikel..."
                                 class="w-full bg-gray-50 border border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/5 rounded-lg outline-none transition-all text-sm placeholder:text-gray-400 font-medium h-10 px-4 pr-20"
-                                aria-label="Cari Produk">
+                                aria-label="Cari">
                             
                             {{-- Clear Search Button (Desktop) --}}
                             @if($search !== '')
@@ -85,9 +85,14 @@
                                 <div class="p-2 space-y-0.5 max-h-72 overflow-y-auto">
                                     @forelse($this->searchResults as $item)
                                         <a href="{{ $item['url'] }}"
-                                            class="block px-4 py-2.5 rounded-lg text-sm text-gray-700 hover:bg-primary/5 hover:text-primary font-medium transition-colors">{{ $item['name'] }}</a>
+                                            class="flex items-center justify-between px-4 py-2.5 rounded-lg text-sm text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors group">
+                                            <span class="font-medium truncate pr-4">{{ $item['name'] }}</span>
+                                            <span class="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded {{ $item['type'] === 'Produk' ? 'bg-primary/10 text-primary' : 'bg-rose-500/10 text-rose-500' }}">
+                                                {{ $item['type'] }}
+                                            </span>
+                                        </a>
                                     @empty
-                                        <div class="px-4 py-3 text-sm text-gray-500 text-center">Produk tidak ditemukan.</div>
+                                        <div class="px-4 py-3 text-sm text-gray-500 text-center">Hasil tidak ditemukan.</div>
                                     @endforelse
                                 </div>
                             </div>
@@ -326,9 +331,9 @@
                         <div class="relative flex-1">
                             <input id="mobileSearchInput" wire:model.live.debounce.300ms="search"
                                 wire:keydown.enter="goToSearch" type="text"
-                                placeholder="Cari produk atau brand..."
+                                placeholder="Cari produk atau artikel..."
                                 class="w-full bg-gray-50 border border-gray-200 focus:border-primary rounded-lg outline-none transition text-[13px] font-semibold text-gray-700 placeholder:text-gray-400 h-9 px-3 pr-16"
-                                aria-label="Cari Produk">
+                                aria-label="Cari">
 
                             {{-- Clear Search Button (Mobile) --}}
                             @if($search !== '')
@@ -344,6 +349,25 @@
                                 aria-label="Cari">
                                 <i class="fas fa-search text-[11px]" aria-hidden="true"></i>
                             </button>
+
+                            {{-- Mobile Search Results Dropdown --}}
+                            @if($search !== '')
+                                <div class="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-[120] overflow-hidden">
+                                    <div class="p-1 space-y-0.5 max-h-60 overflow-y-auto">
+                                        @forelse($this->searchResults as $item)
+                                            <a href="{{ $item['url'] }}"
+                                                class="flex items-center justify-between px-3 py-2 rounded-lg text-xs text-gray-700 hover:bg-primary/5 hover:text-primary transition-colors group">
+                                                <span class="font-medium truncate pr-2">{{ $item['name'] }}</span>
+                                                <span class="text-[8px] font-black uppercase tracking-tight px-1 py-0.5 rounded {{ $item['type'] === 'Produk' ? 'bg-primary/10 text-primary' : 'bg-rose-500/10 text-rose-500' }}">
+                                                    {{ $item['type'] }}
+                                                </span>
+                                            </a>
+                                        @empty
+                                            <div class="px-3 py-3 text-xs text-gray-500 text-center">Hasil tidak ditemukan.</div>
+                                        @endforelse
+                                    </div>
+                                </div>
+                            @endif
                         </div>
 
                         @if(!auth()->check())

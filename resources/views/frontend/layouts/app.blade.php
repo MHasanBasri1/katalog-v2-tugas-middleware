@@ -419,18 +419,18 @@
             class="fixed bottom-[85px] right-5 z-[100] md:bottom-8 md:right-8 group">
             <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $whatsapp_setting) }}" target="_blank"
                 rel="noopener noreferrer"
-                class="relative flex items-center gap-2.5 bg-white/90 backdrop-blur-xl border border-white/50 p-1.5 pr-4 rounded-xl shadow-[0_15px_35px_rgba(0,0,0,0.1)] hover:shadow-[0_15px_45px_rgba(37,99,235,0.15)] transition-all duration-500 group hover:-translate-y-1.5">
+                class="relative flex items-center gap-3 bg-white/95 backdrop-blur-xl border border-white/50 p-2 pr-5 rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.12)] hover:shadow-[0_25px_50px_rgba(37,99,235,0.2)] transition-all duration-500 group hover:-translate-y-2">
                 <div class="relative">
-                    <div class="absolute inset-0 bg-primary/20 rounded-lg animate-ping"></div>
+                    <div class="absolute inset-0 bg-primary/20 rounded-xl animate-ping opacity-75"></div>
                     <div
-                        class="relative flex items-center justify-center w-9 h-9 bg-primary text-white rounded-lg shadow-lg shadow-primary/30 transition-transform duration-500 group-hover:rotate-12">
-                        <i class="fas fa-headset text-base"></i>
+                        class="relative flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary to-primary-dark text-white rounded-xl shadow-lg shadow-primary/30 transition-transform duration-500 group-hover:rotate-12">
+                        <i class="fas fa-headset text-xl"></i>
                     </div>
                 </div>
                 <div class="flex flex-col">
                     <span
-                        class="text-[9px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-1">Support</span>
-                    <span class="text-[12px] font-black text-gray-800 leading-none">Bantuan</span>
+                        class="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mb-1.5 transition-colors group-hover:text-primary">Customer Care</span>
+                    <span class="text-[14px] font-black text-gray-800 leading-none tracking-tight">Butuh Bantuan?</span>
                 </div>
             </a>
         </div>

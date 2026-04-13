@@ -52,6 +52,15 @@ class ProductTransformer
                 'marketplace' => $link->marketplace,
                 'url' => $link->url,
             ])->values()->all(),
+            'reviews' => $product->reviews->map(fn ($review) => [
+                'id' => $review->id,
+                'reviewer_name' => $review->reviewer_name,
+                'rating' => (int) $review->rating,
+                'comment' => $review->comment,
+                'review_date' => $review->review_date,
+                'variant' => $review->variant,
+                'source' => $review->source,
+            ])->values()->all(),
             'created_at' => optional($product->created_at)->toISOString(),
             'updated_at' => optional($product->updated_at)->toISOString(),
         ];
