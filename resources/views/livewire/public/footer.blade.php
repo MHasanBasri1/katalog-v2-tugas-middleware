@@ -2,8 +2,9 @@
     <footer class="bg-gray-50 border-t border-gray-200 text-gray-600/80 pt-12 pb-6 mt-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
             <div class="space-y-6">
-                <a href="/" class="flex items-center" aria-label="Kataloque Beranda">
-                    <img src="https://www.static-src.com/frontend/static/img/logo-blibli-blue.0f340eba.svg" alt="Logo" class="h-10 w-auto">
+                <a href="/" class="flex items-center" aria-label="{{ $setting?->shop_name ?? 'Kataloque' }} Beranda">
+                    <img src="https://www.static-src.com/frontend/static/img/logo-blibli-blue.0f340eba.svg" 
+                        alt="{{ $setting?->shop_name ?? 'Kataloque' }} Logo" class="h-10 w-auto">
                 </a>
                 <p class="text-sm leading-relaxed font-medium text-gray-500 max-w-sm">
                     {{ $setting?->shop_description ?? 'Satu destinasi untuk semua kebutuhan gaya hidup Anda. Belanja cerdas, cepat, dan aman hanya di Kataloque.' }}

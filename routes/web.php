@@ -169,8 +169,17 @@ Route::middleware(['web', 'throttle:60,1'])->group(function () {
     })->name('blog.detail');
 
     Route::get('/robots.txt', function () {
-        return response("User-agent: *\nAllow: /\n\nSitemap: " . url('/sitemap.xml'))
-            ->header('Content-Type', 'text/plain');
+        $robots = "User-agent: *\n";
+        $robots .= "Allow: /\n";
+        $robots .= "Disallow: /admin/\n";
+        $robots .= "Disallow: /masuk\n";
+        $robots .= "Disallow: /daftar\n";
+        $robots .= "Disallow: /profil-saya\n";
+        $robots .= "Disallow: /reset-password/\n";
+        $robots .= "Disallow: /verifikasi-device/\n\n";
+        $robots .= "Sitemap: " . url('/sitemap.xml');
+
+        return response($robots)->header('Content-Type', 'text/plain');
     });
 
     Route::get('/{slug}', function (string $slug) {

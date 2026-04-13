@@ -50,7 +50,7 @@
                     {{-- LOGO --}}
                     <a href="/" class="flex items-center shrink-0" aria-label="Kataloque Beranda">
                         <img src="https://www.static-src.com/frontend/static/img/logo-blibli-blue.0f340eba.svg"
-                            alt="Logo" class="h-9 w-auto">
+                            alt="{{ $setting->shop_name ?? 'Kataloque' }} Logo" class="h-9 w-auto">
                     </a>
 
                     {{-- SEARCH --}}
