@@ -66,6 +66,7 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::get('/blogs', [BlogController::class, 'index']);
+    Route::get('/blog-categories', [BlogController::class, 'categories']);
     Route::get('/blogs/{slug}', [BlogController::class, 'show']);
     Route::get('/blogs/{slug}/related', [BlogController::class, 'related']);
 });

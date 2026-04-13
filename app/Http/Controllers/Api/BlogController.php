@@ -17,8 +17,26 @@ class BlogController extends BaseApiController
         $blogs = Blog::query()
             ->where('is_published', true)
             ->with(['category'])
+            ->when(
+                $request->filled('category_id'),
+                fn ($query) => $query->where('category_id', $request->query('category_id'))
+            )
+            ->when(
+                $request->filled('category_slug'),
+                fn ($query) => $query->whereHas('category', fn ($q) => $q->where('slug', $request->query('category_slug')))
+            )
+            ->when(
+                $request->filled('q'),
+                fn ($query) => $query->where(function ($q) use ($request) {
+                    $search = trim((string) $request->query('q'));
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('excerpt', 'like', "%{$search}%")
+                        ->orWhere('content', 'like', "%{$search}%");
+                })
+            )
             ->latest('published_at')
-            ->paginate($perPage);
+            ->paginate($perPage)
+            ->withQueryString();
 
         return $this->success([
             'blogs' => collect($blogs->items())->map(fn (Blog $blog) => BlogTransformer::transform($blog))->values(),
@@ -28,6 +46,16 @@ class BlogController extends BaseApiController
             'per_page' => $blogs->perPage(),
             'total' => $blogs->total(),
         ]);
+    }
+
+    public function categories(): JsonResponse
+    {
+        $categories = \App\Models\BlogCategory::query()
+            ->withCount(['blogs' => fn ($q) => $q->where('is_published', true)])
+            ->orderBy('name')
+            ->get();
+
+        return $this->success($categories, 'Daftar kategori blog.');
     }
 
     public function show(string $slug): JsonResponse

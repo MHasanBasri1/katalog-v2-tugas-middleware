@@ -29,11 +29,22 @@ class HomeController extends BaseApiController
         $banners = Banner::query()
             ->where('is_active', true)
             ->orderBy('sort_order')
-            ->get(['id', 'title', 'subtitle', 'image_url', 'cta_label', 'cta_url', 'sort_order']);
+            ->get(['id', 'title', 'subtitle', 'image_url', 'cta_label', 'cta_url', 'sort_order'])
+            ->map(function ($banner) {
+                if ($banner->image_url && !str_starts_with($banner->image_url, 'http')) {
+                    $banner->image_url = url(str_starts_with($banner->image_url, 'storage/') ? $banner->image_url : 'storage/' . $banner->image_url);
+                }
+                return $banner;
+            });
 
         return $this->success([
             'banners' => $banners,
-            'categories' => $categories,
+            'categories' => $categories->map(function ($cat) {
+                if ($cat->icon && !str_starts_with($cat->icon, 'http') && (str_contains($cat->icon, '.') || str_contains($cat->icon, '/'))) {
+                    $cat->icon = url(str_starts_with($cat->icon, 'storage/') ? $cat->icon : 'storage/' . $cat->icon);
+                }
+                return $cat;
+            }),
             'flashsale_products' => $promoProducts->map(fn (Product $product) => ProductTransformer::transform($product))->values(),
             'terlaris_products' => $popularProducts->map(fn (Product $product) => ProductTransformer::transform($product))->values(),
             'best_seller_products' => $popularProducts->map(fn (Product $product) => ProductTransformer::transform($product))->values(),

@@ -26,7 +26,12 @@ class CategoryController extends BaseApiController
             ->paginate($perPage)
             ->withQueryString();
 
-        return $this->success($categories->items(), 'OK', 200, [
+        return $this->success(collect($categories->items())->map(function ($cat) {
+            if ($cat->icon && !str_starts_with($cat->icon, 'http') && (str_contains($cat->icon, '.') || str_contains($cat->icon, '/'))) {
+                $cat->icon = url(str_starts_with($cat->icon, 'storage/') ? $cat->icon : 'storage/' . $cat->icon);
+            }
+            return $cat;
+        }), 'OK', 200, [
             'current_page' => $categories->currentPage(),
             'last_page' => $categories->lastPage(),
             'per_page' => $categories->perPage(),
@@ -37,9 +42,13 @@ class CategoryController extends BaseApiController
     public function show(Request $request, string $slug): JsonResponse
     {
         $category = Category::query()
-            ->select('id', 'name', 'slug', 'description')
+            ->select('id', 'name', 'slug', 'description', 'icon')
             ->where('slug', $slug)
             ->firstOrFail();
+
+        if ($category->icon && !str_starts_with($category->icon, 'http') && (str_contains($category->icon, '.') || str_contains($category->icon, '/'))) {
+            $category->icon = url(str_starts_with($category->icon, 'storage/') ? $category->icon : 'storage/' . $category->icon);
+        }
 
         $perPage = (int) $request->integer('per_page', 10);
         $perPage = max(1, min(50, $perPage));

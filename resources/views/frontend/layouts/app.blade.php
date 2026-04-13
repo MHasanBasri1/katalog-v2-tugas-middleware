@@ -313,7 +313,7 @@
                 <span class="text-[10px] font-bold">Beranda</span>
             </a>
             <a href="/produk"
-                class="flex flex-col items-center gap-1 p-2 {{ request()->is('katalog*') ? 'text-primary' : 'text-gray-500' }}"
+                class="flex flex-col items-center gap-1 p-2 {{ request()->is('produk*') ? 'text-primary' : 'text-gray-500' }}"
                 aria-label="Lihat Katalog Produk">
                 <i class="fas fa-th-large text-lg" aria-hidden="true"></i>
                 <span class="text-[10px] font-bold">Katalog</span>

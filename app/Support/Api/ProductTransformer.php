@@ -41,10 +41,10 @@ class ProductTransformer
             'rating_count' => (int) $product->rating_count,
             'is_featured' => (bool) $product->is_featured,
             'show_in_promo' => (bool) $product->show_in_promo,
-            'image' => $image,
+            'image' => self::formatImageUrl($image),
             'images' => $product->images->map(fn ($img) => [
                 'id' => $img->id,
-                'url' => $img->image,
+                'url' => self::formatImageUrl($img->image),
                 'is_primary' => (bool) $img->is_primary,
             ])->values()->all(),
             'marketplace_links' => $product->marketplaceLinks->map(fn ($link) => [
@@ -64,5 +64,24 @@ class ProductTransformer
             'created_at' => optional($product->created_at)->toISOString(),
             'updated_at' => optional($product->updated_at)->toISOString(),
         ];
+    }
+
+    private static function formatImageUrl(?string $path): ?string
+    {
+        if (!$path) {
+            return null;
+        }
+
+        if (str_starts_with($path, 'http')) {
+            return $path;
+        }
+
+        // Handle case where path might already include storage/
+        $cleanPath = ltrim($path, '/');
+        if (str_starts_with($cleanPath, 'storage/')) {
+            return url($cleanPath);
+        }
+
+        return url('storage/' . $cleanPath);
     }
 }

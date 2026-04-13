@@ -93,11 +93,11 @@
             </div>
             
             <div class="flex border-t border-gray-100 dark:border-gray-800">
-                <button @click="showDeleteModal = false" 
+                <button type="button" @click="showDeleteModal = false" 
                     class="flex-1 px-6 py-4 text-xs font-black text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-r border-gray-100 dark:border-gray-800 uppercase tracking-widest">
                     Batal
                 </button>
-                <button @click="$wire.deleteImage(deleteId); showDeleteModal = false;" 
+                <button type="button" @click="$wire.deleteImage(deleteId); showDeleteModal = false;" 
                     class="flex-1 px-6 py-4 text-xs font-black text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-colors uppercase tracking-widest">
                     Ya, Hapus
                 </button>
