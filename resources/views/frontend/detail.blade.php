@@ -135,7 +135,7 @@
                         @else
                             <div class="inline-flex items-center gap-2 bg-gray-100 text-gray-400 px-3 py-1.5 rounded-lg text-xs font-bold tracking-wide"><i class="fas fa-folder-open opacity-50"></i> Tanpa Kategori</div>
                         @endif
-                        @livewire('public.favorite-button', ['productId' => $product->id, 'class' => 'ml-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white text-gray-600 hover:text-rose-500 hover:border-rose-200 shadow-sm text-xs font-bold font-primary'], key('fav-'.$product->id))
+                        @livewire('public.favorite-button', ['productId' => $product->id, 'class' => 'ml-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white text-gray-600 hover:text-rose-500 hover:border-rose-200 shadow-sm text-xs font-bold font-primary'], 'fav-'.$product->id)
                     </div>
                     <h1 class="text-xl lg:text-3xl font-black text-gray-900 leading-tight tracking-tight">{{ $product->name }}</h1>
                 </div>
@@ -210,10 +210,6 @@
                 <div class="p-6 md:p-8">
                     {{-- Description Tab --}}
                     <div x-show="activeTab === 'description'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
-                            <h3 class="text-lg font-black text-gray-900 tracking-tight uppercase">Detail Produk</h3>
-                        </div>
                         <div class="prose prose-sm md:prose-base max-w-none text-gray-600 font-medium leading-relaxed">
                             <p>{!! nl2br(e($product->description)) ?: 'Belum ada deskripsi spesifik untuk produk ini.' !!}</p>
                         </div>
@@ -221,18 +217,14 @@
 
                     {{-- Reviews Tab --}}
                     <div x-show="activeTab === 'reviews'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
-                        <div class="flex items-center justify-between gap-3 mb-6">
-                            <div class="flex items-center gap-3">
-                                <div class="w-1.5 h-6 bg-blue-600 rounded-full"></div>
-                                <h3 class="text-lg font-black text-gray-900 tracking-tight uppercase">Ulasan Pembeli</h3>
-                            </div>
-                            @if($product->last_sync_at)
+                        @if($product->last_sync_at)
+                            <div class="flex justify-end gap-3 mb-6">
                                 <div class="flex flex-col items-end">
                                     <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Data Marketplace</div>
                                     <div class="text-[10px] font-bold text-emerald-600">{{ $product->last_sync_at->diffForHumans() }}</div>
                                 </div>
-                            @endif
-                        </div>
+                            </div>
+                        @endif
 
                         @php
                             $tokpedLink = $product->marketplaceLinks->where('marketplace', 'Tokopedia')->first();
