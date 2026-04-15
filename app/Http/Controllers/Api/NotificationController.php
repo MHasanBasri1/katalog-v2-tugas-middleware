@@ -17,13 +17,26 @@ class NotificationController extends BaseApiController
             ->paginate($perPage);
 
         return $this->success([
-            'notifications' => collect($notifications->items())->map(fn ($notification) => [
-                'id' => $notification->id,
-                'type' => $notification->type,
-                'data' => $notification->data,
-                'read_at' => $notification->read_at ? $notification->read_at->toISOString() : null,
-                'created_at' => $notification->created_at->toISOString(),
-            ])->values(),
+            'notifications' => collect($notifications->items())->map(function ($notification) {
+                // Get base name if type is a class path
+                $type = $notification->type;
+                if (str_contains($type, '\\')) {
+                    $parts = explode('\\', $type);
+                    $type = end($parts);
+                }
+                
+                // Remove 'Notification' suffix if present
+                $type = str_replace('Notification', '', $type);
+                $type = strtolower($type);
+
+                return [
+                    'id' => $notification->id,
+                    'type' => $type,
+                    'data' => $notification->data,
+                    'read_at' => $notification->read_at ? $notification->read_at->toISOString() : null,
+                    'created_at' => $notification->created_at->toISOString(),
+                ];
+            })->values(),
             'unread_count' => $user->unreadNotifications()->count(),
         ], 'Daftar notifikasi.', 200, [
             'current_page' => $notifications->currentPage(),
@@ -31,6 +44,19 @@ class NotificationController extends BaseApiController
             'per_page' => $notifications->perPage(),
             'total' => $notifications->total(),
         ]);
+    }
+
+    public function sendTestNotification(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        
+        $user->notify(new \App\Notifications\GeneralNotification(
+            'Selamat Datang!',
+            'Terima kasih telah bergabung di aplikasi Katalog. Cek produk terbaru kami!',
+            'info'
+        ));
+
+        return $this->success(null, 'Notifikasi tes berhasil dikirim.');
     }
 
     public function markAsRead(Request $request, string $id): JsonResponse

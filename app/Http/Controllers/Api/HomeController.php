@@ -37,8 +37,41 @@ class HomeController extends BaseApiController
                 return $banner;
             });
 
+        $advantages = [
+            [
+                'id' => 1,
+                'title' => 'Jaminan Ori',
+                'subtitle' => '100% Original',
+                'icon' => 'fas fa-certificate',
+                'color' => '#2563eb',
+                'badge' => '100%'
+            ],
+            [
+                'id' => 2,
+                'title' => 'Bebas Retur',
+                'subtitle' => 'Mudah & Cepat',
+                'icon' => 'fas fa-undo-alt',
+                'color' => '#f59e0b',
+            ],
+            [
+                'id' => 3,
+                'title' => 'Garansi Waktu',
+                'subtitle' => 'Tepat & Aman',
+                'icon' => 'fas fa-truck-fast',
+                'color' => '#f43f5e',
+            ],
+            [
+                'id' => 4,
+                'title' => 'Layanan 24/7',
+                'subtitle' => 'Cepat Respon',
+                'icon' => 'fas fa-headset',
+                'color' => '#10b981',
+            ],
+        ];
+
         return $this->success([
             'banners' => $banners,
+            'advantages' => $advantages,
             'categories' => $categories->map(function ($cat) {
                 if ($cat->icon && !str_starts_with($cat->icon, 'http') && (str_contains($cat->icon, '.') || str_contains($cat->icon, '/'))) {
                     $cat->icon = url(str_starts_with($cat->icon, 'storage/') ? $cat->icon : 'storage/' . $cat->icon);
