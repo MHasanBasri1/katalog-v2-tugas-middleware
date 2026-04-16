@@ -57,24 +57,30 @@ class ProfileController extends BaseApiController
     public function updateAvatar(Request $request): JsonResponse
     {
         $request->validate([
-            'avatar' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'avatar' => ['required', 'image', 'mimes:jpg,jpeg,png,webp,heic,heif', 'max:2048'],
         ]);
 
         $user = $request->user();
-        $newPath = $request->file('avatar')->store("avatars/users/{$user->id}", 'public');
+        $oldAvatar = $user->avatar;
 
-        if ($user->hasUploadedAvatar()) {
-            Storage::disk('public')->delete((string) $user->avatar);
-        }
+        $newPath = $request->file('avatar')->store("avatars/users/{$user->id}", 'public');
 
         $user->forceFill([
             'avatar' => $newPath,
         ])->save();
 
+        if ($oldAvatar && ! Str::startsWith((string) $oldAvatar, ['http://', 'https://'])) {
+            Storage::disk('public')->delete((string) $oldAvatar);
+        }
+
         return $this->success([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
             'avatar' => $user->avatar,
             'avatar_url' => $user->avatar_url,
             'google_avatar' => $user->google_avatar,
+            'updated_at' => optional($user->updated_at)->toISOString(),
         ], 'Avatar berhasil diperbarui.');
     }
 
