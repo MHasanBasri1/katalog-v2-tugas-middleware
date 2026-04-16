@@ -30,12 +30,12 @@
 
     @php
         $canDashboard = auth()->user()?->can('dashboard.view');
-        $canCatalog = auth()->user()?->can('categories.manage') || auth()->user()?->can('products.manage');
+        $canCatalog = auth()->user()?->can('categories.manage') || auth()->user()?->can('products.manage') || auth()->user()?->can('vouchers.manage');
         $canContent = auth()->user()?->can('blogs.manage') || auth()->user()?->can('banners.manage') || auth()->user()?->can('static_pages.manage');
         $canUsers = auth()->user()?->can('users.manage');
         $canSystem = auth()->user()?->can('settings.manage');
 
-        $isCatalogActive = request()->routeIs('admin.kategori.*') || request()->routeIs('admin.produk.*');
+        $isCatalogActive = request()->routeIs('admin.kategori.*') || request()->routeIs('admin.produk.*') || request()->routeIs('admin.voucher.*');
         $isContentActive = request()->routeIs('admin.blog.*') || request()->routeIs('admin.blog-kategori.*') || request()->routeIs('admin.banner.*') || request()->routeIs('admin.halaman-statis.*');
         $isUsersActive = request()->routeIs('admin.user.*');
         $isSystemActive = request()->routeIs('admin.setting.*');
@@ -123,6 +123,19 @@
                             <div class="absolute left-0 inset-y-1.5 w-0.5 bg-blue-300/80 rounded-r-full"></div>
                         @endif
                         <span>Produk</span>
+                    </a>
+                @endcan
+                @can('vouchers.manage')
+                    <a href="{{ route('admin.voucher.index') }}"
+                       class="flex items-center rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 relative overflow-hidden group"
+                       @class([
+                           'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/20' => request()->routeIs('admin.voucher.*'),
+                           'text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-gray-800' => !request()->routeIs('admin.voucher.*'),
+                       ])>
+                        @if(request()->routeIs('admin.voucher.*'))
+                            <div class="absolute left-0 inset-y-1.5 w-0.5 bg-blue-300/80 rounded-r-full"></div>
+                        @endif
+                        <span>Voucher</span>
                     </a>
                 @endcan
             </div>

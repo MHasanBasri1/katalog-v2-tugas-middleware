@@ -43,7 +43,7 @@
                     <i class="ti ti-users text-6xl text-orange-600"></i>
                 </div>
                 <div class="relative z-10">
-                    <p class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Total User</p>
+                    <p class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Total Pengguna</p>
                     <h3 class="mt-4 text-4xl font-extrabold text-gray-900 dark:text-white">{{ number_format($stats['users']) }}</h3>
                     <div class="mt-4 flex items-center text-[10px] font-bold text-orange-500 uppercase">
                         <span class="w-1.5 h-1.5 rounded-full bg-orange-500 mr-1.5 border border-white dark:border-gray-950"></span>
@@ -182,7 +182,7 @@
                                                 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-900/30' => $log->user->hasRole('admin'),
                                                 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-900/30' => !$log->user->hasRole('admin')
                                             ])>
-                                                {{ $log->user->hasRole('admin') ? 'ADMIN' : 'USER' }}
+                                                {{ $log->user->hasRole('admin') ? 'ADMIN' : 'MEMBER' }}
                                             </span>
                                         @else
                                             <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest bg-gray-50 text-gray-500 border border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700">

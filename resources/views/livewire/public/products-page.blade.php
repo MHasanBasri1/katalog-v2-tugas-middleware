@@ -62,13 +62,12 @@
         @forelse($products as $product)
             <x-product-card :product="$product" :compactViews="$compactViews" />
         @empty
-            <div class="col-span-full py-16 text-center bg-white rounded-[2rem] border border-gray-100 shadow-sm">
-                <div class="w-48 h-48 mx-auto mb-4 flex items-center justify-center">
-                    <lottie-player src="https://lottie.host/801648a8-b61a-4d37-9750-f8c5b0451e60/a3W60nE6Zt.json" background="transparent" speed="1" style="width: 200px; height: 200px;" loop autoplay></lottie-player>
-                </div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2 font-primary uppercase tracking-tight">Opps! Produk Tidak Ditemukan</h3>
-                <p class="text-gray-500 max-w-md mx-auto mb-6 text-sm font-medium">Kami tidak dapat menemukan produk yang sesuai dengan pencarian atau filter Anda.</p>
-                <button wire:click="clearFilters" class="px-8 py-3 bg-primary text-white font-black rounded-xl hover:bg-primary-dark transition-all duration-300 shadow-lg shadow-primary/20 flex items-center gap-2 mx-auto">
+            <div class="col-span-full py-20 px-4 text-center bg-white rounded-[2rem] border border-gray-100 shadow-sm flex flex-col items-center justify-center">
+                <h3 class="text-xl md:text-2xl font-black text-gray-900 mb-3 font-primary uppercase tracking-tight">Opps! Produk Tidak Ditemukan</h3>
+                <p class="text-gray-500 max-w-md mx-auto mb-8 text-sm md:text-base font-medium leading-relaxed">
+                    Kami tidak dapat menemukan produk yang sesuai dengan pencarian atau filter Anda. Silakan coba kata kunci lain.
+                </p>
+                <button wire:click="clearFilters" class="px-8 py-3 bg-primary text-white font-black rounded-xl hover:bg-primary-dark transition-all duration-300 shadow-lg shadow-primary/20 flex items-center gap-2">
                     <i class="fas fa-undo text-xs"></i>
                     Tampilkan Semua Produk
                 </button>

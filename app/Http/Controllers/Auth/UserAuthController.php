@@ -97,7 +97,7 @@ class UserAuthController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255'],
+            'email' => ['required', 'string', 'email:rfc,dns', 'regex:/^.+@.+\..+$/', 'max:255'],
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
@@ -113,6 +113,7 @@ class UserAuthController extends Controller
             'name' => $validated['name'],
             'email' => $normalizedEmail,
             'password' => Hash::make($validated['password']),
+            'email_verified_at' => config('auth.verification.required') ? null : now(),
         ]);
 
         event(new Registered($user));
@@ -122,12 +123,16 @@ class UserAuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->route('verification.notice')->with('status', 'Akun berhasil dibuat. Cek email untuk verifikasi.');
+        if (config('auth.verification.required')) {
+            return redirect()->route('verification.notice')->with('status', 'Akun berhasil dibuat. Cek email untuk verifikasi.');
+        }
+
+        return redirect()->route('user.panel')->with('status', 'Akun berhasil dibuat dan otomatis terverifikasi.');
     }
 
     private function ensureDefaultUserRole(User $user): void
     {
-        Role::findOrCreate('user', 'web');
-        $user->syncRoles(['user']);
+        Role::findOrCreate('member', 'web');
+        $user->syncRoles(['member']);
     }
 }

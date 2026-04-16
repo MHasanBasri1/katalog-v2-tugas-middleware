@@ -19,7 +19,7 @@ class AuthController extends BaseApiController
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255'],
+            'email' => ['required', 'string', 'email:rfc,dns', 'regex:/^.+@.+\..+$/', 'max:255'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
@@ -37,22 +37,32 @@ class AuthController extends BaseApiController
             'password' => Hash::make((string) $validated['password']),
             'is_admin' => false,
             'is_frozen' => false,
+            'email_verified_at' => config('auth.verification.required') ? null : now(),
         ]);
 
-        $this->ensureUserRole($user);
-        $token = $this->issueToken($user);
+        if (config('auth.verification.required')) {
+            $user->sendEmailVerificationNotification();
+        }
 
-        return $this->success([
-            'token' => $token,
-            'token_type' => 'Bearer',
-            'user' => $this->transformUser($user),
-        ], 'Registrasi berhasil.', 201);
+        $this->ensureUserRole($user);
+
+        $data = ['user' => $this->transformUser($user)];
+        $message = 'Registrasi berhasil.';
+
+        if (config('auth.verification.required')) {
+            $message .= ' Silakan cek email Anda untuk verifikasi sebelum login.';
+        } else {
+            $data['token'] = $this->issueToken($user);
+            $data['token_type'] = 'Bearer';
+        }
+
+        return $this->success($data, $message, 201);
     }
 
     public function login(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'email' => ['required', 'string', 'email'],
+            'email' => ['required', 'string', 'email:rfc,dns', 'regex:/^.+@.+\..+$/'],
             'password' => ['required', 'string'],
         ]);
 
@@ -70,6 +80,10 @@ class AuthController extends BaseApiController
 
         if ($user->is_admin || $user->hasRole('admin')) {
             return $this->error('Akun admin tidak bisa login melalui API user.', 403);
+        }
+
+        if (config('auth.verification.required') && ! $user->hasVerifiedEmail()) {
+            return $this->error('Email Anda belum terverifikasi. Silakan verifikasi email Anda terlebih dahulu.', 403);
         }
 
         $this->ensureUserRole($user);
@@ -149,12 +163,10 @@ class AuthController extends BaseApiController
                 'google_id' => $sub,
                 'google_avatar' => $picture,
                 'avatar' => $picture,
-                'email_verified_at' => null,
+                'email_verified_at' => now(), // Google already verified this
                 'is_admin' => false,
                 'is_frozen' => false,
             ]);
-
-            $user->sendEmailVerificationNotification();
         } else {
             $updates = [];
 
@@ -169,14 +181,14 @@ class AuthController extends BaseApiController
             if (! empty($updates)) {
                 $user->forceFill($updates)->save();
             }
-
-            if (! $user->hasVerifiedEmail()) {
-                $user->sendEmailVerificationNotification();
-            }
         }
 
         if ($user->is_frozen) {
             return $this->error('Akun sedang dibekukan. Hubungi admin.', 403);
+        }
+
+        if (config('auth.verification.required') && ! $user->hasVerifiedEmail()) {
+            return $this->error('Email Anda belum terverifikasi. Silakan verifikasi email Anda terlebih dahulu.', 403);
         }
 
         $this->ensureUserRole($user);
@@ -197,7 +209,7 @@ class AuthController extends BaseApiController
     public function forgotPassword(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'email' => ['required', 'string', 'email'],
+            'email' => ['required', 'string', 'email:rfc,dns', 'regex:/^.+@.+\..+$/'],
         ]);
 
         $email = User::normalizeEmail((string) $validated['email']);
@@ -227,7 +239,7 @@ class AuthController extends BaseApiController
     {
         $validated = $request->validate([
             'token' => ['required', 'string'],
-            'email' => ['required', 'string', 'email'],
+            'email' => ['required', 'string', 'email:rfc,dns', 'regex:/^.+@.+\..+$/'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
@@ -297,8 +309,8 @@ class AuthController extends BaseApiController
             return;
         }
 
-        Role::findOrCreate('user', 'web');
-        $user->syncRoles(['user']);
+        Role::findOrCreate('member', 'web');
+        $user->syncRoles(['member']);
     }
 
     private function transformUser(User $user): array

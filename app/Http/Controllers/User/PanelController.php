@@ -30,7 +30,16 @@ class PanelController extends Controller
             ->unique('id')
             ->values();
 
-        return view('user.panel', compact('favoriteProducts'));
+        $vouchers = \App\Models\Voucher::query()
+            ->where('is_active', true)
+            ->where(function ($query) {
+                $query->whereNull('end_date')
+                    ->orWhere('end_date', '>=', now());
+            })
+            ->latest('id')
+            ->get();
+
+        return view('user.panel', compact('favoriteProducts', 'vouchers'));
     }
 
     public function updateProfile(Request $request): RedirectResponse
@@ -39,7 +48,7 @@ class PanelController extends Controller
 
         $validated = $request->validateWithBag('profileUpdate', [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'email' => ['required', 'string', 'email:rfc,dns', 'regex:/^.+@.+\..+$/', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
         ]);
 
         $user->update($validated);

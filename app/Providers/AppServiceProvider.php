@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\View::composer('*', function ($view) {
             $setting = \Illuminate\Support\Facades\Cache::rememberForever(
                 'global.settings',
-                fn () => \App\Models\Setting::query()->first()
+                fn () => \App\Models\Setting::query()->first() ?? new \App\Models\Setting()
             );
             $view->with('setting', $setting);
         });

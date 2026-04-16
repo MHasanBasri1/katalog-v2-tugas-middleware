@@ -1,7 +1,7 @@
 @php
     /** @var \App\Models\User|null $user */
     $isEdit = isset($user) && $user->exists;
-    $selectedRole = old('role', $isEdit ? ($user->hasRole('admin') ? 'admin' : 'user') : 'user');
+    $selectedRole = old('role', $isEdit ? ($user->hasRole('admin') ? 'admin' : 'member') : 'member');
 @endphp
 
 <form method="POST" action="{{ $isEdit ? route('admin.user.update', $user) : route('admin.user.store') }}" class="space-y-4">
@@ -30,7 +30,7 @@
         <div>
             <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Role</label>
             <select name="role" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100">
-                <option value="user" @selected($selectedRole === 'user')>User</option>
+                <option value="member" @selected($selectedRole === 'member')>Member</option>
                 <option value="admin" @selected($selectedRole === 'admin')>Admin</option>
             </select>
         </div>

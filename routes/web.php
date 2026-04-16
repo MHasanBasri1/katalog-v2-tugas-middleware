@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\StaticPageController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\VoucherController;
 use App\Http\Controllers\Admin\LogController;
 
 Route::middleware('guest')->group(function () {
@@ -79,13 +80,13 @@ Route::middleware('auth')->group(function () {
     })->middleware('throttle:6,1')->name('verification.send');
 });
 
-Route::middleware(['auth', 'role:user', 'verified'])->group(function () {
-    Route::get('/profil-saya', [PanelController::class, 'index'])->name('user.panel');
-    Route::put('/profil-saya/profil', [PanelController::class, 'updateProfile'])->name('user.profile.update');
-    Route::put('/profil-saya/password', [PanelController::class, 'updatePassword'])->name('user.password.update');
-    Route::post('/profil-saya/avatar', [PanelController::class, 'updateAvatar'])->name('user.avatar.update');
-    Route::delete('/profil-saya/avatar', [PanelController::class, 'destroyAvatar'])->name('user.avatar.destroy');
-    Route::delete('/profil-saya/favorit/{productId}', [PanelController::class, 'destroyFavorite'])->name('user.favorite.destroy');
+Route::middleware(array_merge(['auth', 'role:member'], config('auth.verification.required') ? ['verified'] : []))->group(function () {
+    Route::get('/dashboard', [PanelController::class, 'index'])->name('user.panel');
+    Route::put('/dashboard/profil', [PanelController::class, 'updateProfile'])->name('user.profile.update');
+    Route::put('/dashboard/password', [PanelController::class, 'updatePassword'])->name('user.password.update');
+    Route::post('/dashboard/avatar', [PanelController::class, 'updateAvatar'])->name('user.avatar.update');
+    Route::delete('/dashboard/avatar', [PanelController::class, 'destroyAvatar'])->name('user.avatar.destroy');
+    Route::delete('/dashboard/favorit/{productId}', [PanelController::class, 'destroyFavorite'])->name('user.favorite.destroy');
 });
 
 Route::middleware(['web', 'throttle:60,1'])->group(function () {
@@ -106,10 +107,15 @@ Route::middleware(['web', 'throttle:60,1'])->group(function () {
         $seoDescription = 'Artikel terbaru Kataloque seputar tips belanja online, gadget, dan rekomendasi produk.';
         $selectedCategory = (string) $request->query('kategori', '');
         $selectedTag = (string) $request->query('tag', '');
+        $search = (string) $request->query('search', '');
 
         $postQuery = Blog::query()
             ->with(['category:id,name,slug', 'tags:id,name,slug'])
             ->where('is_published', true)
+            ->when(
+                $search !== '',
+                fn ($query) => $query->where('title', 'like', "%{$search}%")
+            )
             ->when(
                 $selectedCategory !== '',
                 fn ($query) => $query->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('slug', $selectedCategory))
@@ -174,7 +180,7 @@ Route::middleware(['web', 'throttle:60,1'])->group(function () {
         $robots .= "Disallow: /admin/\n";
         $robots .= "Disallow: /masuk\n";
         $robots .= "Disallow: /daftar\n";
-        $robots .= "Disallow: /profil-saya\n";
+        $robots .= "Disallow: /dashboard\n";
         $robots .= "Disallow: /reset-password/\n";
         $robots .= "Disallow: /verifikasi-device/\n\n";
         $robots .= "Sitemap: " . url('/sitemap.xml');
@@ -299,6 +305,13 @@ Route::middleware(['auth', 'role:admin', 'log.activity'])->prefix('admin')->name
     Route::post('/halaman-statis/bulk-delete', [StaticPageController::class, 'bulkDestroy'])
         ->middleware('permission:static_pages.manage')
         ->name('halaman-statis.bulk-destroy');
+
+    Route::resource('/voucher', VoucherController::class)
+        ->except(['show'])
+        ->middleware('permission:vouchers.manage');
+    Route::post('/voucher/bulk-delete', [VoucherController::class, 'bulkDestroy'])
+        ->middleware('permission:vouchers.manage')
+        ->name('voucher.bulk-destroy');
 
     // Activity Logs
     Route::get('/logs', [LogController::class, 'index'])->name('logs.index');

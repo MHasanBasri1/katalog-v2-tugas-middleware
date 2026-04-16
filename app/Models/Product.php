@@ -32,13 +32,13 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
-        'original_price' => 'decimal:2',
+        'price' => 'float',
+        'original_price' => 'float',
         'status' => 'boolean',
         'is_featured' => 'boolean',
         'show_in_promo' => 'boolean',
         'is_sync_enabled' => 'boolean',
-        'rating_avg' => 'decimal:1',
+        'rating_avg' => 'float',
         'views_count' => 'integer',
         'sold_count' => 'integer',
         'last_sync_at' => 'datetime',

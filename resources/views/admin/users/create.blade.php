@@ -1,15 +1,15 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Tambah User')
-@section('header', 'Tambah User')
+@section('title', 'Tambah Pengguna')
+@section('header', 'Tambah Pengguna')
 
 @section('content')
 <div class="space-y-6 pb-20">
     <!-- Breadcrumbs -->
     <nav class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
-        <a href="{{ route('admin.user.index') }}" class="hover:text-blue-600 transition-colors">User</a>
+        <a href="{{ route('admin.user.index') }}" class="hover:text-blue-600 transition-colors">Pengguna</a>
         <i class="ti ti-chevron-right text-[10px]"></i>
-        <span class="text-gray-900 dark:text-white">Tambah User Baru</span>
+        <span class="text-gray-900 dark:text-white">Tambah Pengguna Baru</span>
     </nav>
 
     <form method="POST" action="{{ route('admin.user.store') }}" class="space-y-6">
@@ -18,7 +18,7 @@
         <!-- Main Info Card -->
         <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
             <div class="p-6 border-b border-gray-100 dark:border-gray-800">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Identitas User</h3>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Identitas Pengguna</h3>
                 <p class="text-sm text-gray-500">Informasi autentikasi dan profil dasar.</p>
             </div>
             <div class="p-6 space-y-5">
@@ -55,7 +55,7 @@
                         <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Role</label>
                         <select name="role" required 
                             class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">
-                            <option value="user" @selected(old('role') == 'user')>User Standar</option>
+                            <option value="member" @selected(old('role') == 'member')>Member Standar</option>
                             <option value="admin" @selected(old('role') == 'admin')>Administrator</option>
                         </select>
                     </div>

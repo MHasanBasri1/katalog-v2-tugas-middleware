@@ -33,6 +33,7 @@ class RolePermissionSeeder extends Seeder
             'users.manage',
             'banners.manage',
             'static_pages.manage',
+            'vouchers.manage',
         ];
 
         foreach ($permissions as $permissionName) {
@@ -45,14 +46,14 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'admin', 'guard_name' => 'web']
         );
         $userRole = Role::query()->updateOrCreate(
-            ['name' => 'user', 'guard_name' => 'web']
+            ['name' => 'member', 'guard_name' => 'web']
         );
 
         $adminRole->syncPermissions($permissions);
         $userRole->syncPermissions([]);
 
         User::query()->each(function (User $user): void {
-            $role = $user->is_admin ? 'admin' : 'user';
+            $role = $user->is_admin ? 'admin' : 'member';
             $user->syncRoles([$role]);
         });
     }

@@ -211,6 +211,11 @@
     .dark input[type='file']::file-selector-button:hover {
         background: #2563eb;
     }
+
+    .dark input::-webkit-calendar-picker-indicator {
+        filter: invert(1) brightness(0.8) !important;
+        cursor: pointer;
+    }
 }
 
 @layer components {

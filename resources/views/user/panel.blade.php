@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
-@section('title', 'Profil Saya - Kataloque')
-@section('meta_description', 'Profil pengguna Kataloque untuk mengelola data akun dan favorit.')
+@section('title', 'Dashboard Member - Kataloque')
+@section('meta_description', 'Dashboard member Kataloque untuk mengelola data akun, favorit, dan voucher.')
 @section('canonical', route('user.panel'))
 @section('og_url', route('user.panel'))
 
@@ -15,14 +15,14 @@
     <div class="relative bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/70 p-6 sm:p-8 md:p-9" x-data="{ tab: '{{ $activeTab }}' }">
         <div class="grid gap-4 md:grid-cols-[1.6fr_1fr] md:items-end">
             <div>
-                <p class="text-xs font-bold uppercase tracking-[0.2em] text-primary">Profil Saya</p>
+                <p class="text-xs font-bold uppercase tracking-[0.2em] text-primary">Dashboard Member</p>
                 <h1 class="mt-2 text-2xl sm:text-3xl font-black text-gray-900">Halo, {{ auth()->user()->name }}</h1>
-                <p class="mt-2 text-sm text-gray-500">Kelola data akun dan favorit Anda dari satu halaman.</p>
+                <p class="mt-2 text-sm text-gray-500">Kelola akun, favorit, dan voucher Anda dari satu tempat.</p>
             </div>
             <div class="rounded-2xl border border-blue-100 bg-blue-50/70 px-4 py-3">
                 <p class="text-[11px] uppercase tracking-wider font-bold text-blue-700">Status Akun</p>
                 <p class="mt-1 text-sm font-semibold text-gray-800">{{ auth()->user()->email }}</p>
-                <p class="mt-1 text-xs text-gray-500">Terdaftar sebagai pengguna Kataloque</p>
+                <p class="mt-1 text-xs text-gray-500">Terdaftar sebagai member Kataloque</p>
             </div>
         </div>
 
@@ -47,14 +47,18 @@
             </div>
         @endif
 
-        <div class="mt-6 grid w-full max-w-xs grid-cols-2 rounded-xl border border-gray-200 bg-gray-50 p-1">
-            <button type="button" @click="tab = 'profil'" :class="tab === 'profil' ? 'bg-white text-blue-700 shadow-sm' : 'text-gray-600 hover:text-gray-800'" class="rounded-lg px-4 py-2 text-sm font-semibold transition">
+        <div class="mt-6 flex w-full max-w-sm rounded-xl border border-gray-200 bg-gray-50 p-1">
+            <button type="button" @click="tab = 'profil'" :class="tab === 'profil' ? 'bg-white text-blue-700 shadow-sm' : 'text-gray-600 hover:text-gray-800'" class="flex-1 rounded-lg px-4 py-2 text-sm font-semibold transition">
                 <i class="fas fa-user-circle mr-1.5 text-xs"></i>
                 Profil
             </button>
-            <button type="button" @click="tab = 'favorit'" :class="tab === 'favorit' ? 'bg-white text-blue-700 shadow-sm' : 'text-gray-600 hover:text-gray-800'" class="rounded-lg px-4 py-2 text-sm font-semibold transition">
+            <button type="button" @click="tab = 'favorit'" :class="tab === 'favorit' ? 'bg-white text-blue-700 shadow-sm' : 'text-gray-600 hover:text-gray-800'" class="flex-1 rounded-lg px-4 py-2 text-sm font-semibold transition">
                 <i class="fas fa-heart mr-1.5 text-xs"></i>
                 Favorit
+            </button>
+            <button type="button" @click="tab = 'voucher'" :class="tab === 'voucher' ? 'bg-white text-blue-700 shadow-sm' : 'text-gray-600 hover:text-gray-800'" class="flex-1 rounded-lg px-4 py-2 text-sm font-semibold transition">
+                <i class="fas fa-ticket-alt mr-1.5 text-xs"></i>
+                Voucher
             </button>
         </div>
 
@@ -244,6 +248,56 @@
                         </div>
                         <p class="text-gray-500 font-medium text-sm">Belum ada produk di favorit.</p>
                         <a href="{{ route('katalog') }}" class="inline-block mt-4 text-xs font-bold text-primary hover:underline">Jelajahi Produk</a>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        <div x-show="tab === 'voucher'" x-cloak class="mt-6">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-lg font-bold text-gray-900">Voucher Saya</h2>
+                <span class="text-xs font-semibold text-gray-500">{{ $vouchers->count() }} voucher tersedia</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @forelse($vouchers as $voucher)
+                    <div class="group relative flex flex-col sm:flex-row sm:items-center rounded-2xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition-all overflow-hidden gap-4">
+                        <div class="absolute top-0 right-0 h-16 w-16 bg-blue-50 rounded-bl-full opacity-50 group-hover:scale-110 transition-transform"></div>
+                        
+                        <div class="flex items-center gap-4 flex-1 min-w-0">
+                            <div class="relative shrink-0 flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-200">
+                                <i class="fas fa-ticket-alt text-xl sm:text-2xl"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider">
+                                        {{ $voucher->code }}
+                                    </span>
+                                    @if($voucher->end_date)
+                                        <span class="text-[10px] font-bold text-gray-400">Exp: {{ $voucher->end_date->format('d M Y') }}</span>
+                                    @endif
+                                </div>
+                                <h3 class="mt-1 text-sm font-bold text-gray-900 truncate">{{ $voucher->name }}</h3>
+                                <p class="text-[11px] text-gray-500 line-clamp-1 italic">{{ $voucher->description }}</p>
+                            </div>
+                        </div>
+
+                        <div class="shrink-0 flex sm:flex-col items-center sm:items-end justify-between sm:justify-center pt-3 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                            <p class="text-sm sm:text-base font-black text-blue-600">
+                                @if($voucher->type === 'percentage')
+                                    {{ number_format($voucher->value, 0) }}% OFF
+                                @else
+                                    Rp {{ number_format($voucher->value/1000, 0) }}K OFF
+                                @endif
+                            </p>
+                            <button @click="navigator.clipboard.writeText('{{ $voucher->code }}'); window.dispatchEvent(new CustomEvent('alert', { detail: { message: 'Kode voucher {{ $voucher->code }} berhasil disalin!', type: 'success' } }))" class="text-[10px] font-bold text-gray-400 hover:text-blue-600 transition uppercase tracking-widest sm:mt-2">Salin Kode</button>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-span-full rounded-2xl border border-dashed border-gray-200 p-8 text-center bg-gray-50">
+                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border border-gray-100">
+                            <i class="fas fa-ticket-alt text-gray-200 text-xl"></i>
+                        </div>
+                        <p class="text-gray-500 font-medium text-sm">Belum ada voucher tersedia saat ini.</p>
                     </div>
                 @endforelse
             </div>

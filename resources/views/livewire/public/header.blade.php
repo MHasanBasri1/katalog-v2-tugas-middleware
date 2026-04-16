@@ -21,7 +21,7 @@
         }
     }" class="relative">
     <div class="fixed top-0 left-0 right-0 z-[100] transition-transform duration-300"
-        :class="isTopBarHidden ? '-translate-y-[33px]' : 'translate-y-0'">
+        :class="{ 'is-top-bar-hidden': isTopBarHidden }">
 
         {{-- === ROW 1: TOP BAR (Desktop Only) === --}}
         <div class="hidden md:block bg-gray-50 border-b border-gray-200" style="height: 33px;">
@@ -42,7 +42,9 @@
         </div>
 
         {{-- === ROW 2: MAIN HEADER === --}}
-        <header class="bg-white py-2 md:h-[72px] flex items-center border-b border-gray-100 md:border-none">
+        {{-- === MAIN CONTENT WRAPPER (ROW 2 & 3) === --}}
+        <div class="bg-white shadow-sm border-b border-gray-100">
+            <header class="md:h-[64px] flex items-center">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
 
                 {{-- DESKTOP HEADER (Visible on md and up) --}}
@@ -104,7 +106,7 @@
                         {{-- FAVORIT DROPDOWN --}}
                         <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false"
                             class="relative group">
-                            <a href="{{ auth()->check() ? url('/profil-saya?tab=favorit') : route('user.login') }}"
+                            <a href="{{ auth()->check() ? url('/dashboard?tab=favorit') : route('user.login') }}"
                                 class="flex items-center justify-center w-10 h-10 rounded-xl text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-all duration-300 relative">
                                 <i class="far fa-heart text-xl"></i>
                                 @if($favoriteCount > 0)
@@ -128,7 +130,7 @@
                                 <div class="px-5 py-2 mb-2 border-b border-gray-50 flex items-center justify-between">
                                     <span class="text-xs font-black text-gray-800 uppercase tracking-wider">Favorit
                                         Saya</span>
-                                    <a href="{{ url('/profil-saya?tab=favorit') }}"
+                                    <a href="{{ url('/dashboard?tab=favorit') }}"
                                         class="text-[10px] font-bold text-primary hover:underline">Lihat Semua</a>
                                 </div>
 
@@ -269,7 +271,7 @@
                                                 PANEL</span>
                                         @else
                                             <span
-                                                class="text-[8px] font-black text-blue-600 uppercase tracking-widest leading-none mt-0.5">PENGGUNA</span>
+                                                class="text-[8px] font-black text-blue-600 uppercase tracking-widest leading-none mt-0.5">MEMBER</span>
                                         @endif
                                     </div>
                                 </button>
@@ -293,7 +295,7 @@
                                     <div class="p-1.5 space-y-0.5">
                                         <a href="{{ $panelRoute }}"
                                             class="flex items-center gap-3 px-4 py-2.5 text-[13px] font-bold text-gray-700 hover:bg-primary/5 hover:text-primary rounded-xl transition-all">
-                                            <i class="fas fa-user-circle text-gray-400 w-4 pl-0.5"></i> Profil Saya
+                                            <i class="fas fa-user-circle text-gray-400 w-4 pl-0.5"></i> Dashboard
                                         </a>
                                         @if($isAdmin)
                                             <a href="{{ route('admin.dashboard') }}"
@@ -445,63 +447,65 @@
                 </div>
 
             </div>
-        </header>
-
-        {{-- === ROW 3: SUB HEADER (Desktop Only) === --}}
-        <div class="hidden md:block bg-white border-b border-gray-100" style="height: 42px;">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
-
-                {{-- KATEGORI DROPDOWN --}}
-                <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false"
-                    class="relative h-full flex items-center">
-                    <button @click="open = !open"
-                        class="flex items-center gap-2 pr-4 text-[13px] font-bold text-gray-600 hover:text-primary transition-all group"
-                        aria-haspopup="true" :aria-expanded="open">
-                        <i class="fas fa-th-large text-gray-400 group-hover:text-primary transition-colors"></i>
-                        <span>Semua Kategori</span>
-                        <i
-                            class="fas fa-chevron-down text-[10px] opacity-40 group-hover:opacity-100 transition-all"></i>
-                    </button>
-
-                    <div x-show="open" x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 translate-y-2"
-                        x-transition:enter-end="opacity-100 translate-y-0"
-                        x-transition:leave="transition ease-in duration-150"
-                        x-transition:leave-start="opacity-100 translate-y-0"
-                        x-transition:leave-end="opacity-0 translate-y-2"
-                        class="absolute top-full left-0 mt-0 w-64 bg-white border border-gray-100 rounded-b-xl shadow-2xl py-3 z-[60]"
-                        x-cloak>
-                        <div class="px-4 pb-2 mb-2 border-b border-gray-50">
-                            <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Kategori
-                                Populer</span>
-                        </div>
-                        @foreach(collect($categories)->take(8) as $category)
-                            @if(!empty($category['slug']))
-                                <a href="{{ route('kategori.detail', $category['slug']) }}"
-                                    class="flex items-center justify-between px-5 py-2.5 hover:bg-gray-50 hover:text-primary transition-colors text-[13px] text-gray-700 font-semibold group">
-                                    {{ $category['name'] }}
-                                    <i
-                                        class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-100 transition-all"></i>
-                                </a>
-                            @endif
-                        @endforeach
-                        <div class="mt-2 pt-2 border-t border-gray-50 px-2">
-                            <a href="/kategori" class="flex items-center justify-center py-2 text-[12px] font-black text-primary bg-primary/5 rounded-lg hover:bg-primary/10 transition-all">Lihat Semua Kategori</a>
+            </header>
+ 
+            {{-- === ROW 3: SUB HEADER (Desktop Only) === --}}
+            <div class="hidden md:block h-[38px] border-t border-gray-50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
+                    {{-- KATEGORI DROPDOWN --}}
+                    <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false"
+                        class="relative h-full flex items-center">
+                        <button @click="open = !open"
+                            class="flex items-center gap-2 pr-4 text-[13px] font-bold text-gray-600 hover:text-primary transition-all group"
+                            aria-haspopup="true" :aria-expanded="open">
+                            <i class="fas fa-th-large text-gray-400 group-hover:text-primary transition-colors"></i>
+                            <span>Semua Kategori</span>
+                            <i
+                                class="fas fa-chevron-down text-[10px] opacity-40 group-hover:opacity-100 transition-all"></i>
+                        </button>
+    
+                        <div x-show="open" x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 translate-y-2"
+                            x-transition:enter-end="opacity-100 translate-y-0"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 translate-y-0"
+                            x-transition:leave-end="opacity-0 translate-y-2"
+                            class="absolute top-full left-0 mt-0 w-64 bg-white border border-gray-100 rounded-b-xl shadow-2xl py-3 z-[60]"
+                            x-cloak>
+                            <div class="px-4 pb-2 mb-2 border-b border-gray-50">
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Kategori
+                                    Populer</span>
+                            </div>
+                            @foreach(collect($categories)->take(8) as $category)
+                                @if(!empty($category['slug']))
+                                    <a href="{{ route('kategori.detail', $category['slug']) }}"
+                                        class="flex items-center justify-between px-5 py-2.5 hover:bg-gray-50 hover:text-primary transition-colors text-[13px] text-gray-700 font-semibold group">
+                                        {{ $category['name'] }}
+                                        <i
+                                            class="fas fa-chevron-right text-[10px] opacity-0 group-hover:opacity-100 transition-all"></i>
+                                    </a>
+                                @endif
+                            @endforeach
+                            <div class="mt-2 pt-2 border-t border-gray-50 px-2">
+                                <a href="/kategori" class="flex items-center justify-center py-2 text-[12px] font-black text-primary bg-primary/5 rounded-lg hover:bg-primary/10 transition-all">Lihat Semua Kategori</a>
+                            </div>
                         </div>
                     </div>
+    
+                    {{-- TRENDING LINKS / KEYWORDS --}}
+                    <div class="flex items-center gap-4 ml-6 text-[12px] font-medium text-gray-500 overflow-hidden">
+                        <span class="hidden lg:block text-gray-300">|</span>
+                        @foreach($trendingKeywords as $item)
+                            <a href="{{ $item['url'] ?: route('katalog', ['q' => $item['keyword']]) }}"
+                                class="hover:text-primary transition-colors whitespace-nowrap">{{ $item['keyword'] }}</a>
+                            @if(!$loop->last)
+                                <span class="text-gray-200 font-light hidden lg:block">|</span>
+                            @endif
+                        @endforeach
+                    </div>
                 </div>
-
-                {{-- TRENDING LINKS / KEYWORDS --}}
-                <div class="flex items-center gap-4 ml-6 text-[12px] font-medium text-gray-500 overflow-hidden">
-                    <span class="hidden lg:block text-gray-300">|</span>
-                    @foreach($trendingKeywords as $item)
-                        <a href="{{ $item['url'] ?: route('katalog', ['q' => $item['keyword']]) }}"
-                            class="hover:text-primary transition-colors whitespace-nowrap">{{ $item['keyword'] }}</a>
-                        @if(!$loop->last)
-                            <span class="text-gray-200 font-light hidden lg:block">|</span>
-                        @endif
-                    @endforeach
-                </div>
+            </div>
+        </div>
 
             </div>
         </div>

@@ -84,10 +84,11 @@ class LogActivity
             'blog' => 'artikel blog',
             'blog-kategori' => 'kategori blog',
             'banner' => 'banner',
-            'user' => 'user',
+            'user' => 'pengguna',
             'halaman-statis' => 'halaman statis',
             'setting' => 'pengaturan',
             'marketplace-link' => 'link marketplace',
+            'voucher' => 'voucher',
             'logs' => 'log sistem',
         ];
 

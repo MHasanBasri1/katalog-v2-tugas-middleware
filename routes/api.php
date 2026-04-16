@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\SearchController;
+use App\Http\Controllers\Api\VoucherController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -47,6 +48,9 @@ Route::prefix('v1')->group(function () {
     Route::middleware('api.token')->group(function () {
         Route::get('/auth/me', [AuthController::class, 'me']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
+
+        Route::get('/vouchers', [VoucherController::class, 'index']);
+        Route::get('/vouchers/{code}', [VoucherController::class, 'show']);
 
         Route::get('/profile', [ProfileController::class, 'show']);
         Route::put('/profile', [ProfileController::class, 'update']);

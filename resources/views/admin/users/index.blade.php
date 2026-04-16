@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 
-@section('title', 'User')
-@section('header', 'User')
+@section('title', 'Pengguna')
+@section('header', 'Pengguna')
 
 @section('content')
     <div
@@ -73,8 +73,8 @@
             <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div>
-                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Manajemen User</h2>
-                        <p class="text-sm text-gray-500">Kelola akun administrator dan pengguna terdaftar.</p>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Manajemen Pengguna</h2>
+                        <p class="text-sm text-gray-500">Kelola akun administrator dan member terdaftar.</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <div x-data="{ 
@@ -106,7 +106,7 @@
                         </button>
                         <a href="{{ route('admin.user.create') }}" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all text-xs font-bold uppercase tracking-wider shadow-sm shadow-blue-200 dark:shadow-none">
                             <i class="ti ti-plus"></i>
-                            Tambah User
+                            Tambah Pengguna
                         </a>
                     </div>
                 </div>
@@ -114,7 +114,7 @@
                 <!-- Filters -->
                 <form method="GET" action="{{ route('admin.user.index') }}" class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-end gap-4">
                     <div class="flex-1 min-w-[300px]" x-data="{ q: '{{ request('q') }}' }">
-                        <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Pencarian User</label>
+                        <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Pencarian Pengguna</label>
                         <div class="relative group">
                             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center text-gray-400 group-focus-within:text-blue-600 transition-colors" style="width: 44px;">
                                 <i class="ti ti-search text-xs"></i>
@@ -136,7 +136,7 @@
                         <select name="role" class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium" style="padding: 0.65rem 1rem;">
                             <option value="">Semua Role</option>
                             <option value="admin" @selected(request('role') === 'admin')>Admin</option>
-                            <option value="user" @selected(request('role') === 'user')>User</option>
+                            <option value="member" @selected(request('role') === 'member')>Member</option>
                         </select>
                     </div>
                     <div class="flex items-center gap-2">
@@ -161,7 +161,7 @@
                                 <th class="px-6 py-4 text-center w-12 border-b border-gray-100 dark:border-gray-800">
                                     <input type="checkbox" :checked="isAllOnPageSelected" @change="toggleSelectAllOnPage()" class="rounded border-gray-300 text-blue-600">
                                 </th>
-                                <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-100 dark:border-gray-800">User</th>
+                                <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-100 dark:border-gray-800">Pengguna</th>
                                 <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-100 dark:border-gray-800 text-center">Role</th>
                                 <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-100 dark:border-gray-800 text-center">Status Akun</th>
                                 <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-100 dark:border-gray-800 text-right">Aksi</th>
@@ -185,7 +185,7 @@
                                                 'bg-indigo-100 text-indigo-700 shadow-sm shadow-indigo-100' => $user->hasRole('admin'),
                                                 'bg-gray-100 text-gray-700' => ! $user->hasRole('admin'),
                                             ])>
-                                                {{ $user->hasRole('admin') ? 'Admin' : 'User' }}
+                                                {{ $user->hasRole('admin') ? 'Admin' : 'Member' }}
                                             </span>
                                         </td>
                                         <td class="px-4 py-3 text-center">
@@ -236,7 +236,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="px-4 py-10 text-center text-gray-500">Belum ada data user.</td>
+                                        <td colspan="5" class="px-4 py-10 text-center text-gray-500">Belum ada data pengguna.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
