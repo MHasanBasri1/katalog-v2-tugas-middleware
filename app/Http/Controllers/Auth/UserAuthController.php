@@ -132,7 +132,7 @@ class UserAuthController extends Controller
 
     private function ensureDefaultUserRole(User $user): void
     {
-        Role::findOrCreate('user', 'web');
-        $user->syncRoles(['user']);
+        Role::findOrCreate('member', 'web');
+        $user->syncRoles(['member']);
     }
 }

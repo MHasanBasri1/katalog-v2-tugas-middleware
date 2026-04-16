@@ -42,7 +42,7 @@ class UserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validatePayload($request);
-        $role = $data['role'] ?? 'user';
+        $role = $data['role'] ?? 'member';
 
         $payload = [
             'name' => $data['name'],
@@ -74,7 +74,7 @@ class UserController extends Controller
     public function update(Request $request, User $user): RedirectResponse
     {
         $data = $this->validatePayload($request, $user->id);
-        $role = $data['role'] ?? 'user';
+        $role = $data['role'] ?? 'member';
 
         $payload = [
             'name' => $data['name'],
@@ -182,7 +182,7 @@ class UserController extends Controller
                     fputcsv($file, [
                         $user->name,
                         $user->email,
-                        $user->hasRole('admin') ? 'admin' : 'user',
+                        $user->hasRole('admin') ? 'admin' : 'member',
                         $user->is_frozen ? 'frozen' : 'active',
                     ]);
                 }
@@ -219,7 +219,7 @@ class UserController extends Controller
             $name = $row[0];
             $email = $row[1];
             $password = $row[2];
-            $role = $row[3] ?? 'user';
+            $role = $row[3] ?? 'member';
             $status = $row[4] ?? 'active';
 
             if (User::where('email', $email)->exists()) {
@@ -260,7 +260,7 @@ class UserController extends Controller
         $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($ignoreId)],
-            'role' => ['required', 'string', Rule::in(['admin', 'user'])],
+            'role' => ['required', 'string', Rule::in(['admin', 'member'])],
             'is_frozen' => ['required', 'boolean'],
             'freeze_reason' => ['nullable', 'string', 'max:255'],
         ];
@@ -277,6 +277,6 @@ class UserController extends Controller
     private function ensureRolesExist(): void
     {
         Role::findOrCreate('admin', 'web');
-        Role::findOrCreate('user', 'web');
+        Role::findOrCreate('member', 'web');
     }
 }

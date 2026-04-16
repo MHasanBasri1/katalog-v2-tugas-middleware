@@ -234,7 +234,7 @@
                     <div class="absolute left-0 inset-y-2 w-1 bg-blue-400 rounded-r-full shadow-[0_0_10px_rgba(96,165,250,0.8)]"></div>
                 @endif
                 <i class="ti ti-users text-xl group-hover:scale-110 transition-transform"></i>
-                <span x-show="$store.sidebar.isSidebarForceExpanded" x-cloak class="ml-3">Users</span>
+                <span x-show="$store.sidebar.isSidebarForceExpanded" x-cloak class="ml-3">Pengguna</span>
             </a>
         @endif
 

@@ -309,8 +309,8 @@ class AuthController extends BaseApiController
             return;
         }
 
-        Role::findOrCreate('user', 'web');
-        $user->syncRoles(['user']);
+        Role::findOrCreate('member', 'web');
+        $user->syncRoles(['member']);
     }
 
     private function transformUser(User $user): array

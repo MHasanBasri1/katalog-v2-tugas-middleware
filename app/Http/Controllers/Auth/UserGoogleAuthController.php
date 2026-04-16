@@ -159,7 +159,7 @@ class UserGoogleAuthController extends Controller
             return;
         }
 
-        Role::findOrCreate('user', 'web');
-        $user->syncRoles(['user']);
+        Role::findOrCreate('member', 'web');
+        $user->syncRoles(['member']);
     }
 }

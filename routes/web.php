@@ -80,7 +80,7 @@ Route::middleware('auth')->group(function () {
     })->middleware('throttle:6,1')->name('verification.send');
 });
 
-Route::middleware(array_merge(['auth', 'role:user'], config('auth.verification.required') ? ['verified'] : []))->group(function () {
+Route::middleware(array_merge(['auth', 'role:member'], config('auth.verification.required') ? ['verified'] : []))->group(function () {
     Route::get('/dashboard', [PanelController::class, 'index'])->name('user.panel');
     Route::put('/dashboard/profil', [PanelController::class, 'updateProfile'])->name('user.profile.update');
     Route::put('/dashboard/password', [PanelController::class, 'updatePassword'])->name('user.password.update');
