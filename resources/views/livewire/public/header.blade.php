@@ -104,7 +104,7 @@
                         {{-- FAVORIT DROPDOWN --}}
                         <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false"
                             class="relative group">
-                            <a href="{{ auth()->check() ? url('/profil-saya?tab=favorit') : route('user.login') }}"
+                            <a href="{{ auth()->check() ? url('/dashboard?tab=favorit') : route('user.login') }}"
                                 class="flex items-center justify-center w-10 h-10 rounded-xl text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-all duration-300 relative">
                                 <i class="far fa-heart text-xl"></i>
                                 @if($favoriteCount > 0)
@@ -128,7 +128,7 @@
                                 <div class="px-5 py-2 mb-2 border-b border-gray-50 flex items-center justify-between">
                                     <span class="text-xs font-black text-gray-800 uppercase tracking-wider">Favorit
                                         Saya</span>
-                                    <a href="{{ url('/profil-saya?tab=favorit') }}"
+                                    <a href="{{ url('/dashboard?tab=favorit') }}"
                                         class="text-[10px] font-bold text-primary hover:underline">Lihat Semua</a>
                                 </div>
 
@@ -269,7 +269,7 @@
                                                 PANEL</span>
                                         @else
                                             <span
-                                                class="text-[8px] font-black text-blue-600 uppercase tracking-widest leading-none mt-0.5">PENGGUNA</span>
+                                                class="text-[8px] font-black text-blue-600 uppercase tracking-widest leading-none mt-0.5">MEMBER</span>
                                         @endif
                                     </div>
                                 </button>
@@ -293,7 +293,7 @@
                                     <div class="p-1.5 space-y-0.5">
                                         <a href="{{ $panelRoute }}"
                                             class="flex items-center gap-3 px-4 py-2.5 text-[13px] font-bold text-gray-700 hover:bg-primary/5 hover:text-primary rounded-xl transition-all">
-                                            <i class="fas fa-user-circle text-gray-400 w-4 pl-0.5"></i> Profil Saya
+                                            <i class="fas fa-user-circle text-gray-400 w-4 pl-0.5"></i> Dashboard
                                         </a>
                                         @if($isAdmin)
                                             <a href="{{ route('admin.dashboard') }}"

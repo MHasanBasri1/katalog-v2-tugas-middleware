@@ -30,7 +30,16 @@ class PanelController extends Controller
             ->unique('id')
             ->values();
 
-        return view('user.panel', compact('favoriteProducts'));
+        $vouchers = \App\Models\Voucher::query()
+            ->where('is_active', true)
+            ->where(function ($query) {
+                $query->whereNull('end_date')
+                    ->orWhere('end_date', '>=', now());
+            })
+            ->latest('id')
+            ->get();
+
+        return view('user.panel', compact('favoriteProducts', 'vouchers'));
     }
 
     public function updateProfile(Request $request): RedirectResponse

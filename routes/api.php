@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\SearchController;
+use App\Http\Controllers\Api\VoucherController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -25,6 +26,8 @@ Route::prefix('v1')->group(function () {
     Route::get('/home/terbaru', [HomeController::class, 'terbaru']);
     
     Route::get('/banners', [BannerController::class, 'index']);
+    Route::get('/vouchers', [VoucherController::class, 'index']);
+    Route::get('/vouchers/{code}', [VoucherController::class, 'show']);
 
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::get('/categories/{slug}', [CategoryController::class, 'show']);

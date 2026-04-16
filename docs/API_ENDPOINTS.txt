@@ -59,6 +59,15 @@ BANNERS
    Query (opsional): limit (int, default 10, min 1, max 50)
    Return data: banners[] aktif
 
+VOUCHERS
+5.1 GET /api/v1/vouchers
+    - Mengambil daftar voucher yang aktif dan belum kadaluarsa.
+    - Return data: array voucher (id, code, name, description, type, value, min_purchase, max_discount, start_date, end_date, usage_limit, is_active)
+
+5.2 GET /api/v1/vouchers/{code}
+    - Mendapatkan detail voucher sekaligus validasi.
+    - Return data: voucher {} jika valid, error message jika tidak valid/kadaluarsa.
+
 CATEGORIES
 6. GET /api/v1/categories
    Query (opsional):

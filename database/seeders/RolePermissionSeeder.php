@@ -33,6 +33,7 @@ class RolePermissionSeeder extends Seeder
             'users.manage',
             'banners.manage',
             'static_pages.manage',
+            'vouchers.manage',
         ];
 
         foreach ($permissions as $permissionName) {

@@ -88,6 +88,7 @@ class LogActivity
             'halaman-statis' => 'halaman statis',
             'setting' => 'pengaturan',
             'marketplace-link' => 'link marketplace',
+            'voucher' => 'voucher',
             'logs' => 'log sistem',
         ];
 

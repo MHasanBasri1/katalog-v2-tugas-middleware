@@ -10,7 +10,7 @@
         @yield('title', ($setting->seo_settings['seo_title'] ?? $setting->shop_name ?? 'Kataloque') . ' - Katalog Produk Modern')
     </title>
     <meta name="description"
-        content="@yield('meta_description', $setting->shop_description ?? 'Kataloque adalah katalog produk modern dengan pencarian cepat.')">
+        content="@yield('meta_description', $setting->shop_description ?? 'Kataloque adalah katalog produk modern dengan sistem member yang memudahkan pencarian.')">
     <meta name="keywords"
         content="@yield('meta_keywords', $setting->seo_settings['seo_keywords'] ?? 'katalog, belanja, ecommerce')">
     <meta name="robots" content="@yield('meta_robots', $setting->seo_settings['robots'] ?? 'index, follow')">
@@ -318,24 +318,24 @@
                 <i class="fas fa-th-large text-lg" aria-hidden="true"></i>
                 <span class="text-[10px] font-bold">Katalog</span>
             </a>
-            <a href="/blog"
-                class="flex flex-col items-center gap-1 p-2 {{ request()->is('blog*') ? 'text-primary' : 'text-gray-500' }}"
-                aria-label="Baca Blog Terbaru">
-                <i class="fas fa-newspaper text-lg" aria-hidden="true"></i>
-                <span class="text-[10px] font-bold">Blog</span>
+            <a href="{{ auth()->check() ? '/dashboard?tab=voucher' : '/masuk' }}"
+                class="flex flex-col items-center gap-1 p-2 {{ (request()->is('dashboard*') && request()->query('tab') === 'voucher') ? 'text-primary' : 'text-gray-500' }}"
+                aria-label="Voucher Saya">
+                <i class="fas fa-ticket-alt text-lg" aria-hidden="true"></i>
+                <span class="text-[10px] font-bold">Voucher</span>
             </a>
-            <a href="{{ auth()->check() ? '/profil-saya?tab=favorit' : '/masuk' }}"
-                class="flex flex-col items-center gap-1 p-2 {{ request()->query('tab') === 'favorit' || request()->is('user/favorites*') ? 'text-primary' : 'text-gray-500' }}"
+            <a href="{{ auth()->check() ? '/dashboard?tab=favorit' : '/masuk' }}"
+                class="flex flex-col items-center gap-1 p-2 {{ (request()->is('dashboard*') && request()->query('tab') === 'favorit') || request()->is('user/favorites*') ? 'text-primary' : 'text-gray-500' }}"
                 aria-label="Produk Favorit Saya">
                 <i class="fas fa-heart text-lg" aria-hidden="true"></i>
                 <span class="text-[10px] font-bold">Favorit</span>
             </a>
-            <a href="{{ auth()->check() ? (auth()->user()->hasRole('admin') ? '/admin' : '/profil-saya') : '/masuk' }}"
-                class="flex flex-col items-center gap-1 p-2 {{ (request()->is('profil-saya*') && request()->query('tab') !== 'favorit') || request()->is('admin*') ? 'text-primary' : 'text-gray-500' }}"
+            <a href="{{ auth()->check() ? (auth()->user()->hasRole('admin') ? '/admin' : '/dashboard') : '/masuk' }}"
+                class="flex flex-col items-center gap-1 p-2 {{ (request()->is('dashboard*') && request()->query('tab') !== 'favorit') || request()->is('admin*') ? 'text-primary' : 'text-gray-500' }}"
                 aria-label="Profil Akun Saya">
                 @if(auth()->check())
                     @if(auth()->user()->avatar_url)
-                        <img src="{{ auth()->user()->avatar_url }}" alt="Avatar Pengguna"
+                        <img src="{{ auth()->user()->avatar_url }}" alt="Avatar Member"
                             class="w-6 h-6 rounded-full object-cover border border-gray-200" loading="lazy">
                     @else
                         <i class="fas fa-user-circle text-lg" aria-hidden="true"></i>
