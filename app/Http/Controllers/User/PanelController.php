@@ -39,7 +39,9 @@ class PanelController extends Controller
             ->latest('id')
             ->get();
 
-        return view('user.panel', compact('favoriteProducts', 'vouchers'));
+        $claimedVoucherIds = auth()->user()->claimedVouchers()->pluck('voucher_id')->toArray();
+
+        return view('user.panel', compact('favoriteProducts', 'vouchers', 'claimedVoucherIds'));
     }
 
     public function updateProfile(Request $request): RedirectResponse
@@ -130,5 +132,37 @@ class PanelController extends Controller
         return back()
             ->with('status_favorite', 'Favorit diperbarui.')
             ->with('active_tab', 'favorit');
+    }
+
+    public function claimVoucher(string $code): \Illuminate\Http\JsonResponse
+    {
+        $voucher = \App\Models\Voucher::where('code', $code)->first();
+
+        if (! $voucher || ! $voucher->isValid()) {
+            return response()->json(['message' => 'Voucher tidak valid atau sudah habis.'], 400);
+        }
+
+        $userId = auth()->id();
+        
+        \Illuminate\Support\Facades\DB::transaction(function () use ($userId, $voucher) {
+            // Record the claim if not already claimed by this user
+            $claim = \App\Models\VoucherClaim::query()
+                ->where('user_id', $userId)
+                ->where('voucher_id', $voucher->id)
+                ->lockForUpdate() // Lock to prevent race conditions
+                ->first();
+
+            if (!$claim) {
+                \App\Models\VoucherClaim::query()->create([
+                    'user_id' => $userId,
+                    'voucher_id' => $voucher->id,
+                ]);
+                
+                // Only increment global used_count if it's the first claim by this user
+                $voucher->increment('used_count');
+            }
+        });
+
+        return response()->json(['message' => 'Voucher berhasil disalin dan kuota diperbarui.']);
     }
 }

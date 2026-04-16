@@ -37,8 +37,8 @@ class AuthenticatedSessionController extends Controller
 
         $user = $request->user();
 
-        // High Security: Trusted Device Check for Admin
-        if ($user && $user->hasVerifiedEmail()) {
+        // High Security: Trusted Device Check only for Admin
+        if ($user && $user->is_admin && $user->hasVerifiedEmail()) {
             $isTrustedDevice = $this->trustedDeviceService->touchIfTrusted($user, $request);
 
             if (! $isTrustedDevice) {

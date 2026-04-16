@@ -57,7 +57,26 @@ class VoucherController extends BaseApiController
             return $this->error('Voucher sudah tidak berlaku atau kuota habis', 400);
         }
 
-        $voucher->increment('used_count');
+        $userId = auth()->id();
+        
+        \Illuminate\Support\Facades\DB::transaction(function () use ($userId, $voucher) {
+            // Record the claim if not already claimed by this user
+            $claim = \App\Models\VoucherClaim::query()
+                ->where('user_id', $userId)
+                ->where('voucher_id', $voucher->id)
+                ->lockForUpdate() // Lock to prevent race conditions
+                ->first();
+
+            if (!$claim) {
+                \App\Models\VoucherClaim::query()->create([
+                    'user_id' => $userId,
+                    'voucher_id' => $voucher->id,
+                ]);
+                
+                // Only increment global used_count if it's the first claim by this user
+                $voucher->increment('used_count');
+            }
+        });
 
         return $this->success(null, 'Voucher berhasil diklaim');
     }

@@ -67,20 +67,34 @@ class ProductController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $payload = $this->validatePayload($request);
-        $payload['slug'] = $this->productService->makeUniqueSlug($payload['slug'] ?: $payload['name']);
 
-        $product = Product::query()->create($payload);
-
-        $this->productService->syncProductImages($product, $request->file('images', []));
-        $this->productService->syncMarketplaceLinks($product, $payload['marketplace_links'] ?? []);
-
-        $this->clearProductCaches();
-
-        if ($request->input('action') === 'save_and_another') {
-            return redirect()->route('admin.produk.create')->with('status', 'Produk berhasil ditambahkan. Silahkan tambah produk lainnya.');
+        // Anti-Duo Creation Check (prevent rapid multi-clicks bypassing frontend)
+        $lastCreated = Product::query()
+            ->where('name', $payload['name'])
+            ->where('category_id', $payload['category_id'])
+            ->where('created_at', '>=', now()->subSeconds(3))
+            ->first();
+            
+        if ($lastCreated) {
+            return redirect()->route('admin.produk.index')->with('status', 'Produk berhasil ditambahkan.');
         }
 
-        return redirect()->route('admin.produk.index')->with('status', 'Produk berhasil ditambahkan.');
+        return DB::transaction(function () use ($request, $payload) {
+            $payload['slug'] = $this->productService->makeUniqueSlug($payload['slug'] ?: $payload['name']);
+
+            $product = Product::query()->create($payload);
+
+            $this->productService->syncProductImages($product, $request->file('images', []));
+            $this->productService->syncMarketplaceLinks($product, $payload['marketplace_links'] ?? []);
+
+            $this->clearProductCaches();
+
+            if ($request->input('action') === 'save_and_another') {
+                return redirect()->route('admin.produk.create')->with('status', 'Produk berhasil ditambahkan. Silahkan tambah produk lainnya.');
+            }
+
+            return redirect()->route('admin.produk.index')->with('status', 'Produk berhasil ditambahkan.');
+        });
     }
 
     public function show(Product $produk): RedirectResponse

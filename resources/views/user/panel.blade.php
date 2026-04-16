@@ -281,7 +281,7 @@
                             </div>
                         </div>
 
-                        <div class="shrink-0 flex sm:flex-col items-center sm:items-end justify-between sm:justify-center pt-3 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                        <div class="shrink-0 flex sm:flex-col items-center sm:items-end justify-between sm:justify-center pt-3 sm:pt-0 border-t sm:border-t-0 border-gray-100" x-data="{ isClaimed: {{ in_array($voucher->id, $claimedVoucherIds) ? 'true' : 'false' }} }">
                             <p class="text-sm sm:text-base font-black text-blue-600">
                                 @if($voucher->type === 'percentage')
                                     {{ number_format($voucher->value, 0) }}% OFF
@@ -289,7 +289,30 @@
                                     Rp {{ number_format($voucher->value/1000, 0) }}K OFF
                                 @endif
                             </p>
-                            <button @click="navigator.clipboard.writeText('{{ $voucher->code }}'); window.dispatchEvent(new CustomEvent('alert', { detail: { message: 'Kode voucher {{ $voucher->code }} berhasil disalin!', type: 'success' } }))" class="text-[10px] font-bold text-gray-400 hover:text-blue-600 transition uppercase tracking-widest sm:mt-2">Salin Kode</button>
+                            <button 
+                                @click="
+                                    navigator.clipboard.writeText('{{ $voucher->code }}'); 
+                                    if(!isClaimed) {
+                                        isClaimed = true; // Set to true immediately to prevent double clicks
+                                        fetch('{{ route('user.voucher.claim', $voucher->code) }}', { 
+                                            method: 'POST', 
+                                            headers: { 
+                                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content, 
+                                                'Content-Type': 'application/json', 
+                                                'Accept': 'application/json' 
+                                            } 
+                                        }).catch(e => {
+                                            isClaimed = false; // Reset if fetch fails
+                                            console.error(e);
+                                        });
+                                    }
+                                    window.dispatchEvent(new CustomEvent('alert', { detail: { message: 'Kode voucher {{ $voucher->code }} berhasil disalin!', type: 'success' } }))
+                                " 
+                                :class="isClaimed ? 'text-emerald-500 hover:text-emerald-600' : 'text-gray-400 hover:text-blue-600'"
+                                class="text-[10px] font-bold transition uppercase tracking-widest sm:mt-2"
+                            >
+                                <span x-text="isClaimed ? '✓ Sudah Disalin' : 'Salin Kode'"></span>
+                            </button>
                         </div>
                     </div>
                 @empty

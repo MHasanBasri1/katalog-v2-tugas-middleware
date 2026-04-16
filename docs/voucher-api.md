@@ -34,7 +34,8 @@ Mengambil daftar voucher yang saat ini aktif dan belum kadaluarsa.
             "end_date": "2024-12-31T23:59:59.000000Z",
             "usage_limit": 100,
             "used_count": 10,
-            "is_active": true
+            "is_active": true,
+            "is_claimed": false
         }
     ]
 }
@@ -48,9 +49,32 @@ Validasi voucher berdasarkan kodenya.
 - **Headers**: 
   - `Accept: application/json`
   - `Authorization: Bearer <token>` (**WAJIB**)
-- **Response (Valid):** Sama seperti format objek tunggal di atas.
+- **Response (Valid):** Sama seperti format objek tunggal di atas (mengandung `is_claimed`).
 - **Response (Error 401):** Jika token tidak ada atau tidak valid.
 - **Response (Error 404):** Jika kode voucher tidak ditemukan.
+
+### Claim / Increment Voucher Usage
+Gunakan endpoint ini saat pengguna melakukan tindakan "Salin" (Copy) atau "Klaim" voucher. Ini akan meningkatkan `used_count` (yang di admin dianggap sebagai pengurangan stok/kuota).
+
+- **URL**: `/api/v1/vouchers/{code}/claim`
+- **Method**: `POST`
+- **Headers**: 
+  - `Accept: application/json`
+  - `Authorization: Bearer <token>` (**WAJIB**)
+- **Response (Success):**
+```json
+{
+    "success": true,
+    "message": "Voucher berhasil diklaim",
+    "data": null
+}
+```
+- **Response (Error 400):** Jika voucher sudah habis atau tidak valid lagi.
+- **PENTING**: 
+    1. Endpoint ini mengimplementasikan proteksi 1 User 1 Claim. Jika user yang sama memanggil berkali-kali, stok hanya akan berkurang 1 kali.
+    2. Aplikasi Flutter harus memanggil endpoint ini saat tombol "Salin" ditekan.
+    3. Setelah sukses memanggil endpoint ini, nilai `is_claimed` pada list voucher akan otomatis menjadi `true` pada request berikutnya.
+
 
 ---
 
@@ -82,6 +106,20 @@ class VoucherService {
       throw Exception('Gagal memuat voucher');
     }
   }
+
+  Future<void> claimVoucher(String token, String code) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/vouchers/$code/claim'),
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Gagal klaim voucher: ${json.decode(response.body)['message']}');
+    }
+  }
 }
 ```
 
@@ -102,6 +140,7 @@ class Voucher {
   final int? usageLimit;
   final int usedCount;
   final bool isActive;
+  final bool isClaimed;
 
   Voucher({
     required this.id,
@@ -116,6 +155,7 @@ class Voucher {
     this.usageLimit,
     required this.usedCount,
     required this.isActive,
+    required this.isClaimed,
   });
 
   factory Voucher.fromJson(Map<String, dynamic> json) {
@@ -136,6 +176,7 @@ class Voucher {
       usageLimit: json['usage_limit'],
       usedCount: json['used_count'] ?? 0,
       isActive: json['is_active'] ?? false,
+      isClaimed: json['is_claimed'] ?? false,
     );
   }
 }

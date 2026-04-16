@@ -14,7 +14,7 @@
         <span class="text-gray-500 truncate max-w-[200px]">{{ $product->name }}</span>
     </nav>
 
-    <form method="POST" action="{{ route('admin.produk.update', $product) }}" enctype="multipart/form-data" class="space-y-6">
+    <form method="POST" action="{{ route('admin.produk.update', $product) }}" enctype="multipart/form-data" class="space-y-6" x-data="{ isSubmitting: false }" @submit="isSubmitting = true">
         @csrf
         @method('PUT')
         
@@ -29,14 +29,16 @@
                     <div class="md:col-span-2">
                         <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Nama Produk</label>
                         <input type="text" name="name" value="{{ old('name', $product->name) }}" required
-                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">
+                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium"
+                            :readonly="isSubmitting">
                         @error('name') <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
                         <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Kategori</label>
                         <select name="category_id" required 
-                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">
+                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium"
+                            :disabled="isSubmitting">
                             <option value="">Pilih Kategori</option>
                             @foreach ($categories as $category)
                                 <option value="{{ $category->id }}" @selected(old('category_id', $product->category_id) == $category->id)>{{ $category->name }}</option>
@@ -47,7 +49,9 @@
 
                     <div>
                         <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Slug (Kosongkan untuk auto)</label>
-                        <input type="text" name="slug" value="{{ old('slug', $product->slug) }}" placeholder="headphone-wireless-premium" class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">
+                        <input type="text" name="slug" value="{{ old('slug', $product->slug) }}" placeholder="headphone-wireless-premium" 
+                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium"
+                            :readonly="isSubmitting">
                         @error('slug') <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p> @enderror
                     </div>
                 </div>
@@ -55,7 +59,8 @@
                 <div>
                     <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Deskripsi Produk</label>
                     <textarea name="description" rows="5"
-                        class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">{{ old('description', $product->description) }}</textarea>
+                        class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium"
+                        :readonly="isSubmitting">{{ old('description', $product->description) }}</textarea>
                     @error('description') <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -63,20 +68,22 @@
 
         <!-- Pricing & Stats Card -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6 space-y-5">
+            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm p-6 space-y-5" :class="isSubmitting ? 'opacity-50 pointer-events-none' : ''">
                 <h3 class="text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-4 mb-2">Harga & Promo</h3>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Harga Jual (Rp)</label>
                         <input type="number" name="price" value="{{ old('price', (float)$product->price) }}" step="0.01" min="0" required
-                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">
+                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium"
+                            :readonly="isSubmitting">
                         @error('price') <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Harga Coret (Rp)</label>
                         <input type="number" name="original_price" value="{{ old('original_price', $product->original_price ? (float)$product->original_price : '') }}" step="0.01" min="0"
-                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">
+                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium"
+                            :readonly="isSubmitting">
                         @error('original_price') <p class="mt-1 text-xs text-rose-600 font-medium">{{ $message }}</p> @enderror
                     </div>
                 </div>
@@ -144,7 +151,7 @@
                             this.loading = false;
                         });
                     }
-                }">
+                }" :class="isSubmitting ? 'opacity-50 pointer-events-none' : ''">
 
                 <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4 mb-2">
                     <div class="flex flex-col">
@@ -162,12 +169,14 @@
                     <div>
                         <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Terjual</label>
                         <input type="number" name="sold_count" value="{{ old('sold_count', $product->sold_count) }}" min="0" required
-                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">
+                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium"
+                            :readonly="isSubmitting">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Likes</label>
                         <input type="number" name="likes_count" value="{{ old('likes_count', $product->likes_count) }}" min="0" required
-                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">
+                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium"
+                            :readonly="isSubmitting">
                     </div>
                 </div>
 
@@ -175,12 +184,14 @@
                     <div>
                         <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Rating (0-5)</label>
                         <input type="number" name="rating_avg" value="{{ old('rating_avg', (float)$product->rating_avg) }}" step="0.1" min="0" max="5" required
-                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">
+                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium"
+                            :readonly="isSubmitting">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Jumlah Rating</label>
                         <input type="number" name="rating_count" value="{{ old('rating_count', $product->rating_count) }}" min="0" required
-                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">
+                            class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium"
+                            :readonly="isSubmitting">
                     </div>
                 </div>
 
@@ -196,14 +207,16 @@
                     <div>
                         <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest text-blue-600">Limit Sync Ulasan</label>
                         <input type="number" name="review_sync_limit" value="{{ old('review_sync_limit', $product->review_sync_limit) }}" min="1" max="50" required
-                            class="w-full bg-blue-50/50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-bold text-gray-900 dark:text-white">
+                            class="w-full bg-blue-50/50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-900 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-bold text-gray-900 dark:text-white"
+                            :readonly="isSubmitting">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Status Publikasi</label>
                     <select name="status" required 
-                        class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">
+                        class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium"
+                        :disabled="isSubmitting">
                         <option value="1" @selected(old('status', $product->status) == '1')>Aktif</option>
                         <option value="0" @selected(old('status', $product->status) == '0')>Nonaktif</option>
                     </select>
@@ -228,7 +241,7 @@
                             reader.readAsDataURL(file);
                         });
                     }
-                }">
+                }" :class="isSubmitting ? 'opacity-50 pointer-events-none' : ''">
                 <div class="p-6 border-b border-gray-100 dark:border-gray-800">
                     <h3 class="text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-white text-center sm:text-left">Galeri Produk</h3>
                     <p class="text-xs text-gray-500 mt-1 text-center sm:text-left">Kelola galeri foto produk (Maks 2MB/file).</p>
@@ -239,7 +252,7 @@
             </div>
 
             <!-- Marketplace Links Card -->
-            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+            <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden" :class="isSubmitting ? 'opacity-50 pointer-events-none' : ''">
                 <div class="p-6 border-b border-gray-100 dark:border-gray-800">
                     <h3 class="text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-white text-center sm:text-left">Tautan Marketplace</h3>
                     <p class="text-xs text-gray-500 mt-1 text-center sm:text-left">Masukkan URL produk di setiap marketplace.</p>
@@ -254,7 +267,8 @@
                                 <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">{{ $marketplace }}</label>
                                 <input type="hidden" name="marketplace_links[{{ $index }}][marketplace]" value="{{ $marketplace }}">
                                 <input type="url" name="marketplace_links[{{ $index }}][url]" value="{{ old('marketplace_links.'.$index.'.url', $link?->url) }}" placeholder="https://..."
-                                    class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium">
+                                    class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium"
+                                    :readonly="isSubmitting">
                             </div>
                         @endforeach
                     </div>
@@ -270,11 +284,20 @@
                 'left-0': true
             }">
             <div class="flex flex-row items-center justify-end gap-2 sm:gap-3 px-3 sm:px-6">
-                <a href="{{ route('admin.produk.index') }}" class="flex-1 sm:flex-none px-4 sm:px-8 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-[10px] sm:text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-center whitespace-nowrap">
+                <a href="{{ route('admin.produk.index') }}" class="flex-1 sm:flex-none px-4 sm:px-8 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-[10px] sm:text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-center whitespace-nowrap"
+                    x-show="!isSubmitting">
                     Batal
                 </a>
-                <button type="submit" class="flex-1 sm:flex-none px-8 sm:px-14 py-2.5 rounded-xl bg-blue-600 text-white text-[10px] sm:text-sm font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200 dark:shadow-none text-center whitespace-nowrap">
-                    Simpan Perubahan
+                <button type="submit" class="flex-1 sm:flex-none px-8 sm:px-14 py-2.5 rounded-xl bg-blue-600 text-white text-[10px] sm:text-sm font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200 dark:shadow-none text-center whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                    :disabled="isSubmitting">
+                    <span x-show="!isSubmitting">Simpan Perubahan</span>
+                    <span x-show="isSubmitting" class="flex items-center gap-2">
+                        <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Menyimpan...
+                    </span>
                 </button>
             </div>
         </div>

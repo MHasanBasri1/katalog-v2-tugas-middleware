@@ -86,6 +86,7 @@ Route::middleware(array_merge(['auth', 'role:member'], config('auth.verification
     Route::put('/dashboard/password', [PanelController::class, 'updatePassword'])->name('user.password.update');
     Route::post('/dashboard/avatar', [PanelController::class, 'updateAvatar'])->name('user.avatar.update');
     Route::delete('/dashboard/avatar', [PanelController::class, 'destroyAvatar'])->name('user.avatar.destroy');
+    Route::post('/dashboard/voucher/{code}/claim', [PanelController::class, 'claimVoucher'])->name('user.voucher.claim');
     Route::delete('/dashboard/favorit/{productId}', [PanelController::class, 'destroyFavorite'])->name('user.favorite.destroy');
 });
 
