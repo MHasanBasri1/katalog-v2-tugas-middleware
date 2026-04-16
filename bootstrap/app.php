@@ -37,6 +37,13 @@ return Application::configure(basePath: dirname(__DIR__))
                 ? route('login')
                 : route('user.login');
         });
+
+        $middleware->redirectUsersTo(function (Request $request): string {
+            if ($request->user()?->hasRole('admin')) {
+                return route('admin.dashboard');
+            }
+            return route('user.panel');
+        });
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule): void {
         $schedule->command('sitemap:generate')->daily();
