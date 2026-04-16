@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Voucher;
+use App\Support\Api\VoucherTransformer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -22,7 +23,9 @@ class VoucherController extends BaseApiController
             ->latest('id')
             ->get();
 
-        return $this->success($vouchers, 'Success fetch vouchers');
+        $transformed = $vouchers->map(fn ($voucher) => VoucherTransformer::transform($voucher));
+
+        return $this->success($transformed, 'Success fetch vouchers');
     }
 
     /**
@@ -48,6 +51,6 @@ class VoucherController extends BaseApiController
             return $this->error('Batas penggunaan voucher telah tercapai', 400);
         }
 
-        return $this->success($voucher, 'Voucher valid');
+        return $this->success(VoucherTransformer::transform($voucher), 'Voucher valid');
     }
 }

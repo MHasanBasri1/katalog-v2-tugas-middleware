@@ -22,9 +22,9 @@ class Voucher extends Model
     ];
 
     protected $casts = [
-        'value' => 'decimal:2',
-        'min_purchase' => 'decimal:2',
-        'max_discount' => 'decimal:2',
+        'value' => 'float',
+        'min_purchase' => 'float',
+        'max_discount' => 'float',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
         'is_active' => 'boolean',

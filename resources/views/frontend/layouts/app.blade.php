@@ -93,7 +93,7 @@
                     "availableLanguage": "Indonesian"
                 },
                 "sameAs": [
-                    @if($setting->social_media)
+                    @if($setting && $setting->social_media)
                         @foreach($setting->social_media as $index => $social)
                             "{{ $social['username'] }}"{{ $index < count($setting->social_media) - 1 ? ',' : '' }}
                         @endforeach

@@ -24,13 +24,13 @@
                             <div>
                                 <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Kode Voucher</label>
                                 <input type="text" name="code" value="{{ old('code', $voucher->code ?? '') }}" required placeholder="KODEPROMO2024"
-                                    class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 rounded-xl outline-none transition-all duration-300 text-sm font-bold p-3 uppercase">
+                                    class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 rounded-xl outline-none transition-all duration-300 text-sm font-bold p-3 uppercase placeholder:font-medium placeholder:text-gray-400">
                                 @error('code') <p class="text-[10px] text-rose-500 mt-1 font-bold">{{ $message }}</p> @enderror
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Nama Voucher (Internal)</label>
                                 <input type="text" name="name" value="{{ old('name', $voucher->name ?? '') }}" required placeholder="Contoh: Diskon Ramadhan 50k"
-                                    class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 rounded-xl outline-none transition-all duration-300 text-sm font-medium p-3">
+                                    class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 rounded-xl outline-none transition-all duration-300 text-sm font-medium p-3 placeholder:text-gray-400">
                                 @error('name') <p class="text-[10px] text-rose-500 mt-1 font-bold">{{ $message }}</p> @enderror
                             </div>
                         </div>
@@ -38,7 +38,7 @@
                         <div>
                             <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Deskripsi Voucher</label>
                             <textarea name="description" rows="3" placeholder="Jelaskan detail voucher ini..."
-                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 rounded-xl outline-none transition-all duration-300 text-sm font-medium p-3">{{ old('description', $voucher->description ?? '') }}</textarea>
+                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 rounded-xl outline-none transition-all duration-300 text-sm font-medium p-3 placeholder:text-gray-400">{{ old('description', $voucher->description ?? '') }}</textarea>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -50,19 +50,19 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Nilai Diskon</label>
+                                <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">
+                                    Nilai Diskon (<span x-text="type === 'percentage' ? '%' : 'Rp'"></span>)
+                                </label>
                                 <div class="relative">
-                                    <input type="number" step="0.01" name="value" value="{{ old('value', $voucher->value ?? 0) }}" required
-                                        class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 rounded-xl outline-none transition-all duration-300 text-sm font-bold p-3 pr-10">
-                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400" x-text="type === 'percentage' ? '%' : 'Rp'"></span>
+                                    <input type="number" step="0.01" name="value" value="{{ old('value', $voucher->value ?? 0) }}" required placeholder="0"
+                                        class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 rounded-xl outline-none transition-all duration-300 text-sm font-bold p-3 placeholder:font-medium placeholder:text-gray-400">
                                 </div>
                             </div>
                             <div x-show="type === 'percentage'">
-                                <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Maksimal Diskon</label>
+                                <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Maksimal Diskon (Rp)</label>
                                 <div class="relative">
-                                    <input type="number" step="0.01" name="max_discount" value="{{ old('max_discount', $voucher->max_discount ?? '') }}"
-                                        class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 rounded-xl outline-none transition-all duration-300 text-sm font-bold p-3 pr-10">
-                                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">Rp</span>
+                                    <input type="number" step="0.01" name="max_discount" value="{{ old('max_discount', $voucher->max_discount ?? '') }}" placeholder="0"
+                                        class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 rounded-xl outline-none transition-all duration-300 text-sm font-bold p-3 placeholder:font-medium placeholder:text-gray-400">
                                 </div>
                             </div>
                         </div>
@@ -74,17 +74,16 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Minimal Pembelian</label>
+                            <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Minimal Pembelian (Rp)</label>
                             <div class="relative">
-                                <input type="number" step="0.01" name="min_purchase" value="{{ old('min_purchase', $voucher->min_purchase ?? 0) }}" required
-                                    class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 rounded-xl outline-none transition-all duration-300 text-sm font-bold p-3 pr-10">
-                                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">Rp</span>
+                                <input type="number" step="0.01" name="min_purchase" value="{{ old('min_purchase', $voucher->min_purchase ?? 0) }}" required placeholder="0"
+                                    class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 rounded-xl outline-none transition-all duration-300 text-sm font-bold p-3 placeholder:font-medium placeholder:text-gray-400">
                             </div>
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Limit Penggunaan (Kosongkan jika tidak terbatas)</label>
-                            <input type="number" name="usage_limit" value="{{ old('usage_limit', $voucher->usage_limit ?? '') }}"
-                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 rounded-xl outline-none transition-all duration-300 text-sm font-bold p-3">
+                            <input type="number" name="usage_limit" value="{{ old('usage_limit', $voucher->usage_limit ?? '') }}" placeholder="Contoh: 100"
+                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 rounded-xl outline-none transition-all duration-300 text-sm font-bold p-3 placeholder:font-medium placeholder:text-gray-400">
                         </div>
                     </div>
                 </div>

@@ -48,7 +48,7 @@ class PanelController extends Controller
 
         $validated = $request->validateWithBag('profileUpdate', [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'email' => ['required', 'string', 'email:rfc,dns', 'regex:/^.+@.+\..+$/', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
         ]);
 
         $user->update($validated);

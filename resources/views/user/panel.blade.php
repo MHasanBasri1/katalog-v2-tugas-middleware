@@ -260,32 +260,36 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 @forelse($vouchers as $voucher)
-                    <div class="group relative flex items-center rounded-2xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition-all overflow-hidden">
+                    <div class="group relative flex flex-col sm:flex-row sm:items-center rounded-2xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition-all overflow-hidden gap-4">
                         <div class="absolute top-0 right-0 h-16 w-16 bg-blue-50 rounded-bl-full opacity-50 group-hover:scale-110 transition-transform"></div>
-                        <div class="relative shrink-0 flex items-center justify-center w-14 h-14 rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-200">
-                            <i class="fas fa-ticket-alt text-2xl"></i>
-                        </div>
-                        <div class="ml-4 flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider">
-                                    {{ $voucher->code }}
-                                </span>
-                                @if($voucher->end_date)
-                                    <span class="text-[10px] font-bold text-gray-400">Exp: {{ $voucher->end_date->format('d M Y') }}</span>
-                                @endif
+                        
+                        <div class="flex items-center gap-4 flex-1 min-w-0">
+                            <div class="relative shrink-0 flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-200">
+                                <i class="fas fa-ticket-alt text-xl sm:text-2xl"></i>
                             </div>
-                            <h3 class="mt-1 text-sm font-bold text-gray-900 truncate">{{ $voucher->name }}</h3>
-                            <p class="text-[11px] text-gray-500 line-clamp-1 italic">{{ $voucher->description }}</p>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider">
+                                        {{ $voucher->code }}
+                                    </span>
+                                    @if($voucher->end_date)
+                                        <span class="text-[10px] font-bold text-gray-400">Exp: {{ $voucher->end_date->format('d M Y') }}</span>
+                                    @endif
+                                </div>
+                                <h3 class="mt-1 text-sm font-bold text-gray-900 truncate">{{ $voucher->name }}</h3>
+                                <p class="text-[11px] text-gray-500 line-clamp-1 italic">{{ $voucher->description }}</p>
+                            </div>
                         </div>
-                        <div class="ml-4 shrink-0 text-right">
-                            <p class="text-sm font-black text-blue-600">
+
+                        <div class="shrink-0 flex sm:flex-col items-center sm:items-end justify-between sm:justify-center pt-3 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                            <p class="text-sm sm:text-base font-black text-blue-600">
                                 @if($voucher->type === 'percentage')
                                     {{ number_format($voucher->value, 0) }}% OFF
                                 @else
                                     Rp {{ number_format($voucher->value/1000, 0) }}K OFF
                                 @endif
                             </p>
-                            <button @click="navigator.clipboard.writeText('{{ $voucher->code }}'); window.dispatchEvent(new CustomEvent('alert', { detail: { message: 'Kode voucher {{ $voucher->code }} berhasil disalin!', type: 'success' } }))" class="mt-2 text-[10px] font-bold text-gray-400 hover:text-blue-600 transition uppercase tracking-widest">Salin Kode</button>
+                            <button @click="navigator.clipboard.writeText('{{ $voucher->code }}'); window.dispatchEvent(new CustomEvent('alert', { detail: { message: 'Kode voucher {{ $voucher->code }} berhasil disalin!', type: 'success' } }))" class="text-[10px] font-bold text-gray-400 hover:text-blue-600 transition uppercase tracking-widest sm:mt-2">Salin Kode</button>
                         </div>
                     </div>
                 @empty
