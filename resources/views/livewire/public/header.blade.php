@@ -184,8 +184,12 @@
                             <button
                                 class="flex items-center justify-center w-10 h-10 rounded-xl text-gray-400 hover:text-primary hover:bg-primary/5 transition-all duration-300 relative">
                                 <i class="far fa-bell text-xl"></i>
-                                <span
-                                    class="absolute top-2 right-2.5 flex h-2 w-2 rounded-full bg-primary ring-2 ring-white"></span>
+                                @if($notificationCount > 0)
+                                    <span
+                                        class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
+                                        {{ $notificationCount }}
+                                    </span>
+                                @endif
                             </button>
 
                             {{-- Notification Popup --}}
@@ -207,14 +211,15 @@
                                     <div class="px-2 space-y-1">
                                         @forelse($this->notificationItems as $item)
                                             <a href="{{ $item['url'] }}"
-                                                class="block px-4 py-3 hover:bg-gray-50 rounded-xl transition-colors border-b border-gray-50 last:border-0">
+                                                class="block px-4 py-3 hover:bg-gray-50 rounded-xl transition-colors border-b border-gray-50 last:border-0 {{ !$item['is_read'] ? 'bg-primary/5' : '' }}">
                                                 <div class="flex items-center gap-2 mb-1">
-                                                    <span
-                                                        class="text-[9px] font-black bg-primary/10 text-primary px-1.5 py-0.5 rounded uppercase">Update</span>
+                                                    <span class="text-[9px] font-black {{ !$item['is_read'] ? 'bg-primary text-white' : 'bg-gray-100 text-gray-500' }} px-1.5 py-0.5 rounded uppercase">
+                                                        {{ !$item['is_read'] ? 'Baru' : 'Info' }}
+                                                    </span>
                                                     <span class="text-[9px] font-medium text-gray-400">{{ $item['time'] }}</span>
                                                 </div>
-                                                <div class="text-[12px] font-bold text-gray-800 truncate">{{ $item['name'] }}</div>
-                                                <div class="text-[11px] font-medium text-gray-500">Admin baru saja memperbarui produk ini.</div>
+                                                <div class="text-[12px] font-bold text-gray-800 truncate">{{ $item['title'] }}</div>
+                                                <div class="text-[11px] font-medium text-gray-500 line-clamp-1">{{ $item['message'] }}</div>
                                             </a>
                                         @empty
                                             <div class="px-5 py-8 text-center">
@@ -381,7 +386,11 @@
                                     class="w-10 h-10 flex items-center justify-center text-gray-400 border border-gray-100 rounded-xl relative focus:outline-none bg-gray-50/20"
                                     aria-label="Notifikasi">
                                     <i class="far fa-bell text-xl"></i>
-                                    <span class="absolute top-3 right-3 h-1.5 w-1.5 bg-primary rounded-full ring-2 ring-white"></span>
+                                    @if($notificationCount > 0)
+                                        <span class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
+                                            {{ $notificationCount }}
+                                        </span>
+                                    @endif
                                 </button>
 
                                 <div x-show="open" x-transition:enter="transition ease-out duration-200"
@@ -393,9 +402,9 @@
                                         <span class="text-[10px] font-black text-gray-800 uppercase tracking-wider">Notifikasi</span>
                                     </div>
                                     <div class="px-1 space-y-0.5 max-h-64 overflow-y-auto">
-                                        @forelse(collect($this->notificationItems)->take(3) as $item)
-                                            <a href="{{ $item['url'] }}" class="block px-4 py-2 hover:bg-gray-50 rounded-lg text-[11px]">
-                                                <div class="font-bold text-gray-800 truncate">{{ $item['name'] }}</div>
+                                        @forelse(collect($this->notificationItems)->take(5) as $item)
+                                            <a href="{{ $item['url'] }}" class="block px-4 py-2 hover:bg-gray-50 rounded-lg text-[11px] {{ !$item['is_read'] ? 'bg-primary/5' : '' }}">
+                                                <div class="font-bold text-gray-800 truncate">{{ $item['title'] }}</div>
                                                 <div class="text-gray-400 text-[9px]">{{ $item['time'] }}</div>
                                             </a>
                                         @empty

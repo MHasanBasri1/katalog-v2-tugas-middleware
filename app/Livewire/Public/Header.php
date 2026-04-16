@@ -15,7 +15,7 @@ class Header extends Component
 {
     public string $search = '';
 
-    public int $notificationCount = 1;
+    public int $notificationCount = 0;
 
     public int $favoriteCount = 0;
 
@@ -208,16 +208,23 @@ class Header extends Component
 
     public function getNotificationItemsProperty(): array
     {
-        return Product::query()
-            ->where('status', true)
-            ->latest('updated_at')
-            ->limit(3)
+        if (!auth()->check()) {
+            return [];
+        }
+
+        return auth()->user()->notifications()
+            ->latest()
+            ->limit(5)
             ->get()
-            ->map(fn($p) => [
-                'name' => $p->name,
-                'price' => $p->price,
-                'url' => route('produk.detail', $p->slug),
-                'time' => $p->updated_at->diffForHumans(),
+            ->map(fn($n) => [
+                'id' => $n->id,
+                'title' => $n->data['title'] ?? 'Pesan Baru',
+                'message' => $n->data['message'] ?? '',
+                'url' => isset($n->data['product_slug']) 
+                    ? route('produk.detail', $n->data['product_slug']) 
+                    : route('user.panel'),
+                'time' => $n->created_at->diffForHumans(),
+                'is_read' => $n->read_at !== null,
             ])
             ->all();
     }
@@ -225,7 +232,9 @@ class Header extends Component
     public function render()
     {
         if (auth()->check()) {
-            $this->favoriteCount = auth()->user()->favorites()->count();
+            $user = auth()->user();
+            $this->favoriteCount = $user->favorites()->count();
+            $this->notificationCount = $user->unreadNotifications()->count();
         }
 
         $this->menus = array_map(function (array $menu): array {

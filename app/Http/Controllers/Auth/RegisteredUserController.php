@@ -47,6 +47,7 @@ class RegisteredUserController extends Controller
             'name' => $validated['name'],
             'email' => $normalizedEmail,
             'password' => Hash::make((string) $validated['password']),
+            'email_verified_at' => config('auth.verification.required', true) ? null : now(),
         ]);
 
         event(new Registered($user));

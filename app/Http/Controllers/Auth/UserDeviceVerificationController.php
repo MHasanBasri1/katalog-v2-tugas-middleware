@@ -25,14 +25,7 @@ class UserDeviceVerificationController extends Controller
         }
 
         $user = $challenge->user;
-
-        if ($user->is_frozen || $user->is_admin || $user->hasRole('admin')) {
-            $challenge->forceFill(['used_at' => now()])->save();
-
-            return redirect()->route('user.login')->withErrors([
-                'email' => 'Akun ini tidak dapat login dari halaman user.',
-            ]);
-        }
+        $isAdmin = $user->is_admin || $user->hasRole('admin');
 
         $challenge->forceFill(['used_at' => now()])->save();
         $trustedDeviceService->trustCurrentDevice($user, $request);
@@ -40,7 +33,11 @@ class UserDeviceVerificationController extends Controller
         Auth::login($user, (bool) $challenge->remember);
         $request->session()->regenerate();
 
-        $redirectPath = $challenge->intended_path ?: route('user.panel', absolute: false);
+        $defaultRedirect = $isAdmin 
+            ? route('admin.dashboard', absolute: false) 
+            : route('user.panel', absolute: false);
+            
+        $redirectPath = $challenge->intended_path ?: $defaultRedirect;
 
         return redirect()->to($redirectPath)->with('status', 'Device berhasil diverifikasi. Anda sudah login.');
     }

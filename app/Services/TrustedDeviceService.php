@@ -86,10 +86,6 @@ class TrustedDeviceService
             return null;
         }
 
-        if (str_starts_with($path, '/admin')) {
-            return null;
-        }
-
         return str_starts_with($path, '/') ? $path : null;
     }
 

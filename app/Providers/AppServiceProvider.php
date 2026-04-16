@@ -19,6 +19,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \App\Models\Product::observe(\App\Observers\ProductObserver::class);
+
         \Illuminate\Support\Facades\View::composer('*', function ($view) {
             $setting = \Illuminate\Support\Facades\Cache::rememberForever(
                 'global.settings',

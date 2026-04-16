@@ -64,9 +64,20 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    public function hasVerifiedEmail(): bool
+    {
+        if (! config('auth.verification.required', true)) {
+            return true;
+        }
+
+        return $this->email_verified_at !== null;
+    }
+
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify(new UserVerifyEmailNotification());
+        if (config('auth.verification.required', true)) {
+            $this->notify(new UserVerifyEmailNotification());
+        }
     }
 
     public function sendPasswordResetNotification($token): void

@@ -12,12 +12,14 @@ class GeneralNotification extends Notification
     private string $title;
     private string $message;
     private string $type;
+    private array $extraData;
 
-    public function __construct(string $title, string $message, string $type = 'info')
+    public function __construct(string $title, string $message, string $type = 'info', array $extraData = [])
     {
         $this->title = $title;
         $this->message = $message;
         $this->type = $type;
+        $this->extraData = $extraData;
     }
 
     public function via($notifiable): array
@@ -27,10 +29,10 @@ class GeneralNotification extends Notification
 
     public function toArray($notifiable): array
     {
-        return [
+        return array_merge([
             'title' => $this->title,
             'message' => $this->message,
             'type' => $this->type,
-        ];
+        ], $this->extraData);
     }
 }
