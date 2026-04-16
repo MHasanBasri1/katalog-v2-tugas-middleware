@@ -327,32 +327,33 @@
                 </div>
 
                 {{-- MOBILE HEADER (Visible on mobile only) --}}
-                <div class="flex md:hidden flex-col gap-1.5 w-full">
-                    {{-- Row 1: Search & Login --}}
-                    <div class="flex items-center gap-2 w-full">
-                        <div class="relative flex-1">
+                <div class="flex md:hidden flex-col gap-2 w-full py-3">
+                    {{-- COMPACT SINGLE ROW: Search | Notification --}}
+                    <div class="flex items-center gap-3 w-full">
+                        {{-- SEARCH (Flexible) --}}
+                        <div class="flex-1 relative">
                             <input id="mobileSearchInput" wire:model.live.debounce.300ms="search"
                                 wire:keydown.enter="goToSearch" type="text"
                                 placeholder="Cari produk atau artikel..."
-                                class="w-full bg-gray-50 border border-gray-200 focus:border-primary rounded-lg outline-none transition text-[13px] font-semibold text-gray-700 placeholder:text-gray-400 h-9 px-3 pr-16"
+                                class="w-full bg-gray-50 border border-gray-200 focus:border-primary rounded-xl outline-none transition text-[13px] font-semibold text-gray-700 placeholder:text-gray-400 h-10 px-4 pr-16"
                                 aria-label="Cari">
 
-                            {{-- Clear Search Button (Mobile) --}}
+                            {{-- Clear Search Button --}}
                             @if($search !== '')
                                 <button wire:click="clearSearch"
-                                    class="absolute right-10 top-0 bottom-0 px-2 text-gray-400 hover:text-rose-500 transition-colors"
+                                    class="absolute right-9 top-0 bottom-0 px-1.5 text-gray-400 hover:text-rose-500 transition-colors"
                                     aria-label="Hapus Pencarian">
-                                    <i class="fas fa-times-circle text-sm"></i>
+                                    <i class="fas fa-times-circle text-[11px]"></i>
                                 </button>
                             @endif
 
                             <button wire:click="goToSearch"
-                                class="absolute right-0 top-0 bottom-0 w-9 bg-primary text-white rounded-r-lg flex items-center justify-center"
+                                class="absolute right-0 top-0 bottom-0 w-9 bg-primary text-white rounded-r-xl flex items-center justify-center"
                                 aria-label="Cari">
-                                <i class="fas fa-search text-[11px]" aria-hidden="true"></i>
+                                <i class="fas fa-search text-[10px]" aria-hidden="true"></i>
                             </button>
 
-                            {{-- Mobile Search Results Dropdown --}}
+                            {{-- Mobile Search Dropdown --}}
                             @if($search !== '')
                                 <div class="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-[120] overflow-hidden">
                                     <div class="p-1 space-y-0.5 max-h-60 overflow-y-auto">
@@ -372,73 +373,48 @@
                             @endif
                         </div>
 
-                        @if(!auth()->check())
-                            <a href="{{ route('user.login') }}"
-                                class="px-5 h-9 flex items-center justify-center text-[11px] font-black text-white bg-primary border-2 border-primary rounded-lg whitespace-nowrap gap-1.5 shadow-lg shadow-primary/20">
-                                <i class="fas fa-sign-in-alt text-[10px]"></i>
-                                <span>Masuk</span>
-                            </a>
-                        @else
-                            @php
-                                $isAdmin = auth()->user()->hasRole('admin');
-                                $panelRoute = $isAdmin ? route('admin.dashboard') : route('user.panel');
-                                $userAvatar = auth()->user()->avatar_url;
-                            @endphp
-                            <div class="flex items-center gap-2">
-                                {{-- Mobile Notification Dropdown --}}
-                                <div x-data="{ open: false }" class="relative">
-                                    <button @click="open = !open" @click.away="open = false"
-                                        class="w-9 h-9 flex items-center justify-center text-gray-400 border-2 border-gray-100 rounded-lg relative focus:outline-none"
-                                        aria-label="Notifikasi">
-                                        <i class="far fa-bell text-lg"></i>
-                                        <span class="absolute top-1.5 right-1.5 h-2 w-2 bg-primary rounded-full ring-2 ring-white"></span>
-                                    </button>
+                        {{-- ACTIONS --}}
+                        <div class="flex items-center shrink-0">
+                            {{-- Notification --}}
+                            <div x-data="{ open: false }" class="relative">
+                                <button @click="open = !open" @click.away="open = false"
+                                    class="w-10 h-10 flex items-center justify-center text-gray-400 border border-gray-100 rounded-xl relative focus:outline-none bg-gray-50/20"
+                                    aria-label="Notifikasi">
+                                    <i class="far fa-bell text-xl"></i>
+                                    <span class="absolute top-3 right-3 h-1.5 w-1.5 bg-primary rounded-full ring-2 ring-white"></span>
+                                </button>
 
-                                    {{-- Mobile Notification Popup --}}
-                                    <div x-show="open" x-transition:enter="transition ease-out duration-200"
-                                        x-transition:enter-start="opacity-0 translate-y-2 scale-95"
-                                        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-                                        x-transition:leave="transition ease-in duration-150"
-                                        x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-                                        x-transition:leave-end="opacity-0 translate-y-2 scale-95"
-                                        class="absolute right-0 mt-2 w-72 bg-white border border-gray-100 rounded-2xl shadow-2xl py-3 z-[110] overflow-hidden"
-                                        x-cloak>
-                                        <div class="px-5 py-2 mb-2 border-b border-gray-50 flex items-center justify-between">
-                                            <span class="text-xs font-black text-gray-800 uppercase tracking-wider">Notifikasi</span>
-                                            <span class="text-[10px] font-bold text-gray-400">Terbaru</span>
-                                        </div>
-
-                                        <div class="px-2 space-y-1 max-h-80 overflow-y-auto">
-                                            @forelse($this->notificationItems as $item)
-                                                <a href="{{ $item['url'] }}"
-                                                    class="block px-4 py-3 hover:bg-gray-50 rounded-xl transition-colors border-b border-gray-50 last:border-0">
-                                                    <div class="flex items-center gap-2 mb-1">
-                                                        <span class="text-[9px] font-black bg-primary/10 text-primary px-1.5 py-0.5 rounded uppercase">Update</span>
-                                                        <span class="text-[9px] font-medium text-gray-400">{{ $item['time'] }}</span>
-                                                    </div>
-                                                    <div class="text-[12px] font-bold text-gray-800 truncate">{{ $item['name'] }}</div>
-                                                    <div class="text-[11px] font-medium text-gray-500">Admin baru saja memperbarui produk ini.</div>
-                                                </a>
-                                            @empty
-                                                <div class="px-5 py-8 text-center">
-                                                    <p class="text-[11px] font-medium text-gray-400">Belum ada notifikasi baru.</p>
-                                                </div>
-                                            @endforelse
-                                        </div>
+                                <div x-show="open" x-transition:enter="transition ease-out duration-200"
+                                    x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                                    x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                    class="absolute right-0 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-2xl py-3 z-[110] overflow-hidden"
+                                    x-cloak>
+                                    <div class="px-4 py-2 mb-2 border-b border-gray-50 flex items-center justify-between">
+                                        <span class="text-[10px] font-black text-gray-800 uppercase tracking-wider">Notifikasi</span>
+                                    </div>
+                                    <div class="px-1 space-y-0.5 max-h-64 overflow-y-auto">
+                                        @forelse(collect($this->notificationItems)->take(3) as $item)
+                                            <a href="{{ $item['url'] }}" class="block px-4 py-2 hover:bg-gray-50 rounded-lg text-[11px]">
+                                                <div class="font-bold text-gray-800 truncate">{{ $item['name'] }}</div>
+                                                <div class="text-gray-400 text-[9px]">{{ $item['time'] }}</div>
+                                            </a>
+                                        @empty
+                                            <div class="px-4 py-4 text-center text-[10px] text-gray-400">Tidak ada info baru.</div>
+                                        @endforelse
                                     </div>
                                 </div>
                             </div>
-                        @endif
+                        </div>
                     </div>
 
-                    {{-- Row 2: Trending --}}
-                    <div class="relative w-full overflow-hidden h-7">
+                    {{-- Row 2: Trending (Optional/Compact) --}}
+                    <div class="relative w-full overflow-hidden h-6">
                         <div class="swiper trending-swiper !overflow-visible">
                             <div class="swiper-wrapper !ease-linear">
                                 @foreach($trendingKeywords as $item)
                                     <div class="swiper-slide !w-auto">
                                         <a href="{{ $item['url'] ?: route('katalog', ['q' => $item['keyword']]) }}"
-                                            class="block text-[10px] font-bold text-gray-500 px-2.5 py-1 bg-gray-50 border border-gray-100 rounded-md whitespace-nowrap transition-colors hover:text-primary">{{ $item['keyword'] }}</a>
+                                            class="block text-[9px] font-bold text-gray-400 px-2.5 py-1 bg-gray-50 border border-gray-100 rounded-lg whitespace-nowrap transition-colors hover:text-primary leading-none">{{ $item['keyword'] }}</a>
                                     </div>
                                 @endforeach
                             </div>

@@ -29,11 +29,13 @@ class Blog extends Model
         'author_name',
         'is_published',
         'published_at',
+        'views_count',
     ];
 
     protected $casts = [
         'is_published' => 'boolean',
         'published_at' => 'datetime',
+        'views_count' => 'integer',
     ];
 
     public function category(): BelongsTo

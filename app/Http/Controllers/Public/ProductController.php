@@ -39,8 +39,14 @@ class ProductController extends Controller
             ])
             ->firstOrFail();
 
-        // Increment views count
+        // Increment views count and log analytics
         $product->increment('views_count');
+        \App\Models\AnalyticsLog::create([
+            'target_id' => $product->id,
+            'target_type' => 'product',
+            'activity' => 'view',
+            'ip_address' => request()->ip(),
+        ]);
 
         $settings = Setting::query()->first();
         $marketplaces = $settings?->marketplaces ?? ['Shopee', 'Tokopedia', 'Lazada', 'Blibli', 'Tiktok Shop'];
@@ -54,8 +60,7 @@ class ProductController extends Controller
 
         $marketplaceLinks = $product->marketplaceLinks
             ->filter(fn ($item) => in_array(Str::lower($item->marketplace), $activeLower, true))
-            ->mapWithKeys(fn ($item) => [Str::lower($item->marketplace) => $item->url])
-            ->toArray();
+            ->values();
 
         $galleryImages = $product->images
             ->map(fn($item) => \Illuminate\Support\Facades\Storage::url($item->image))
@@ -91,5 +96,20 @@ class ProductController extends Controller
             'canonical',
             'ogImage'
         ));
+    }
+
+    public function marketplaceRedirect(int $id)
+    {
+        $link = \App\Models\MarketplaceLink::findOrFail($id);
+        $link->increment('click_count');
+        
+        \App\Models\AnalyticsLog::create([
+            'target_id' => $link->id,
+            'target_type' => 'marketplace_link',
+            'activity' => 'click',
+            'ip_address' => request()->ip(),
+        ]);
+
+        return redirect()->away($link->url);
     }
 }

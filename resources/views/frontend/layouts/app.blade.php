@@ -287,12 +287,12 @@
             }
 
             main {
-                padding-top: calc(95px + 32px) !important;
+                padding-top: calc(105px + 32px) !important;
             }
 
             @media (min-width: 768px) {
                 main {
-                    padding-top: calc(135px + 32px) !important;
+                    padding-top: calc(150px + 32px) !important;
                 }
             }
         </style>
@@ -301,7 +301,7 @@
     <livewire:public.header />
 
     <main id="main-content"
-        class="relative z-10 pt-[95px] md:pt-[147px] pb-20 md:pb-0 @yield('main_class') max-w-full overflow-x-hidden">
+        class="relative z-10 pt-[105px] md:pt-[150px] pb-20 md:pb-0 @yield('main_class') max-w-full overflow-x-hidden">
         @yield('content')
     </main>
 

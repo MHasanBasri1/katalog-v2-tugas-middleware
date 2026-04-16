@@ -38,6 +38,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/products/detail/{slug}', [ProductController::class, 'detail']);
     Route::get('/products/{slug}/related', [ProductController::class, 'related']);
     Route::get('/products/{slug}', [ProductController::class, 'show']);
+    Route::post('/products/click/{id}', [ProductController::class, 'logClick']);
 
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/login', [AuthController::class, 'login']);
@@ -51,6 +52,7 @@ Route::prefix('v1')->group(function () {
 
         Route::get('/vouchers', [VoucherController::class, 'index']);
         Route::get('/vouchers/{code}', [VoucherController::class, 'show']);
+        Route::post('/vouchers/{code}/claim', [VoucherController::class, 'claim']);
 
         Route::get('/profile', [ProfileController::class, 'show']);
         Route::put('/profile', [ProfileController::class, 'update']);

@@ -4,6 +4,9 @@ namespace App\Livewire\Public;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Blog;
+use App\Models\Favorite;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -49,7 +52,7 @@ class Header extends Component
                 ->all()
         );
 
-        $setting = Cache::remember('global.settings', now()->addDay(), fn() => \App\Models\Setting::first());
+        $setting = Cache::remember('global.settings', now()->addDay(), fn() => Setting::first());
         
         // Trending Keywords
         if ($setting && !empty($setting->trending_keywords)) {
@@ -134,7 +137,7 @@ class Header extends Component
                 'type' => 'Produk',
             ]);
 
-        $blogs = \App\Models\Blog::query()
+        $blogs = Blog::query()
             ->select('title', 'slug')
             ->where('is_published', true)
             ->where(function ($builder) use ($query) {
@@ -172,12 +175,13 @@ class Header extends Component
             return [];
         }
 
-        return \App\Models\Favorite::query()
+        return Favorite::query()
             ->where('user_id', auth()->id())
             ->with(['product.primaryImage'])
             ->latest()
             ->limit(3)
             ->get()
+            ->filter(fn($fav) => $fav->product !== null) // Ensure product exists
             ->map(fn($fav) => [
                 'id' => $fav->product->id,
                 'name' => $fav->product->name,
@@ -194,7 +198,7 @@ class Header extends Component
             return;
         }
 
-        \App\Models\Favorite::query()
+        Favorite::query()
             ->where('user_id', auth()->id())
             ->where('product_id', $productId)
             ->delete();
@@ -204,7 +208,7 @@ class Header extends Component
 
     public function getNotificationItemsProperty(): array
     {
-        return \App\Models\Product::query()
+        return Product::query()
             ->where('status', true)
             ->latest('updated_at')
             ->limit(3)

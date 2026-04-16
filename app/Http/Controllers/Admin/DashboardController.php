@@ -26,15 +26,16 @@ class DashboardController extends Controller
             'blogs' => Blog::count(),
         ];
 
-        // Pie Chart: Marketplace Distribution
+        // Pie Chart: Marketplace Clicks Distribution
         $marketplaceStats = MarketplaceLink::query()
-            ->select('marketplace', \DB::raw('count(*) as count'))
+            ->select('marketplace', \DB::raw('SUM(click_count) as total_clicks'))
             ->groupBy('marketplace')
+            ->orderByDesc('total_clicks')
             ->get();
         
         $pieChartData = [
             'labels' => $marketplaceStats->pluck('marketplace'),
-            'data' => $marketplaceStats->pluck('count'),
+            'data' => $marketplaceStats->pluck('total_clicks'),
         ];
 
         // Line Chart: Product Views (Filtering by Top Products based on views within range or overall)

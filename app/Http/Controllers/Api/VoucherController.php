@@ -23,7 +23,7 @@ class VoucherController extends BaseApiController
             ->latest('id')
             ->get();
 
-        $transformed = $vouchers->map(fn ($voucher) => VoucherTransformer::transform($voucher));
+        $transformed = $vouchers->map(fn (Voucher $voucher) => VoucherTransformer::transform($voucher));
 
         return $this->success($transformed, 'Success fetch vouchers');
     }
@@ -39,18 +39,26 @@ class VoucherController extends BaseApiController
             return $this->error('Voucher tidak ditemukan', 404);
         }
 
-        if (!$voucher->is_active) {
-            return $this->error('Voucher sudah tidak aktif', 400);
-        }
-
-        if ($voucher->isExpired()) {
-            return $this->error('Voucher sudah kadaluarsa', 400);
-        }
-
-        if ($voucher->hasReachedLimit()) {
-            return $this->error('Batas penggunaan voucher telah tercapai', 400);
-        }
-
         return $this->success(VoucherTransformer::transform($voucher), 'Voucher valid');
+    }
+
+    /**
+     * Increment voucher usage (Claim/Copy).
+     */
+    public function claim(string $code): JsonResponse
+    {
+        $voucher = Voucher::where('code', $code)->first();
+
+        if (!$voucher) {
+            return $this->error('Voucher tidak ditemukan', 404);
+        }
+
+        if (!$voucher->isValid()) {
+            return $this->error('Voucher sudah tidak berlaku atau kuota habis', 400);
+        }
+
+        $voucher->increment('used_count');
+
+        return $this->success(null, 'Voucher berhasil diklaim');
     }
 }

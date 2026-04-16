@@ -100,6 +100,7 @@ Route::middleware(['web', 'throttle:60,1'])->group(function () {
     })->name('katalog');
 
     Route::get('/produk/{slug}', [App\Http\Controllers\Public\ProductController::class, 'show'])->name('produk.detail');
+    Route::get('/marketplace-click/{id}', [App\Http\Controllers\Public\ProductController::class, 'marketplaceRedirect'])->name('marketplace.click');
 
     Route::get('/blog', function (Request $request) {
         $canonical = route('blog.index');
@@ -157,6 +158,9 @@ Route::middleware(['web', 'throttle:60,1'])->group(function () {
             ->where('is_published', true)
             ->firstOrFail();
 
+        // Increment views count
+        $post->increment('views_count');
+
         $canonical = route('blog.detail', $post->slug);
         $seoTitle = "{$post->title} - Blog Kataloque";
         $seoDescription = $post->excerpt;
@@ -207,6 +211,10 @@ Route::middleware(['auth', 'role:admin', 'log.activity'])->prefix('admin')->name
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->middleware('permission:dashboard.view')
         ->name('dashboard');
+
+    Route::get('/statistik', [App\Http\Controllers\Admin\StatisticController::class, 'index'])
+        ->middleware('permission:dashboard.view')
+        ->name('statistics');
 
     Route::get('/profil', [AdminProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profil', [AdminProfileController::class, 'update'])->name('profile.update');

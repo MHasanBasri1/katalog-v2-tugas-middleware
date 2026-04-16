@@ -131,9 +131,9 @@ class LoginRequest extends FormRequest
         }
 
         Role::findOrCreate('admin', 'web');
-        Role::findOrCreate('user', 'web');
+        Role::findOrCreate('member', 'web');
 
-        $expectedRole = $user->is_admin ? 'admin' : 'user';
+        $expectedRole = $user->is_admin ? 'admin' : 'member';
         if (! $user->hasRole($expectedRole)) {
             $user->syncRoles([$expectedRole]);
         }

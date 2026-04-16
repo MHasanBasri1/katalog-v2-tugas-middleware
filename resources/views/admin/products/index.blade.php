@@ -177,6 +177,7 @@
                             </th>
                             <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500">Produk</th>
                             <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 text-right">Harga</th>
+                            <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 text-center">Views</th>
                             <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 text-center">Featured</th>
                             <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 text-center">Status</th>
                             <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 text-right">Aksi</th>
@@ -199,6 +200,12 @@
                                         </div>
                                     </td>
                                     <td class="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">Rp {{ number_format((float) $product->price, 0, ',', '.') }}</td>
+                                    <td class="px-4 py-3 text-center">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-bold">
+                                            <i class="ti ti-eye"></i>
+                                            {{ number_format($product->views_count) }}
+                                        </span>
+                                    </td>
                                     <td class="px-4 py-3 text-center">
                                         <span @class([
                                             'inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider',

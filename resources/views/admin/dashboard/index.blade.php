@@ -71,8 +71,8 @@
         <!-- Charts Row -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Views Chart (Line) -->
-            <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 flex flex-col hover:shadow-lg transition-shadow">
-                <div class="flex items-center justify-between mb-8">
+            <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 flex flex-col hover:shadow-lg transition-shadow">
+                <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 flex items-center justify-center border border-blue-100 dark:border-blue-900/10">
                             <i class="ti ti-trending-up text-xl"></i>
@@ -125,25 +125,25 @@
                         </div>
                     </div>
                 </div>
-                <div class="relative flex-1" style="min-height: 350px;">
+                <div class="relative flex-1" style="min-height: 260px;">
                     <canvas id="viewsChart"></canvas>
                 </div>
             </div>
 
             <!-- Marketplace Sebaran (Pie) -->
-            <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 flex flex-col hover:shadow-lg transition-shadow">
-                <div class="flex items-center justify-between mb-8">
+            <div class="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 flex flex-col hover:shadow-lg transition-shadow">
+                <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-900/20 text-orange-600 flex items-center justify-center border border-orange-100 dark:border-orange-900/10">
                             <i class="ti ti-chart-pie-2 text-xl"></i>
                         </div>
                         <div>
-                            <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-none">Sebaran Marketplace</h3>
-                            <p class="mt-1 text-xs text-gray-400 font-medium">Distribusi link per platform</p>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-none">Ringkasan Klik Marketplace</h3>
+                            <p class="mt-1 text-xs text-gray-400 font-medium">Total akumulasi klik per platform</p>
                         </div>
                     </div>
                 </div>
-                <div class="relative flex-1 flex items-center justify-center" style="min-height: 350px;">
+                <div class="relative flex-1 flex items-center justify-center" style="min-height: 260px;">
                     <canvas id="marketplaceChart"></canvas>
                 </div>
             </div>

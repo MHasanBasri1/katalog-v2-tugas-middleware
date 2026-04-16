@@ -63,6 +63,15 @@ class ProductController extends BaseApiController
             ->with($this->withRelations())
             ->firstOrFail();
 
+        // Increment views count and log analytics (Sync with Web)
+        $product->increment('views_count');
+        \App\Models\AnalyticsLog::create([
+            'target_id' => $product->id,
+            'target_type' => 'product',
+            'activity' => 'view',
+            'ip_address' => request()->ip(),
+        ]);
+
         $related = Product::query()
             ->where('status', true)
             ->where('id', '!=', $product->id)
@@ -77,6 +86,22 @@ class ProductController extends BaseApiController
             'product' => ProductTransformer::transform($product),
             'related_products' => $related->map(fn (Product $item) => ProductTransformer::transform($item))->values(),
         ]);
+    }
+
+    public function logClick(int $id): JsonResponse
+    {
+        $link = \App\Models\MarketplaceLink::findOrFail($id);
+
+        // Increment click count and log analytics (Sync with Web)
+        $link->increment('click_count');
+        \App\Models\AnalyticsLog::create([
+            'target_id' => $link->id,
+            'target_type' => 'marketplace_link',
+            'activity' => 'click',
+            'ip_address' => request()->ip(),
+        ]);
+
+        return $this->success(null, 'Klik marketplace berhasil dicatat.');
     }
 
     public function related(Request $request, string $slug): JsonResponse

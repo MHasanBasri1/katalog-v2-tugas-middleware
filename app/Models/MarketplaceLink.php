@@ -11,6 +11,11 @@ class MarketplaceLink extends Model
         'product_id',
         'marketplace',
         'url',
+        'click_count',
+    ];
+
+    protected $casts = [
+        'click_count' => 'integer',
     ];
 
     public function product(): BelongsTo

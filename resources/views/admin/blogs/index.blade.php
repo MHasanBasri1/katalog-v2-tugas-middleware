@@ -140,6 +140,7 @@
                                 <input type="checkbox" :checked="isAllOnPageSelected" @change="toggleSelectAllOnPage()" class="rounded border-gray-300 text-blue-600">
                             </th>
                             <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-100 dark:border-gray-800">Artikel</th>
+                            <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-100 dark:border-gray-800 text-center">Views</th>
                             <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-100 dark:border-gray-800 text-center">Status</th>
                             <th class="px-6 py-4 text-[11px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-100 dark:border-gray-800 text-right">Aksi</th>
                         </tr>
@@ -160,6 +161,12 @@
                                             </span>
                                             <p class="text-[10px] text-gray-500 font-mono">#{{ $blog->id }} • {{ $blog->author_name }} • {{ optional($blog->published_at)->format('d M Y') ?: '-' }}</p>
                                         </div>
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-bold">
+                                            <i class="ti ti-eye"></i>
+                                            {{ number_format($blog->views_count) }}
+                                        </span>
                                     </td>
                                     <td class="px-4 py-3 text-center">
                                         <form action="{{ route('admin.blog.update-status', $blog) }}" method="POST">

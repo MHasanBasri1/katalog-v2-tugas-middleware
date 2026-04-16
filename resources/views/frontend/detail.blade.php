@@ -179,11 +179,15 @@
                                 'tiktok shop' => ['name' => 'TikTok Shop', 'icon' => 'fab fa-tiktok', 'color' => 'bg-black', 'shadow' => 'hover:shadow-black/30'],
                             ];
                         @endphp
-                        @foreach($marketplaceLinks as $key => $url)
+                        @foreach($marketplaceLinks as $link)
+                            @php
+                                $key = Str::lower($link->marketplace);
+                                if ($key === 'tiktok shop') $key = 'tiktok';
+                            @endphp
                             @if(isset($marketplaces[$key]))
-                                <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" class="group relative overflow-hidden inline-flex items-center justify-center gap-2.5 rounded-2xl px-4 py-3.5 font-bold text-sm {{ $marketplaces[$key]['color'] }} text-white hover:-translate-y-1 hover:shadow-lg {{ $marketplaces[$key]['shadow'] }} transition-all duration-300"><span class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span><i class="{{ $marketplaces[$key]['icon'] }} {{ $marketplaces[$key]['icon_class'] ?? '' }} relative z-10 text-base"></i> <span class="relative z-10">{{ $marketplaces[$key]['name'] }}</span></a>
+                                <a href="{{ route('marketplace.click', $link->id) }}" target="_blank" rel="noopener noreferrer" class="group relative overflow-hidden inline-flex items-center justify-center gap-2.5 rounded-2xl px-4 py-3.5 font-bold text-sm {{ $marketplaces[$key]['color'] }} text-white hover:-translate-y-1 hover:shadow-lg {{ $marketplaces[$key]['shadow'] }} transition-all duration-300"><span class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span><i class="{{ $marketplaces[$key]['icon'] }} {{ $marketplaces[$key]['icon_class'] ?? '' }} relative z-10 text-base"></i> <span class="relative z-10">{{ $marketplaces[$key]['name'] }}</span></a>
                             @else
-                                <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" class="group relative overflow-hidden inline-flex items-center justify-center gap-2.5 rounded-2xl px-4 py-3.5 font-bold text-sm bg-gray-600 text-white hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-600/30 transition-all duration-300"><span class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span><i class="fas fa-store relative z-10"></i> <span class="relative z-10 font-bold uppercase">{{ $key }}</span></a>
+                                <a href="{{ route('marketplace.click', $link->id) }}" target="_blank" rel="noopener noreferrer" class="group relative overflow-hidden inline-flex items-center justify-center gap-2.5 rounded-2xl px-4 py-3.5 font-bold text-sm bg-gray-600 text-white hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-600/30 transition-all duration-300"><span class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span><i class="fas fa-store relative z-10"></i> <span class="relative z-10 font-bold uppercase">{{ $link->marketplace }}</span></a>
                             @endif
                         @endforeach
                     </div>

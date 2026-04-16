@@ -66,6 +66,9 @@ class BlogController extends BaseApiController
             ->with(['category'])
             ->firstOrFail();
 
+        // Increment views count
+        $blog->increment('views_count');
+
         return $this->success([
             'blog' => BlogTransformer::transform($blog),
         ]);
