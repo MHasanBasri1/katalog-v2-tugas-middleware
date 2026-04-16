@@ -117,12 +117,15 @@
                     </div>
                 </article>
             @empty
-                <div class="col-span-full py-16 text-center bg-white rounded-[2rem] border border-gray-100 shadow-sm">
-                    <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100">
-                        <i class="fas fa-newspaper text-3xl text-gray-300"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Belum Ada Artikel</h3>
-                    <p class="text-gray-500 max-w-md mx-auto">Kami belum mempublikasikan artikel yang sesuai dengan kriteria pencarian Anda.</p>
+                <div class="col-span-full py-20 px-4 text-center bg-white rounded-[2rem] border border-gray-100 shadow-sm flex flex-col items-center justify-center">
+                    <h3 class="text-xl md:text-2xl font-black text-gray-900 mb-3 font-primary uppercase tracking-tight">Oops! Artikel Tidak Ditemukan</h3>
+                    <p class="text-gray-500 max-w-md mx-auto mb-8 text-sm md:text-base font-medium leading-relaxed">
+                        Kami tidak dapat menemukan artikel yang sesuai dengan pencarian atau filter Anda. Silakan coba kata kunci lain.
+                    </p>
+                    <a href="{{ route('blog.index') }}" class="px-8 py-3 bg-primary text-white font-black rounded-xl hover:bg-primary-dark transition-all duration-300 shadow-lg shadow-primary/20 flex items-center gap-2">
+                        <i class="fas fa-rotate-left text-xs"></i>
+                        Tampilkan Semua Artikel
+                    </a>
                 </div>
             @endforelse
         </section>

@@ -107,10 +107,15 @@ Route::middleware(['web', 'throttle:60,1'])->group(function () {
         $seoDescription = 'Artikel terbaru Kataloque seputar tips belanja online, gadget, dan rekomendasi produk.';
         $selectedCategory = (string) $request->query('kategori', '');
         $selectedTag = (string) $request->query('tag', '');
+        $search = (string) $request->query('search', '');
 
         $postQuery = Blog::query()
             ->with(['category:id,name,slug', 'tags:id,name,slug'])
             ->where('is_published', true)
+            ->when(
+                $search !== '',
+                fn ($query) => $query->where('title', 'like', "%{$search}%")
+            )
             ->when(
                 $selectedCategory !== '',
                 fn ($query) => $query->whereHas('category', fn ($categoryQuery) => $categoryQuery->where('slug', $selectedCategory))

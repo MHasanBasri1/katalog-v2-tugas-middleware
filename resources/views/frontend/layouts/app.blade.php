@@ -177,6 +177,11 @@
             will-change: transform;
             transform: translateZ(0);
         }
+
+        /* Header Scroll States */
+        .is-top-bar-hidden {
+            transform: translateY(-33px) !important;
+        }
     </style>
     @livewireStyles
     @stack('meta')
@@ -274,10 +279,10 @@
             }
 
             .fixed.top-0.left-0.right-0.z-\[100\] {
-                transform: translateY(32px) !important;
+                transform: translateY(32px);
             }
 
-            .isTopBarHidden {
+            .is-top-bar-hidden {
                 transform: translateY(-1px) !important;
             }
 
@@ -287,7 +292,7 @@
 
             @media (min-width: 768px) {
                 main {
-                    padding-top: calc(147px + 32px) !important;
+                    padding-top: calc(135px + 32px) !important;
                 }
             }
         </style>
