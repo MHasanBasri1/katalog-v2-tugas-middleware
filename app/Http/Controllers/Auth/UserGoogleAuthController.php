@@ -114,8 +114,9 @@ class UserGoogleAuthController extends Controller
 
         // 5. Account Frozen check
         if ($user->is_frozen) {
+            $reason = $user->freeze_reason ? " (Alasan: {$user->freeze_reason})" : "";
             return redirect()->route('user.login')->withErrors([
-                'email' => 'Akun Anda sedang dibekukan. Silakan hubungi admin.',
+                'email' => "Akun Anda sedang dibekukan.{$reason} Silakan hubungi admin.",
             ]);
         }
 

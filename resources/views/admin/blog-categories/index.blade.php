@@ -28,29 +28,35 @@
             },
             submitBulkDelete() {
                 if (this.selectedIds.length === 0) return;
-                if (!confirm(`Hapus ${this.selectedIds.length} kategori blog terpilih?`)) return;
+                
+                $store.confirm.open({
+                    title: 'Hapus Kategori Blog Terpilih',
+                    message: `Apakah Anda yakin ingin menghapus ${this.selectedIds.length} kategori blog yang dipilih?`,
+                    confirmText: 'Ya, Hapus Semua',
+                    onConfirm: () => {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = this.bulkDeleteUrl;
 
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = this.bulkDeleteUrl;
+                        const csrf = document.querySelector('meta[name=csrf-token]')?.getAttribute('content') ?? '';
+                        const tokenInput = document.createElement('input');
+                        tokenInput.type = 'hidden';
+                        tokenInput.name = '_token';
+                        tokenInput.value = csrf;
+                        form.appendChild(tokenInput);
 
-                const csrf = document.querySelector('meta[name=csrf-token]')?.getAttribute('content') ?? '';
-                const tokenInput = document.createElement('input');
-                tokenInput.type = 'hidden';
-                tokenInput.name = '_token';
-                tokenInput.value = csrf;
-                form.appendChild(tokenInput);
+                        this.selectedIds.forEach((id) => {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'selected_ids[]';
+                            input.value = String(id);
+                            form.appendChild(input);
+                        });
 
-                this.selectedIds.forEach((id) => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'selected_ids[]';
-                    input.value = String(id);
-                    form.appendChild(input);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
                 });
-
-                document.body.appendChild(form);
-                form.submit();
             },
             get isAllOnPageSelected() {
                 return this.currentPageIds.length > 0 && this.currentPageIds.every((id) => this.selectedIds.includes(id));
@@ -154,10 +160,19 @@
                                                 <a href="{{ route('admin.blog-kategori.edit', $category) }}" class="inline-flex items-center rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800" title="Edit">
                                                     <i class="ti ti-pencil text-base"></i>
                                                 </a>
-                                                <form method="POST" action="{{ route('admin.blog-kategori.destroy', $category) }}" onsubmit="return confirm('Hapus kategori blog ini?')">
+                                                <form method="POST" action="{{ route('admin.blog-kategori.destroy', $category) }}" x-ref="deleteForm{{ $category->id }}">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="inline-flex items-center rounded-lg border border-rose-100 dark:border-rose-900/10 p-2 text-rose-600 hover:bg-rose-600 hover:text-white transition-all text-center" title="Hapus">
+                                                    <button 
+                                                        type="button" 
+                                                        @click="$store.confirm.open({
+                                                            title: 'Hapus Kategori Blog',
+                                                            message: 'Apakah Anda yakin ingin menghapus kategori blog ini?',
+                                                            confirmText: 'Ya, Hapus',
+                                                            onConfirm: () => $refs.deleteForm{{ $category->id }}.submit()
+                                                        })"
+                                                        class="inline-flex items-center rounded-lg border border-rose-100 dark:border-rose-900/10 p-2 text-rose-600 hover:bg-rose-600 hover:text-white transition-all text-center" title="Hapus"
+                                                    >
                                                         <i class="ti ti-trash text-base"></i>
                                                     </button>
                                                 </form>

@@ -98,6 +98,9 @@
             </button>
         </div>
     </div>
+    
+    @include('admin.partials.confirmation-modal')
+
     @stack('scripts')
 </body>
 </html>

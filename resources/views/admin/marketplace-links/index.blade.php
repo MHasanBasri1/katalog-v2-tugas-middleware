@@ -4,7 +4,7 @@
 @section('header', 'Marketplace Link')
 
 @section('content')
-    <div class="space-y-4 w-full">
+    <div class="space-y-4 w-full" x-data>
         @if (session('status'))
             <div class="rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 px-4 py-3 text-sm font-semibold">
                 {{ session('status') }}
@@ -107,10 +107,19 @@
                                         <a href="{{ route('admin.marketplace-link.index', ['edit' => $link->id]) }}" class="inline-flex items-center rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800" title="Edit" aria-label="Edit">
                                             <i class="ti ti-pencil text-base"></i>
                                         </a>
-                                        <form method="POST" action="{{ route('admin.marketplace-link.destroy', $link) }}" onsubmit="return confirm('Hapus marketplace link ini?')">
+                                        <form method="POST" action="{{ route('admin.marketplace-link.destroy', $link) }}" x-ref="deleteForm{{ $link->id }}">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="inline-flex items-center rounded-lg border border-rose-200 p-2 text-rose-600 hover:bg-rose-50" title="Hapus" aria-label="Hapus">
+                                            <button 
+                                                type="button" 
+                                                @click="$store.confirm.open({
+                                                    title: 'Hapus Link',
+                                                    message: 'Apakah Anda yakin ingin menghapus link marketplace ini?',
+                                                    confirmText: 'Ya, Hapus',
+                                                    onConfirm: () => $refs.deleteForm{{ $link->id }}.submit()
+                                                })"
+                                                class="inline-flex items-center rounded-lg border border-rose-200 p-2 text-rose-600 hover:bg-rose-50" title="Hapus" aria-label="Hapus"
+                                            >
                                                 <i class="ti ti-trash text-base"></i>
                                             </button>
                                         </form>

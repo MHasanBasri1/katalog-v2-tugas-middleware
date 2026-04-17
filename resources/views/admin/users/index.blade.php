@@ -28,29 +28,35 @@
             },
             submitBulkDelete() {
                 if (this.selectedIds.length === 0) return;
-                if (!confirm(`Hapus ${this.selectedIds.length} user terpilih?`)) return;
+                
+                $store.confirm.open({
+                    title: 'Hapus User Terpilih',
+                    message: `Apakah Anda yakin ingin menghapus ${this.selectedIds.length} user yang dipilih?`,
+                    confirmText: 'Ya, Hapus Semua',
+                    onConfirm: () => {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = this.bulkDeleteUrl;
 
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = this.bulkDeleteUrl;
+                        const csrf = document.querySelector('meta[name=csrf-token]')?.getAttribute('content') ?? '';
+                        const tokenInput = document.createElement('input');
+                        tokenInput.type = 'hidden';
+                        tokenInput.name = '_token';
+                        tokenInput.value = csrf;
+                        form.appendChild(tokenInput);
 
-                const csrf = document.querySelector('meta[name=csrf-token]')?.getAttribute('content') ?? '';
-                const tokenInput = document.createElement('input');
-                tokenInput.type = 'hidden';
-                tokenInput.name = '_token';
-                tokenInput.value = csrf;
-                form.appendChild(tokenInput);
+                        this.selectedIds.forEach((id) => {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'selected_ids[]';
+                            input.value = String(id);
+                            form.appendChild(input);
+                        });
 
-                this.selectedIds.forEach((id) => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'selected_ids[]';
-                    input.value = String(id);
-                    form.appendChild(input);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
                 });
-
-                document.body.appendChild(form);
-                form.submit();
             },
             get isAllOnPageSelected() {
                 return this.currentPageIds.length > 0 && this.currentPageIds.every((id) => this.selectedIds.includes(id));
@@ -201,17 +207,37 @@
                                             <div class="flex items-center justify-end gap-2">
                                                 @if ($user->id !== auth()->id())
                                                     @if (!$user->is_frozen)
-                                                        <form method="POST" action="{{ route('admin.user.freeze', $user) }}" onsubmit="return confirm('Bekukan akun user ini?')">
+                                                        <form method="POST" action="{{ route('admin.user.freeze', $user) }}" x-ref="freezeForm{{ $user->id }}">
                                                             @csrf
                                                             <input type="hidden" name="freeze_reason" value="Dibekukan oleh admin">
-                                                            <button type="submit" class="inline-flex items-center rounded-lg border border-amber-100 dark:border-amber-900/10 p-2 text-amber-600 hover:bg-amber-600 hover:text-white transition-all text-center" title="Bekukan">
+                                                            <button 
+                                                                type="button" 
+                                                                @click="$store.confirm.open({
+                                                                    title: 'Bekukan Akun',
+                                                                    message: 'Apakah Anda yakin ingin membekukan akun user ini?',
+                                                                    confirmText: 'Ya, Bekukan',
+                                                                    variant: 'warning',
+                                                                    onConfirm: () => $refs.freezeForm{{ $user->id }}.submit()
+                                                                })"
+                                                                class="inline-flex items-center rounded-lg border border-amber-100 dark:border-amber-900/10 p-2 text-amber-600 hover:bg-amber-600 hover:text-white transition-all text-center" title="Bekukan"
+                                                            >
                                                                 <i class="ti ti-user-x text-base"></i>
                                                             </button>
                                                         </form>
                                                     @else
-                                                        <form method="POST" action="{{ route('admin.user.unfreeze', $user) }}" onsubmit="return confirm('Aktifkan kembali akun user ini?')">
+                                                        <form method="POST" action="{{ route('admin.user.unfreeze', $user) }}" x-ref="unfreezeForm{{ $user->id }}">
                                                             @csrf
-                                                            <button type="submit" class="inline-flex items-center rounded-lg border border-emerald-100 dark:border-emerald-900/10 p-2 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all text-center" title="Aktifkan">
+                                                            <button 
+                                                                type="button" 
+                                                                @click="$store.confirm.open({
+                                                                    title: 'Aktifkan Akun',
+                                                                    message: 'Aktifkan kembali akun user ini?',
+                                                                    confirmText: 'Ya, Aktifkan',
+                                                                    variant: 'primary',
+                                                                    onConfirm: () => $refs.unfreezeForm{{ $user->id }}.submit()
+                                                                })"
+                                                                class="inline-flex items-center rounded-lg border border-emerald-100 dark:border-emerald-900/10 p-2 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all text-center" title="Aktifkan"
+                                                            >
                                                                 <i class="ti ti-user-check text-base"></i>
                                                             </button>
                                                         </form>
@@ -219,10 +245,19 @@
                                                     <a href="{{ route('admin.user.edit', $user) }}" class="inline-flex items-center rounded-lg border border-gray-200 dark:border-gray-700 p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800" title="Edit">
                                                         <i class="ti ti-pencil text-base"></i>
                                                     </a>
-                                                    <form method="POST" action="{{ route('admin.user.destroy', $user) }}" onsubmit="return confirm('Hapus user ini? Tindakan ini tidak dapat dibatalkan.')">
+                                                    <form method="POST" action="{{ route('admin.user.destroy', $user) }}" x-ref="deleteForm{{ $user->id }}">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="inline-flex items-center rounded-lg border border-rose-100 dark:border-rose-900/10 p-2 text-rose-600 hover:bg-rose-600 hover:text-white transition-all text-center" title="Hapus">
+                                                        <button 
+                                                            type="button" 
+                                                            @click="$store.confirm.open({
+                                                                title: 'Hapus User',
+                                                                message: 'Apakah Anda yakin ingin menghapus user ini? Tindakan ini tidak dapat dibatalkan.',
+                                                                confirmText: 'Ya, Hapus',
+                                                                onConfirm: () => $refs.deleteForm{{ $user->id }}.submit()
+                                                            })"
+                                                            class="inline-flex items-center rounded-lg border border-rose-100 dark:border-rose-900/10 p-2 text-rose-600 hover:bg-rose-600 hover:text-white transition-all text-center" title="Hapus"
+                                                        >
                                                             <i class="ti ti-trash text-base"></i>
                                                         </button>
                                                     </form>

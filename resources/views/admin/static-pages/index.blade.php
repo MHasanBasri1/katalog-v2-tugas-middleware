@@ -28,29 +28,35 @@
             },
             submitBulkDelete() {
                 if (this.selectedIds.length === 0) return;
-                if (!confirm(`Hapus ${this.selectedIds.length} halaman terpilih?`)) return;
+                
+                $store.confirm.open({
+                    title: 'Hapus Halaman Terpilih',
+                    message: `Apakah Anda yakin ingin menghapus ${this.selectedIds.length} halaman yang dipilih?`,
+                    confirmText: 'Ya, Hapus Semua',
+                    onConfirm: () => {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = this.bulkDeleteUrl;
 
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = this.bulkDeleteUrl;
+                        const csrf = document.querySelector('meta[name=csrf-token]')?.getAttribute('content') ?? '';
+                        const tokenInput = document.createElement('input');
+                        tokenInput.type = 'hidden';
+                        tokenInput.name = '_token';
+                        tokenInput.value = csrf;
+                        form.appendChild(tokenInput);
 
-                const csrf = document.querySelector('meta[name=csrf-token]')?.getAttribute('content') ?? '';
-                const tokenInput = document.createElement('input');
-                tokenInput.type = 'hidden';
-                tokenInput.name = '_token';
-                tokenInput.value = csrf;
-                form.appendChild(tokenInput);
+                        this.selectedIds.forEach((id) => {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'selected_ids[]';
+                            input.value = String(id);
+                            form.appendChild(input);
+                        });
 
-                this.selectedIds.forEach((id) => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'selected_ids[]';
-                    input.value = String(id);
-                    form.appendChild(input);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
                 });
-
-                document.body.appendChild(form);
-                form.submit();
             },
             get isAllOnPageSelected() {
                 return this.currentPageIds.length > 0 && this.currentPageIds.every((id) => this.selectedIds.includes(id));
@@ -192,10 +198,19 @@
                                             <a href="{{ route('admin.halaman-statis.edit', $page) }}" class="inline-flex items-center rounded-xl border border-gray-200 dark:border-gray-800 p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all" title="Edit Halaman">
                                                 <i class="ti ti-pencil text-sm"></i>
                                             </a>
-                                            <form method="POST" action="{{ route('admin.halaman-statis.destroy', $page) }}" onsubmit="return confirm('Hapus halaman ini?')">
+                                            <form method="POST" action="{{ route('admin.halaman-statis.destroy', $page) }}" x-ref="deleteForm{{ $page->id }}">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="inline-flex items-center rounded-xl border border-gray-200 dark:border-gray-800 p-2.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition-all" title="Hapus Halaman">
+                                                <button 
+                                                    type="button" 
+                                                    @click="$store.confirm.open({
+                                                        title: 'Hapus Halaman',
+                                                        message: 'Apakah Anda yakin ingin menghapus halaman statis ini?',
+                                                        confirmText: 'Ya, Hapus',
+                                                        onConfirm: () => $refs.deleteForm{{ $page->id }}.submit()
+                                                    })"
+                                                    class="inline-flex items-center rounded-xl border border-gray-200 dark:border-gray-800 p-2.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition-all" title="Hapus Halaman"
+                                                >
                                                     <i class="ti ti-trash text-sm"></i>
                                                 </button>
                                             </form>

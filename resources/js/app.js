@@ -27,6 +27,36 @@ document.addEventListener('alpine:init', () => {
             this.isMobileOpen = !this.isMobileOpen;
         },
     });
+
+    Alpine.store('confirm', {
+        show: false,
+        title: 'Konfirmasi',
+        message: 'Apakah Anda yakin ingin melakukan tindakan ini?',
+        confirmText: 'Ya, Lanjutkan',
+        cancelText: 'Batal',
+        variant: 'danger', // danger, warning, primary
+        callback: null,
+
+        open(options) {
+            this.title = options.title || 'Konfirmasi';
+            this.message = options.message || 'Apakah Anda yakin?';
+            this.confirmText = options.confirmText || 'Ya, Lanjutkan';
+            this.cancelText = options.cancelText || 'Batal';
+            this.variant = options.variant || 'danger';
+            this.callback = options.onConfirm || null;
+            this.show = true;
+        },
+
+        confirm() {
+            if (this.callback) this.callback();
+            this.show = false;
+        },
+
+        close() {
+            this.show = false;
+        }
+    });
+
     window.addEventListener('resize', () => {
         const store = Alpine.store('sidebar');
         if (window.innerWidth >= 1280 && !store.isExpanded && !store.isMobileOpen) {

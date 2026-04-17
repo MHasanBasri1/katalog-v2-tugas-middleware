@@ -12,8 +12,8 @@
                     <h2 class="text-xl font-bold text-gray-900 dark:text-white">Log Aktivitas Sistem</h2>
                     <p class="text-sm text-gray-500">Memantau seluruh interaksi user dan pengunjung dalam aplikasi.</p>
                 </div>
-                <div class="flex items-center gap-2">
-                    <form action="{{ route('admin.logs.clear') }}" method="POST" class="flex items-center gap-2" x-data="{ months: 3 }" @submit="return confirm('Hapus semua log yang sudah lebih dari ' + months + ' bulan?')">
+                <div class="flex items-center gap-2" x-data="{ months: 3 }">
+                    <form x-ref="clearForm" action="{{ route('admin.logs.clear') }}" method="POST" class="flex items-center gap-2">
                         @csrf
                         <div class="relative">
                             <select name="months" x-model="months" class="appearance-none bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl pl-4 pr-10 py-2.5 text-xs font-bold text-gray-700 dark:text-gray-300 outline-none focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10 transition-all cursor-pointer uppercase tracking-wider">
@@ -26,7 +26,16 @@
                                 <i class="ti ti-chevron-down text-xs"></i>
                             </div>
                         </div>
-                        <button type="submit" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-50 dark:bg-rose-900/20 text-rose-600 hover:bg-rose-600 hover:text-white transition-all text-xs font-bold uppercase tracking-wider border border-rose-100 dark:border-rose-900/10 shadow-sm">
+                        <button 
+                            type="button" 
+                            @click="$store.confirm.open({
+                                title: 'Bersihkan Log',
+                                message: `Hapus semua log yang sudah lebih dari ${months} bulan?`,
+                                confirmText: 'Ya, Bersihkan',
+                                onConfirm: () => $refs.clearForm.submit()
+                            })"
+                            class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-50 dark:bg-rose-900/20 text-rose-600 hover:bg-rose-600 hover:text-white transition-all text-xs font-bold uppercase tracking-wider border border-rose-100 dark:border-rose-900/10 shadow-sm"
+                        >
                             <i class="ti ti-trash text-sm"></i>
                             Bersihkan
                         </button>
