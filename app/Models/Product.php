@@ -74,4 +74,24 @@ class Product extends Model
     {
         return $this->hasMany(ProductReview::class)->latest();
     }
+
+    public function getPrimaryImageUrlAttribute(): ?string
+    {
+        $image = $this->primaryImage?->image ?: $this->images->first()?->image;
+        
+        if (!$image) {
+            return null;
+        }
+
+        if (str_starts_with($image, 'http')) {
+            return $image;
+        }
+
+        $cleanPath = ltrim($image, '/');
+        if (str_starts_with($cleanPath, 'storage/')) {
+            return asset($cleanPath);
+        }
+
+        return asset('storage/' . $cleanPath);
+    }
 }

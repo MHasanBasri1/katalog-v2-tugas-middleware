@@ -204,23 +204,39 @@
 
                                 <div class="px-5 py-2 mb-2 border-b border-gray-50 flex items-center justify-between">
                                     <span class="text-xs font-black text-gray-800 uppercase tracking-wider">Notifikasi</span>
-                                    <span class="text-[10px] font-bold text-gray-400">Terbaru</span>
+                                    @if($notificationCount > 0)
+                                        <button wire:click="markAllAsRead" class="text-[9px] font-black text-primary hover:text-primary-dark uppercase tracking-widest leading-none bg-primary/5 px-2 py-1 rounded-lg transition-all active:scale-95">
+                                            Tandai Semua Dibaca
+                                        </button>
+                                    @else
+                                        <span class="text-[10px] font-bold text-gray-400">Terbaru</span>
+                                    @endif
                                 </div>
 
                                 @if(auth()->check())
                                     <div class="px-2 space-y-1">
                                         @forelse($this->notificationItems as $item)
-                                            <a href="{{ $item['url'] }}"
-                                                class="block px-4 py-3 hover:bg-gray-50 rounded-xl transition-colors border-b border-gray-50 last:border-0 {{ !$item['is_read'] ? 'bg-primary/5' : '' }}">
-                                                <div class="flex items-center gap-2 mb-1">
-                                                    <span class="text-[9px] font-black {{ !$item['is_read'] ? 'bg-primary text-white' : 'bg-gray-100 text-gray-500' }} px-1.5 py-0.5 rounded uppercase">
-                                                        {{ !$item['is_read'] ? 'Baru' : 'Info' }}
-                                                    </span>
-                                                    <span class="text-[9px] font-medium text-gray-400">{{ $item['time'] }}</span>
-                                                </div>
-                                                <div class="text-[12px] font-bold text-gray-800 truncate">{{ $item['title'] }}</div>
-                                                <div class="text-[11px] font-medium text-gray-500 line-clamp-1">{{ $item['message'] }}</div>
-                                            </a>
+                                            <div class="relative group/notif">
+                                                <a href="{{ $item['url'] }}"
+                                                    class="block px-4 py-3 hover:bg-gray-50 rounded-xl transition-colors border-b border-gray-50 last:border-0 {{ !$item['is_read'] ? 'bg-primary/5' : '' }}">
+                                                    <div class="flex items-center gap-2 mb-1">
+                                                        <span class="text-[9px] font-black {{ !$item['is_read'] ? 'bg-primary text-white' : 'bg-gray-100 text-gray-500' }} px-1.5 py-0.5 rounded uppercase">
+                                                            {{ !$item['is_read'] ? 'Baru' : 'Info' }}
+                                                        </span>
+                                                        <span class="text-[9px] font-medium text-gray-400">{{ $item['time'] }}</span>
+                                                    </div>
+                                                    <div class="text-[12px] font-bold text-gray-800 truncate pr-6">{{ $item['title'] }}</div>
+                                                    <div class="text-[11px] font-medium text-gray-500 line-clamp-1">{{ $item['message'] }}</div>
+                                                </a>
+                                                
+                                                @if(!$item['is_read'])
+                                                    <button wire:click.stop="markAsRead('{{ $item['id'] }}')" 
+                                                        class="absolute right-4 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-lg bg-white border border-gray-100 text-gray-400 hover:text-white hover:bg-blue-600 hover:border-blue-600 opacity-0 group-hover/notif:opacity-100 transition-all duration-200 shadow-sm"
+                                                        title="Tandai dibaca">
+                                                        <i class="ti ti-check text-xs"></i>
+                                                    </button>
+                                                @endif
+                                            </div>
                                         @empty
                                             <div class="px-5 py-8 text-center">
                                                 <p class="text-[11px] font-medium text-gray-400">Belum ada notifikasi baru.</p>
@@ -400,13 +416,26 @@
                                     x-cloak>
                                     <div class="px-4 py-2 mb-2 border-b border-gray-50 flex items-center justify-between">
                                         <span class="text-[10px] font-black text-gray-800 uppercase tracking-wider">Notifikasi</span>
+                                        @if($notificationCount > 0)
+                                            <button wire:click="markAllAsRead" class="text-[8px] font-black text-primary uppercase bg-primary/5 px-2 py-0.5 rounded-lg active:scale-95 transition-all">
+                                                DIBACA SEMUA
+                                            </button>
+                                        @endif
                                     </div>
                                     <div class="px-1 space-y-0.5 max-h-64 overflow-y-auto">
-                                        @forelse(collect($this->notificationItems)->take(5) as $item)
-                                            <a href="{{ $item['url'] }}" class="block px-4 py-2 hover:bg-gray-50 rounded-lg text-[11px] {{ !$item['is_read'] ? 'bg-primary/5' : '' }}">
-                                                <div class="font-bold text-gray-800 truncate">{{ $item['title'] }}</div>
-                                                <div class="text-gray-400 text-[9px]">{{ $item['time'] }}</div>
-                                            </a>
+                                        @forelse(collect($this->notificationItems)->take(3) as $item)
+                                            <div class="relative group/notif-mob">
+                                                <a href="{{ $item['url'] }}" class="block px-4 py-2 hover:bg-gray-50 rounded-lg text-[11px] {{ !$item['is_read'] ? 'bg-primary/5' : '' }}">
+                                                    <div class="font-bold text-gray-800 truncate pr-6">{{ $item['title'] }}</div>
+                                                    <div class="text-gray-400 text-[9px]">{{ $item['time'] }}</div>
+                                                </a>
+                                                @if(!$item['is_read'])
+                                                    <button wire:click.stop="markAsRead('{{ $item['id'] }}')" 
+                                                        class="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-lg bg-white border border-gray-100 text-primary transition-all active:scale-90 shadow-sm">
+                                                        <i class="ti ti-check text-[10px]"></i>
+                                                    </button>
+                                                @endif
+                                            </div>
                                         @empty
                                             <div class="px-4 py-4 text-center text-[10px] text-gray-400">Tidak ada info baru.</div>
                                         @endforelse

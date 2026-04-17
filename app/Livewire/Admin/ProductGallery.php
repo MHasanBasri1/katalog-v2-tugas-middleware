@@ -56,6 +56,8 @@ class ProductGallery extends Component
         ]);
     }
 
+
+
     public function setPrimary($imageId)
     {
         $image = ProductImage::find($imageId);

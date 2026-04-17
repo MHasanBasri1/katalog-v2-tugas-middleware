@@ -17,7 +17,7 @@
                 @endif
                 
                 <!-- Image Actions Overlay -->
-                <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-2 backdrop-blur-[2px]">
+                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-2 backdrop-blur-[1px] z-20">
                     @if(!$image->is_primary)
                         <button type="button" 
                             wire:click="setPrimary({{ $image->id }})"

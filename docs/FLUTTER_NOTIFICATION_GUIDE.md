@@ -7,11 +7,12 @@ Dokumen ini menjelaskan cara mengintegrasikan sistem notifikasi database Laravel
 Semua endpoint ini membutuhkan header `Authorization: Bearer <token>`.
 
 | Method | Endpoint | Deskripsi |
-|--------|----------|-----------|
-| **GET** | `/api/v1/notifications` | Mengambil daftar notifikasi user dan jumlah unread. |
-| **POST** | `/api/v1/notifications/{id}/read` | Menandai satu notifikasi sebagai sudah dibaca. |
-| **POST** | `/api/v1/notifications/read-all` | Menandai semua notifikasi sebagai sudah dibaca. |
-| **DELETE** | `/api/v1/notifications/{id}` | Menghapus satu data notifikasi. |
+| Method | Endpoint | Deskripsi | Parameter |
+|--------|----------|-----------|-----------|
+| **GET** | `/api/v1/notifications` | Mengambil daftar notifikasi dan unread count. | `page`, `per_page` |
+| **POST** | `/api/v1/notifications/{id}/read` | Mark as read (tunggal). | - |
+| **POST** | `/api/v1/notifications/read-all` | Mark as read (semua). | - |
+| **DELETE** | `/api/v1/notifications/{id}` | Hapus notifikasi. | - |
 
 ---
 
@@ -79,6 +80,7 @@ class NotificationService {
         return {
           'notifications': rawList.map((e) => NotificationModel.fromJson(e)).toList(),
           'unreadCount': response.data['data']['unread_count'],
+          'total': response.data['meta']?['total'] ?? 0,
         };
       }
       return {'notifications': [], 'unreadCount': 0};
@@ -112,8 +114,10 @@ Sistem telah memiliki **ProductObserver**. Anda tidak perlu memanggil API untuk 
 
 - **Badge Notifikasi:** Gunakan field `unread_count` dari API untuk menampilkan angka di atas icon lonceng.
 - **Warna Berdasarkan Tipe:**
-  - `type == 'success'`: Hijau (biasanya untuk promo baru).
+  - `type == 'success'` atau `'new_product'`: Hijau (biasanya untuk promo/produk baru).
   - `type == 'info'`: Biru.
+  - `type == 'warning'`: Kuning/Oranye.
+- **Navigasi Otomatis:** Jika `type == 'new_product'` dan `productSlug` tidak null, arahkan user ke halaman Detail Produk saat notifikasi di-tap.
 - **Empty State:** Berikan ilustrasi jika `notifications.isEmpty`.
 
 ---

@@ -20,8 +20,8 @@ class PanelController extends Controller
             ->where('user_id', auth()->id())
             ->with([
                 'product' => fn ($query) => $query
-                    ->select('id', 'name', 'slug', 'price', 'original_price')
-                    ->with('primaryImage:id,product_id,image'),
+                    ->where('status', true)
+                    ->with(['category:id,name,slug,icon', 'primaryImage:id,product_id,image', 'images:id,product_id,image,is_primary', 'marketplaceLinks:id,product_id,marketplace,url', 'reviews']),
             ])
             ->latest('id')
             ->get()

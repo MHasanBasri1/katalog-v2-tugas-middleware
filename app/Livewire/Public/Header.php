@@ -94,6 +94,23 @@ class Header extends Component
         $this->notificationCount = 0;
     }
 
+    public function markAsRead(string $id): void
+    {
+        if (!auth()->check()) return;
+        
+        $notification = auth()->user()->notifications()->find($id);
+        if ($notification) {
+            $notification->markAsRead();
+        }
+    }
+
+    public function markAllAsRead(): void
+    {
+        if (!auth()->check()) return;
+        
+        auth()->user()->unreadNotifications->markAsRead();
+    }
+
     public function goToSearch(): void
     {
         $query = trim($this->search);
@@ -214,7 +231,7 @@ class Header extends Component
 
         return auth()->user()->notifications()
             ->latest()
-            ->limit(5)
+            ->limit(3)
             ->get()
             ->map(fn($n) => [
                 'id' => $n->id,

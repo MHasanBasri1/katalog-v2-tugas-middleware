@@ -84,7 +84,7 @@ class ProductController extends Controller
 
             $product = Product::query()->create($payload);
 
-            $this->productService->syncProductImages($product, $request->file('images', []));
+            $this->productService->syncProductImages($product, $request->file('images', []), $request->input('primary_image_index'));
             $this->productService->syncMarketplaceLinks($product, $payload['marketplace_links'] ?? []);
 
             $this->clearProductCaches();
@@ -129,7 +129,7 @@ class ProductController extends Controller
 
         $produk->update($payload);
 
-        $this->productService->syncProductImages($produk, $request->file('images', []));
+        $this->productService->syncProductImages($produk, $request->file('images', []), $request->input('primary_image_index'));
         $this->productService->syncMarketplaceLinks($produk, $payload['marketplace_links'] ?? []);
 
         $this->clearProductCaches();

@@ -35,7 +35,7 @@
                         <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Kategori</label>
                         <select name="category_id" required 
                             class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium"
-                            :disabled="isSubmitting">
+                            :class="isSubmitting ? 'opacity-50 pointer-events-none' : ''">
                             <option value="">Pilih Kategori</option>
                             @foreach ($categories as $category)
                                 <option value="{{ $category->id }}" @selected(old('category_id') == $category->id)>{{ $category->name }}</option>
@@ -143,7 +143,7 @@
                     <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">Status Publikasi</label>
                     <select name="status" required 
                         class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium"
-                        :disabled="isSubmitting">
+                        :class="isSubmitting ? 'opacity-50 pointer-events-none' : ''">
                         <option value="1" @selected(old('status', '1') == '1')>Aktif</option>
                         <option value="0" @selected(old('status') == '0')>Nonaktif</option>
                     </select>
@@ -157,6 +157,7 @@
             <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden" 
                 x-data="{ 
                     previews: [],
+                    primaryIndex: 0,
                     handleFileChange(event) {
                         const files = Array.from(event.target.files);
                         if (files.length > 10) {
@@ -165,6 +166,7 @@
                             return;
                         }
                         this.previews = [];
+                        this.primaryIndex = 0;
                         files.forEach(file => {
                             const reader = new FileReader();
                             reader.onload = (e) => {
@@ -172,6 +174,17 @@
                             };
                             reader.readAsDataURL(file);
                         });
+                    },
+                    removeImage(index) {
+                        this.previews.splice(index, 1);
+                        if (this.primaryIndex === index) {
+                            this.primaryIndex = 0;
+                        } else if (this.primaryIndex > index) {
+                            this.primaryIndex--;
+                        }
+                        if (this.previews.length === 0) {
+                            this.$refs.fileInput.value = '';
+                        }
                     }
                 }" :class="isSubmitting ? 'opacity-50 pointer-events-none' : ''">
                 <div class="p-6 border-b border-gray-100 dark:border-gray-800">
@@ -179,16 +192,34 @@
                     <p class="text-xs text-gray-500 mt-1">Upload satu atau beberapa gambar produk (Maks 2MB/file).</p>
                 </div>
                 <div class="p-6">
+                    <input type="hidden" name="primary_image_index" :value="primaryIndex">
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                         {{-- Previews --}}
                         <template x-for="(preview, index) in previews" :key="index">
-                            <div class="relative aspect-square rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm bg-gray-50 dark:bg-gray-800">
+                            <div class="relative aspect-square rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm bg-gray-50 dark:bg-gray-800 group">
                                 <img :src="preview" class="w-full h-full object-cover">
-                                <div class="absolute top-2 left-2 bg-blue-600 text-[8px] font-black text-white px-2 py-0.5 rounded shadow-sm z-10 uppercase tracking-tighter">BARU</div>
-                                <button type="button" @click="previews.splice(index, 1); if(previews.length === 0) $refs.fileInput.value = '';" 
-                                    class="absolute top-2 right-2 bg-rose-600 text-white w-6 h-6 rounded-lg flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <i class="ti ti-x text-xs"></i>
-                                </button>
+                                
+                                <template x-if="primaryIndex === index">
+                                    <div class="absolute top-2 left-2 bg-emerald-600 text-[8px] font-black text-white px-2 py-0.5 rounded shadow-sm z-10 uppercase tracking-tighter uppercase tracking-widest">UTAMA</div>
+                                </template>
+                                <template x-if="primaryIndex !== index">
+                                    <div class="absolute top-2 left-2 bg-blue-600 text-[8px] font-black text-white px-2 py-0.5 rounded shadow-sm z-10 uppercase tracking-tighter uppercase tracking-widest">BARU</div>
+                                </template>
+
+                                <!-- Image Actions Overlay -->
+                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-2 backdrop-blur-[1px] z-20">
+                                    <template x-if="primaryIndex !== index">
+                                        <button type="button" 
+                                            @click="primaryIndex = index"
+                                            class="bg-white/95 hover:bg-white text-gray-900 text-[10px] font-black px-3 py-1.5 rounded-xl shadow-sm transition-all transform translate-y-2 group-hover:translate-y-0 active:scale-95 uppercase tracking-tight">
+                                            Set Utama
+                                        </button>
+                                    </template>
+                                    <button type="button" @click="removeImage(index)" 
+                                        class="bg-rose-600/90 hover:bg-rose-600 text-white p-2 rounded-xl shadow-sm transition-all transform translate-y-2 group-hover:translate-y-0 hover:scale-110 active:scale-90">
+                                        <i class="ti ti-trash text-sm"></i>
+                                    </button>
+                                </div>
                             </div>
                         </template>
 

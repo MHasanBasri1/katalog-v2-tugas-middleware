@@ -8,9 +8,7 @@ class ProductTransformer
 {
     public static function transform(Product $product): array
     {
-        $primaryImage = $product->primaryImage?->image;
-        $firstImage = $product->images->first()?->image;
-        $image = $primaryImage ?: $firstImage;
+        $image = $product->primary_image_url;
 
         $price = (float) $product->price;
         $originalPrice = $product->original_price !== null ? (float) $product->original_price : null;

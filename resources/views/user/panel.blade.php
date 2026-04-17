@@ -213,8 +213,8 @@
                     <div class="rounded-2xl border border-gray-100 p-3 hover:border-blue-200 transition bg-white">
                         <div class="aspect-square w-full bg-gray-100 rounded-xl overflow-hidden">
                             <a href="{{ route('produk.detail', $product->slug) }}">
-                                @if($product->primaryImage?->image)
-                                    <img src="{{ $product->primaryImage->image }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                                @if($product->primary_image_url)
+                                    <img src="{{ $product->primary_image_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-gray-300">
                                         <i class="fas fa-box text-2xl"></i>

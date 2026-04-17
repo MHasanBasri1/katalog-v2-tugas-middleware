@@ -36,13 +36,13 @@ class ProductService
     /**
      * Synchronize product images with automatic WebP conversion for SEO optimization.
      */
-    public function syncProductImages(Product $product, array $images): void
+    public function syncProductImages(Product $product, array $images, ?int $primaryIndex = null): void
     {
         if (empty($images)) {
             return;
         }
 
-        foreach ($images as $image) {
+        foreach ($images as $index => $image) {
             // Convert to WebP for optimization
             $img = Image::read($image);
             $filename = Str::random(40) . '.webp';
@@ -50,9 +50,20 @@ class ProductService
             
             Storage::disk('public')->put($path, (string) $img->toWebp(80));
 
+            $isPrimary = false;
+            if ($primaryIndex !== null) {
+                $isPrimary = ($index === (int) $primaryIndex);
+            } else {
+                $isPrimary = !$product->images()->exists();
+            }
+
+            if ($isPrimary) {
+                $product->images()->update(['is_primary' => false]);
+            }
+
             $product->images()->create([
                 'image' => $path,
-                'is_primary' => !$product->images()->exists(),
+                'is_primary' => $isPrimary,
             ]);
         }
     }

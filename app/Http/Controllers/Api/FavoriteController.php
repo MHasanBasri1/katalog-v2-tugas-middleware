@@ -17,7 +17,13 @@ class FavoriteController extends BaseApiController
             ->with([
                 'product' => fn ($query) => $query
                     ->where('status', true)
-                    ->with(['category:id,name,slug', 'primaryImage:id,product_id,image', 'images:id,product_id,image,is_primary', 'marketplaceLinks:id,product_id,marketplace,url']),
+                    ->with([
+                        'category:id,name,slug,icon', 
+                        'primaryImage:id,product_id,image', 
+                        'images:id,product_id,image,is_primary', 
+                        'marketplaceLinks:id,product_id,marketplace,url',
+                        'reviews'
+                    ]),
             ])
             ->latest('id')
             ->get();
@@ -29,7 +35,7 @@ class FavoriteController extends BaseApiController
             ->values()
             ->map(fn ($product) => ProductTransformer::transform($product));
 
-        return $this->success($products);
+        return $this->success(['products' => $products], 'Daftar produk favorit.');
     }
 
     public function store(Request $request): JsonResponse
