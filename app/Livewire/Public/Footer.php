@@ -15,10 +15,9 @@ class Footer extends Component
 
     public function mount(): void
     {
-        $this->setting = Cache::remember(
-            'public.footer.setting',
-            now()->addMinutes(10),
-            fn () => Setting::query()->first()
+        $this->setting = Cache::rememberForever(
+            'global.settings',
+            fn () => Setting::query()->first() ?? new Setting()
         );
 
         $this->categories = Cache::remember(

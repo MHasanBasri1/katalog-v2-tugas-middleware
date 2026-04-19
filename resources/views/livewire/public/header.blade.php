@@ -353,8 +353,8 @@
 
                 {{-- MOBILE HEADER (Visible on mobile only) --}}
                 <div class="flex md:hidden flex-col gap-2 w-full py-3">
-                    {{-- MOBILE BRANDING (LOGO) --}}
-                    <div class="flex items-center justify-between px-1 mb-1">
+                    {{-- MOBILE BRANDING (LOGO) HIDDEN AS PER REQUEST --}}
+                    {{-- <div class="flex items-center justify-between px-1 mb-1">
                         <a href="/" class="flex items-center" aria-label="{{ $setting->shop_name ?? 'Kataloque' }} Beranda">
                             @if($setting->shop_logo)
                                 <img src="{{ $setting->shop_logo }}" alt="{{ $setting->shop_name ?? 'Kataloque' }} Logo" class="h-7 w-auto">
@@ -363,7 +363,7 @@
                             @endif
                         </a>
                         <div class="text-[10px] font-black text-gray-300 uppercase tracking-widest">{{ $setting->shop_name ?? 'Kataloque' }}</div>
-                    </div>
+                    </div> --}}
                     {{-- COMPACT SINGLE ROW: Search | Notification --}}
                     <div class="flex items-center gap-3 w-full">
                         {{-- SEARCH (Flexible) --}}

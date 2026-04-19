@@ -29,6 +29,7 @@ class Setting extends Model
         'seo_settings',
         'system_settings',
         'is_maintenance',
+        'payment_methods',
     ];
 
     protected $casts = [
@@ -40,5 +41,6 @@ class Setting extends Model
         'seo_settings' => 'array',
         'system_settings' => 'array',
         'is_maintenance' => 'boolean',
+        'payment_methods' => 'array',
     ];
 }

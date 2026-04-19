@@ -67,6 +67,14 @@ class SettingController extends Controller
             }));
         }
 
+        // Process Payment Methods
+        $data['payment_methods'] = $request->input('payment_methods', []);
+        if (!empty($data['payment_methods'])) {
+            $data['payment_methods'] = array_values(array_filter($data['payment_methods'], function ($item) {
+                return !empty($item);
+            }));
+        }
+
         // Handle File Uploads
         $data = $this->handleFiles($request, $data, $setting);
         
@@ -110,7 +118,7 @@ class SettingController extends Controller
     {
         return $request->validate([
             'shop_name' => ['sometimes', 'required', 'string', 'max:255'],
-            'shop_logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,svg,webp', 'max:2048'],
+            'shop_logo' => ['nullable', 'file', 'mimes:jpeg,png,jpg,svg,webp', 'max:2048'],
             'shop_description' => ['nullable', 'string'],
             'shop_address' => ['nullable', 'string'],
             'city' => ['nullable', 'string', 'max:255'],
@@ -122,7 +130,7 @@ class SettingController extends Controller
             'facebook' => ['nullable', 'url', 'max:255'],
             'instagram' => ['nullable', 'url', 'max:255'],
             'footer_text' => ['nullable', 'string', 'max:255'],
-            'favicon' => ['nullable', 'image', 'mimes:jpeg,png,jpg,svg,ico,webp', 'max:1024'],
+            'favicon' => ['nullable', 'file', 'mimes:jpeg,png,jpg,svg,ico,webp', 'max:1024'],
             'marketplaces' => ['nullable', 'array'],
             'social_media' => ['nullable', 'array'],
             'social_media.*.platform' => ['nullable', 'string'],
@@ -155,8 +163,8 @@ class SettingController extends Controller
             'system_settings.announcement_enabled' => ['nullable', 'boolean'],
             'system_settings.announcement_text' => ['nullable', 'string', 'max:255'],
             'system_settings.announcement_url' => ['nullable', 'string', 'max:255'],
-            'system_settings.custom_header_script' => ['nullable', 'string'],
-            'system_settings.custom_footer_script' => ['nullable', 'string'],
+            'payment_methods' => ['nullable', 'array'],
+            'payment_methods.*' => ['nullable', 'string', 'max:50'],
         ]);
     }
 

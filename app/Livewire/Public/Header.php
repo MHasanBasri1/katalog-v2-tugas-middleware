@@ -20,6 +20,7 @@ class Header extends Component
     public int $favoriteCount = 0;
 
     public array $categories = [];
+    public ?Setting $setting = null;
 
     protected $listeners = [
         'favorite-updated' => '$refresh',
@@ -52,26 +53,22 @@ class Header extends Component
                 ->all()
         );
 
-        $setting = Cache::remember('global.settings', now()->addDay(), fn() => Setting::first());
+        $this->setting = Cache::rememberForever('global.settings', fn() => Setting::first() ?? new Setting());
         
         // Trending Keywords
-        if ($setting && !empty($setting->trending_keywords)) {
-            $this->trendingKeywords = $setting->trending_keywords;
-        } else {
+        $this->trendingKeywords = $this->setting->trending_keywords ?? [];
+        if (empty($this->trendingKeywords)) {
             $this->trendingKeywords = [
                 ['keyword' => 'iPhone 15 Pro', 'url' => null],
                 ['keyword' => 'Samsung S24 Ultra', 'url' => null],
                 ['keyword' => 'MacBook Pro M3', 'url' => null],
                 ['keyword' => 'Sony WH-1000XM5', 'url' => null],
-                ['keyword' => 'Logitech G Pro', 'url' => null],
-                ['keyword' => 'iPad Pro M2', 'url' => null],
             ];
         }
 
         // Top Bar Menus
-        if ($setting && !empty($setting->header_navigation)) {
-            $this->topMenus = $setting->header_navigation;
-        } else {
+        $this->topMenus = $this->setting->header_navigation ?? [];
+        if (empty($this->topMenus)) {
             $this->topMenus = [
                 ['label' => 'Tentang Kami', 'url' => '/tentang-kami'],
                 ['label' => 'Blog & Edukasi', 'url' => '/blog'],

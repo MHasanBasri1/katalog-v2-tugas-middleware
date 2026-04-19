@@ -121,9 +121,15 @@
                 <div class="space-y-4">
                     <h4 class="text-gray-900 font-bold text-sm tracking-wide">Pembayaran</h4>
                     <div class="flex flex-wrap gap-2 text-gray-600">
-                         <div class="h-6 px-2 bg-white border border-gray-300 rounded text-[9px] flex items-center font-bold">BCA</div>
-                         <div class="h-6 px-2 bg-white border border-gray-300 rounded text-[9px] flex items-center font-bold">BNI</div>
-                         <div class="h-6 px-2 bg-white border border-gray-300 rounded text-[9px] flex items-center font-bold">GOPAY</div>
+                        @if($setting?->payment_methods)
+                            @foreach($setting->payment_methods as $method)
+                                <div class="h-6 px-2 bg-white border border-gray-300 rounded text-[9px] flex items-center font-bold uppercase transition-all hover:border-blue-500 hover:text-blue-600">{{ $method }}</div>
+                            @endforeach
+                        @else
+                            <div class="h-6 px-2 bg-white border border-gray-300 rounded text-[9px] flex items-center font-bold">BCA</div>
+                            <div class="h-6 px-2 bg-white border border-gray-300 rounded text-[9px] flex items-center font-bold">BNI</div>
+                            <div class="h-6 px-2 bg-white border border-gray-300 rounded text-[9px] flex items-center font-bold">GOPAY</div>
+                        @endif
                     </div>
                 </div>
             </div>

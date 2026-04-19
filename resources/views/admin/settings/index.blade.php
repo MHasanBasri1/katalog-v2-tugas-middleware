@@ -20,7 +20,7 @@
     @endif
 
     <div x-data="{ 
-        activeTab: new URLSearchParams(window.location.search).get('tab') || 'umum',
+        activeTab: new URLSearchParams(window.location.search).get('tab') || 'branding',
         setTab(tab) {
             this.activeTab = tab;
             const url = new URL(window.location);
@@ -32,7 +32,6 @@
         <div class="flex items-center gap-2 overflow-x-auto pb-4 mb-6 no-scrollbar border-b border-gray-100 dark:border-gray-800">
             @php
                 $tabs = [
-                    'umum' => ['label' => 'Umum', 'icon' => 'ti ti-settings'],
                     'branding' => ['label' => 'Branding', 'icon' => 'ti ti-palette'],
                     'marketplace' => ['label' => 'Marketplace', 'icon' => 'ti ti-shopping-cart'],
                     'navigasi' => ['label' => 'Navigasi', 'icon' => 'ti ti-map-2'],
@@ -57,8 +56,10 @@
                 @method('PUT')
             @endif
 
-            <!-- Section: UMUM -->
-            <div x-show="activeTab === 'umum'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
+        <!-- Section: BRANDING -->
+        <div x-show="activeTab === 'branding'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="space-y-6">
+
+
             <!-- Shop Identity Card -->
             <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
@@ -100,12 +101,8 @@
                     </div>
                 </div>
             </div>
-        </div> <!-- End Section: UMUM -->
-
-        <!-- Section: BRANDING -->
-        <div x-show="activeTab === 'branding'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
             <!-- Branding Assets Card -->
-            <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
                     <div class="w-1.5 h-6 bg-amber-500 rounded-full"></div>
                     <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Aset Visual & Branding</h3>
@@ -114,7 +111,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                         <!-- Logo Upload -->
                         <div x-data="{ photoName: null, photoPreview: null }">
-                            <label class="block text-[10px] font-black text-gray-400 mb-4 uppercase tracking-widest">Logo Utama (Light/Dark)</label>
+                            <label class="block text-[10px] font-black text-gray-400 mb-4 uppercase tracking-widest">Logo Utama / Header Branding (Support SVG)</label>
                             <input type="file" name="shop_logo" class="hidden" x-ref="photo" x-on:change="
                                     photoName = $refs.photo.files[0].name;
                                     const reader = new FileReader();
@@ -261,6 +258,7 @@
                             </template>
                         </div>
                     </div>
+
                 </div>
             </div>
 
@@ -355,6 +353,37 @@
                             </div>
                         </template>
                     </div>
+
+                    <!-- Payment Methods Section -->
+                    <div class="pt-10 border-t border-gray-100 dark:border-gray-800">
+                        <div class="flex flex-col gap-1 mb-8">
+                            <h4 class="text-[11px] font-black uppercase tracking-wider text-gray-400">Metode Pembayaran (Footer)</h4>
+                            <p class="text-[10px] text-gray-400">Pilih metode pembayaran yang akan ditampilkan sebagai ikon informasi di footer.</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                            @php
+                                $commonMethods = ['BCA', 'Mandiri', 'BNI', 'BRI', 'BSI', 'QRIS', 'GoPay', 'OVO', 'Dana', 'LinkAja', 'ShopeePay'];
+                                $selectedMethods = $setting->payment_methods ?? ['BCA', 'BNI', 'GOPAY'];
+                            @endphp
+                            @foreach($commonMethods as $method)
+                                <label class="group relative flex items-center gap-3 p-3 rounded-2xl border transition-all duration-300 cursor-pointer 
+                                    {{ in_array($method, $selectedMethods) 
+                                        ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800' 
+                                        : 'bg-gray-50/50 border-gray-100 dark:bg-gray-800/30 dark:border-gray-700 hover:border-emerald-200' }}">
+                                    <div class="relative flex items-center justify-center">
+                                        <input type="checkbox" name="payment_methods[]" value="{{ $method }}" 
+                                            @checked(in_array($method, $selectedMethods))
+                                            class="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-gray-300 dark:border-gray-600 checked:bg-emerald-600 checked:border-emerald-600 transition-all">
+                                        <i class="ti ti-check absolute text-[10px] text-white opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+                                    </div>
+                                    <span class="text-xs font-black uppercase tracking-tight {{ in_array($method, $selectedMethods) ? 'text-emerald-900 dark:text-emerald-400' : 'text-gray-500' }}">
+                                        {{ $method }}
+                                    </span>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -364,9 +393,17 @@
         <div x-show="activeTab === 'navigasi'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
             <!-- Navigation Card -->
             <div class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+
                 <!-- Trending Keywords -->
                 <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm" x-data="{ 
-                    items: {{ json_encode(old('trending_keywords', $setting->trending_keywords ?? [['keyword' => '', 'url' => '']])) }},
+                    items: {{ json_encode(old('trending_keywords', !empty($setting->trending_keywords) ? $setting->trending_keywords : [
+                        ['keyword' => 'iPhone 15 Pro', 'url' => ''],
+                        ['keyword' => 'Samsung S24 Ultra', 'url' => ''],
+                        ['keyword' => 'MacBook Pro M3', 'url' => ''],
+                        ['keyword' => 'Sony WH-1000XM5', 'url' => ''],
+                        ['keyword' => 'Logitech G Pro', 'url' => ''],
+                        ['keyword' => 'iPad Pro M2', 'url' => '']
+                    ])) }},
                     addItem() { this.items.push({ keyword: '', url: '' }); },
                     removeItem(index) { this.items.splice(index, 1); }
                 }">
@@ -401,7 +438,11 @@
 
                 <!-- Header Navigation -->
                 <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm" x-data="{ 
-                    items: {{ json_encode(old('header_navigation', $setting->header_navigation ?? [['label' => '', 'url' => '']])) }},
+                    items: {{ json_encode(old('header_navigation', !empty($setting->header_navigation) ? $setting->header_navigation : [
+                        ['label' => 'Tentang Kami', 'url' => '/tentang-kami'],
+                        ['label' => 'Blog & Edukasi', 'url' => '/blog'],
+                        ['label' => 'Cara Order', 'url' => '/cara-pesan']
+                    ])) }},
                     addItem() { this.items.push({ label: '', url: '' }); },
                     removeItem(index) { this.items.splice(index, 1); }
                 }">
@@ -436,7 +477,12 @@
 
                 <!-- Footer Quick Links -->
                 <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm" x-data="{ 
-                    items: {{ json_encode(old('footer_navigation', $setting->footer_navigation ?? [['label' => '', 'url' => '']])) }},
+                    items: {{ json_encode(old('footer_navigation', !empty($setting->footer_navigation) ? $setting->footer_navigation : [
+                        ['label' => 'Tentang Kami', 'url' => '/tentang-kami'],
+                        ['label' => 'Blog', 'url' => '/blog'],
+                        ['label' => 'Cara Belanja', 'url' => '/cara-pesan'],
+                        ['label' => 'Metode Pembayaran', 'url' => '/pembayaran']
+                    ])) }},
                     addItem() { this.items.push({ label: '', url: '' }); },
                     removeItem(index) { this.items.splice(index, 1); }
                 }">
@@ -643,34 +689,7 @@
                     </div>
                 </div>
 
-                <!-- Announcement Bar Card -->
-                <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden text-sm">
-                    <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="w-1.5 h-6 bg-amber-500 rounded-full"></div>
-                            <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Announcement Bar (Promo)</h3>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="hidden" name="system_settings[announcement_enabled]" value="0">
-                            <input type="checkbox" name="system_settings[announcement_enabled]" value="1" @checked($setting->system_settings['announcement_enabled'] ?? false) class="sr-only peer">
-                            <div class="w-12 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-amber-500"></div>
-                        </label>
-                    </div>
-                    <div class="p-8 space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">Pesan Promo / Pengumuman</label>
-                                <input type="text" name="system_settings[announcement_text]" value="{{ old('system_settings.announcement_text', $setting->system_settings['announcement_text'] ?? '') }}" placeholder="Contoh: Promo Ramadhan Diskon 50%!"
-                                    class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 rounded-2xl outline-none transition-all duration-300 text-xs font-bold p-4">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">Target Link (Optional)</label>
-                                <input type="text" name="system_settings[announcement_url]" value="{{ old('system_settings.announcement_url', $setting->system_settings['announcement_url'] ?? '') }}" placeholder="https://..."
-                                    class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 rounded-2xl outline-none transition-all duration-300 text-xs font-bold p-4">
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
 
                 <!-- Marketing & Tracking Card -->
                 <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
@@ -697,30 +716,7 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Custom Scripts Card -->
-                <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
-                    <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
-                        <div class="w-1.5 h-6 bg-purple-600 rounded-full"></div>
-                        <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Custom Scripts (Header & Footer)</h3>
-                    </div>
-                    <div class="p-8 space-y-6">
-                        <div>
-                            <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">Custom Header Scripts (Inside &lt;head&gt;)</label>
-                            <textarea name="system_settings[custom_header_script]" rows="4" placeholder="<script> ... </script>"
-                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-purple-600 focus:ring-4 focus:ring-purple-600/10 rounded-2xl outline-none transition-all duration-300 text-xs font-mono p-4 resize-none">{{ old('system_settings.custom_header_script', $setting->system_settings['custom_header_script'] ?? '') }}</textarea>
-                            <p class="mt-2 text-[10px] text-gray-400">Gunakan untuk memasukkan Meta Tag custom, CSS tambahan, atau library JavaScript di header.</p>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">Custom Footer Scripts (Before &lt;/body&gt;)</label>
-                            <textarea name="system_settings[custom_footer_script]" rows="4" placeholder="<script> ... </script>"
-                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-purple-600 focus:ring-4 focus:ring-purple-600/10 rounded-2xl outline-none transition-all duration-300 text-xs font-mono p-4 resize-none">{{ old('system_settings.custom_footer_script', $setting->system_settings['custom_footer_script'] ?? '') }}</textarea>
-                            <p class="mt-2 text-[10px] text-gray-400">Gunakan untuk memasukkan kode tracking Chatbot, Widget, atau script yang membutuhkan pemuatan terakhir.</p>
-                        </div>
-                    </div>
-                </div>
             </div>
-
         </div> <!-- End Section: SISTEM -->
 
         <!-- Sticky Bottom Actions -->
