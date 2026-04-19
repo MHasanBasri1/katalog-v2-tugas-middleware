@@ -19,27 +19,36 @@ class SettingController extends Controller
         return view('admin.settings.index', compact('setting'));
     }
 
-    public function create(): RedirectResponse
-    {
-        return redirect()->route('admin.setting.index');
-    }
-
     public function store(Request $request): RedirectResponse
     {
+        return $this->saveSettings($request);
+    }
+
+    public function update(Request $request): RedirectResponse
+    {
+        return $this->saveSettings($request);
+    }
+
+    private function saveSettings(Request $request): RedirectResponse
+    {
+        $setting = Setting::query()->firstOrNew(['id' => 1]);
         $data = $this->validatePayload($request);
 
+        // Process Social Media
         if (isset($data['social_media'])) {
             $data['social_media'] = array_values(array_filter($data['social_media'], function ($item) {
                 return !empty($item['username']);
             }));
         }
 
+        // Process Marketplaces
         if (isset($data['marketplaces'])) {
             $data['marketplaces'] = array_filter($data['marketplaces'], function ($url) {
                 return !empty($url);
             });
         }
 
+        // Process Navigations
         if (isset($data['header_navigation'])) {
             $data['header_navigation'] = array_values(array_filter($data['header_navigation'], function ($item) {
                 return !empty($item['label']);
@@ -58,15 +67,28 @@ class SettingController extends Controller
             }));
         }
 
-        $data = $this->handleFiles($request, $data);
+        // Handle File Uploads
+        $data = $this->handleFiles($request, $data, $setting);
         
-        Setting::query()->updateOrCreate(['id' => 1], $data);
+        // Handle Booleans (Checkboxes)
+        $data['is_maintenance'] = $request->boolean('is_maintenance');
+        
+        if (isset($data['system_settings'])) {
+            $system = $data['system_settings'];
+            $system['announcement_enabled'] = $request->boolean('system_settings.announcement_enabled');
+            $data['system_settings'] = $system;
+        }
 
+        $setting->fill($data);
+        $setting->save();
+
+        // Clear All Related Caches
         Cache::forget('public.footer.setting');
         Cache::forget('public.whatsapp_setting');
         Cache::forget('global.settings');
+        Cache::forget('public.header.categories'); // In case shop name changed and affects alt tags
 
-        return back()->with('status', 'Setting berhasil disimpan.');
+        return back()->with('status', 'Pengaturan berhasil diperbarui.');
     }
 
     public function show(string $id): RedirectResponse
@@ -77,53 +99,6 @@ class SettingController extends Controller
     public function edit(string $id): RedirectResponse
     {
         return redirect()->route('admin.setting.index');
-    }
-
-    public function update(Request $request): RedirectResponse
-    {
-        $setting = Setting::query()->firstOrNew(['id' => 1]);
-        $data = $this->validatePayload($request);
-        
-        if (isset($data['social_media'])) {
-            $data['social_media'] = array_values(array_filter($data['social_media'], function ($item) {
-                return !empty($item['username']);
-            }));
-        }
-
-        if (isset($data['marketplaces'])) {
-            $data['marketplaces'] = array_filter($data['marketplaces'], function ($url) {
-                return !empty($url);
-            });
-        }
-
-        if (isset($data['header_navigation'])) {
-            $data['header_navigation'] = array_values(array_filter($data['header_navigation'], function ($item) {
-                return !empty($item['label']);
-            }));
-        }
-
-        if (isset($data['footer_navigation'])) {
-            $data['footer_navigation'] = array_values(array_filter($data['footer_navigation'], function ($item) {
-                return !empty($item['label']);
-            }));
-        }
-
-        if (isset($data['trending_keywords'])) {
-            $data['trending_keywords'] = array_values(array_filter($data['trending_keywords'], function ($item) {
-                return !empty($item['keyword']);
-            }));
-        }
-
-        $data = $this->handleFiles($request, $data, $setting);
-        
-        $setting->fill($data);
-        $setting->save();
-
-        Cache::forget('public.footer.setting');
-        Cache::forget('public.whatsapp_setting');
-        Cache::forget('global.settings');
-
-        return back()->with('status', 'Setting berhasil diperbarui.');
     }
 
     public function destroy(string $id): RedirectResponse
@@ -180,6 +155,8 @@ class SettingController extends Controller
             'system_settings.announcement_enabled' => ['nullable', 'boolean'],
             'system_settings.announcement_text' => ['nullable', 'string', 'max:255'],
             'system_settings.announcement_url' => ['nullable', 'string', 'max:255'],
+            'system_settings.custom_header_script' => ['nullable', 'string'],
+            'system_settings.custom_footer_script' => ['nullable', 'string'],
         ]);
     }
 

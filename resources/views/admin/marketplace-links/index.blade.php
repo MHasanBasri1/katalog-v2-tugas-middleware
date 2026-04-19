@@ -46,7 +46,7 @@
                     </select>
                     <input type="url" name="url" placeholder="https://..." value="{{ old('url', $editLink->url ?? '') }}" required class="rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 dark:text-gray-100 text-sm py-2">
                     <div class="flex items-center gap-2">
-                        <button type="submit" class="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase tracking-wider py-2.5 transition shadow-sm">
+                        <button type="submit" class="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2.5 transition shadow-sm">
                             {{ $editLink ? 'Update' : 'Simpan' }}
                         </button>
                         @if ($editLink)

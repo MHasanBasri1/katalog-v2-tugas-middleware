@@ -69,7 +69,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">Nama Platform / Toko</label>
-                            <input type="text" name="shop_name" required value="{{ old('shop_name', $setting->shop_name) }}" placeholder="Kataloque"
+                            <input type="text" name="shop_name" required value="{{ old('shop_name', $setting->shop_name ?? 'Kataloque') }}" placeholder="Kataloque"
                                 class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4">
                             @error('shop_name') <p class="mt-2 text-xs text-rose-600 font-medium">{{ $message }}</p> @enderror
                         </div>
@@ -178,10 +178,10 @@
 
                     <!-- Social Media Section -->
                     <div class="pt-10 border-t border-gray-100 dark:border-gray-800" x-data="{ 
-                        socials: {{ json_encode($setting->social_media ?? [
+                        socials: {{ json_encode(old('social_media', $setting->social_media ?? [
                             ['platform' => 'instagram', 'username' => $setting->instagram ?? ''],
                             ['platform' => 'facebook', 'username' => $setting->facebook ?? '']
-                        ]) }},
+                        ])) }},
                         addSocial() {
                             this.socials.push({ platform: 'instagram', username: '' });
                         },
@@ -275,9 +275,9 @@
                     <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Ekosistem Belanja</h3>
                 </div>
                 <div class="p-8" x-data="{ 
-                    marketplaces: {{ json_encode(collect($setting->marketplaces ?? [])->map(function($url, $key) { 
+                    marketplaces: {{ json_encode(old('marketplaces', collect($setting->marketplaces ?? [])->map(function($url, $key) { 
                         return ['platform' => $key, 'url' => $url]; 
-                    })->values()->all() ?: [['platform' => 'shopee', 'url' => ''], ['platform' => 'tokopedia', 'url' => '']]) }},
+                    })->values()->all() ?: [['platform' => 'shopee', 'url' => ''], ['platform' => 'tokopedia', 'url' => '']])) }},
                     addMarketplace() {
                         this.marketplaces.push({ platform: 'shopee', url: '' });
                     },
@@ -366,7 +366,7 @@
             <div class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <!-- Trending Keywords -->
                 <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm" x-data="{ 
-                    items: {{ json_encode($setting->trending_keywords ?? [['keyword' => '', 'url' => '']]) }},
+                    items: {{ json_encode(old('trending_keywords', $setting->trending_keywords ?? [['keyword' => '', 'url' => '']])) }},
                     addItem() { this.items.push({ keyword: '', url: '' }); },
                     removeItem(index) { this.items.splice(index, 1); }
                 }">
@@ -401,7 +401,7 @@
 
                 <!-- Header Navigation -->
                 <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm" x-data="{ 
-                    items: {{ json_encode($setting->header_navigation ?? [['label' => '', 'url' => '']]) }},
+                    items: {{ json_encode(old('header_navigation', $setting->header_navigation ?? [['label' => '', 'url' => '']])) }},
                     addItem() { this.items.push({ label: '', url: '' }); },
                     removeItem(index) { this.items.splice(index, 1); }
                 }">
@@ -436,7 +436,7 @@
 
                 <!-- Footer Quick Links -->
                 <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm" x-data="{ 
-                    items: {{ json_encode($setting->footer_navigation ?? [['label' => '', 'url' => '']]) }},
+                    items: {{ json_encode(old('footer_navigation', $setting->footer_navigation ?? [['label' => '', 'url' => '']])) }},
                     addItem() { this.items.push({ label: '', url: '' }); },
                     removeItem(index) { this.items.splice(index, 1); }
                 }">
@@ -485,7 +485,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">SEO Title Bar / Meta Title</label>
-                                <input type="text" name="seo_settings[seo_title]" value="{{ old('seo_settings.seo_title', $setting->seo_settings['seo_title'] ?? '') }}" placeholder="Kataloque - Digital Catalog & Marketplace"
+                                <input type="text" name="seo_settings[seo_title]" value="{{ old('seo_settings.seo_title', $setting->seo_settings['seo_title'] ?? $setting->shop_name ?? 'Kataloque - Digital Catalog') }}" placeholder="Kataloque - Digital Catalog & Marketplace"
                                     class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4">
                             </div>
                             <div>
@@ -497,7 +497,7 @@
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">Global Meta Description</label>
                             <textarea name="shop_description" rows="3" placeholder="Masukan deskripsi singkat untuk Google..."
-                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4 leading-relaxed">{{ old('shop_description', $setting->shop_description) }}</textarea>
+                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/10 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4 leading-relaxed">{{ old('shop_description', $setting->shop_description ?? 'Satu destinasi untuk semua kebutuhan gaya hidup Anda. Belanja cerdas, cepat, dan aman hanya di ' . ($setting->shop_name ?? 'Kataloque')) }}</textarea>
                             <p class="mt-2 text-[10px] text-gray-400">Deskripsi ini akan muncul di hasil pencarian Google (Ideal: 150-160 karakter).</p>
                         </div>
                         <div>
@@ -638,7 +638,7 @@
                         <div>
                             <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">Pesan Pemeliharaan</label>
                             <textarea name="system_settings[maintenance_message]" rows="3" placeholder="Maaf, kami sedang melakukan perbaikan sistem..."
-                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-rose-600 focus:ring-4 focus:ring-rose-600/10 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4 resize-none leading-relaxed">{{ old('system_settings.maintenance_message', $setting->system_settings['maintenance_message'] ?? '') }}</textarea>
+                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-rose-600 focus:ring-4 focus:ring-rose-600/10 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4 resize-none leading-relaxed">{{ old('system_settings.maintenance_message', $setting->system_settings['maintenance_message'] ?? 'Maaf, saat ini sistem kami sedang dalam tahap pemeliharaan rutin untuk meningkatkan layanan. Kami akan segera kembali!') }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -694,6 +694,28 @@
                             </label>
                             <input type="text" name="system_settings[facebook_pixel_id]" value="{{ old('system_settings.facebook_pixel_id', $setting->system_settings['facebook_pixel_id'] ?? '') }}" placeholder="1234567890"
                                 class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 rounded-2xl outline-none transition-all duration-300 text-sm font-bold p-4">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Scripts Card -->
+                <div class="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+                    <div class="p-8 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
+                        <div class="w-1.5 h-6 bg-purple-600 rounded-full"></div>
+                        <h3 class="text-xs font-black uppercase tracking-widest text-gray-900 dark:text-white">Custom Scripts (Header & Footer)</h3>
+                    </div>
+                    <div class="p-8 space-y-6">
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">Custom Header Scripts (Inside &lt;head&gt;)</label>
+                            <textarea name="system_settings[custom_header_script]" rows="4" placeholder="<script> ... </script>"
+                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-purple-600 focus:ring-4 focus:ring-purple-600/10 rounded-2xl outline-none transition-all duration-300 text-xs font-mono p-4 resize-none">{{ old('system_settings.custom_header_script', $setting->system_settings['custom_header_script'] ?? '') }}</textarea>
+                            <p class="mt-2 text-[10px] text-gray-400">Gunakan untuk memasukkan Meta Tag custom, CSS tambahan, atau library JavaScript di header.</p>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-400 mb-2.5 uppercase tracking-widest">Custom Footer Scripts (Before &lt;/body&gt;)</label>
+                            <textarea name="system_settings[custom_footer_script]" rows="4" placeholder="<script> ... </script>"
+                                class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-purple-600 focus:ring-4 focus:ring-purple-600/10 rounded-2xl outline-none transition-all duration-300 text-xs font-mono p-4 resize-none">{{ old('system_settings.custom_footer_script', $setting->system_settings['custom_footer_script'] ?? '') }}</textarea>
+                            <p class="mt-2 text-[10px] text-gray-400">Gunakan untuk memasukkan kode tracking Chatbot, Widget, atau script yang membutuhkan pemuatan terakhir.</p>
                         </div>
                     </div>
                 </div>

@@ -50,9 +50,13 @@
                 {{-- DESKTOP HEADER (Visible on md and up) --}}
                 <div class="hidden md:flex items-center gap-6 w-full">
                     {{-- LOGO --}}
-                    <a href="/" class="flex items-center shrink-0" aria-label="Kataloque Beranda">
-                        <img src="https://www.static-src.com/frontend/static/img/logo-blibli-blue.0f340eba.svg"
-                            alt="{{ $setting->shop_name ?? 'Kataloque' }} Logo" class="h-9 w-auto">
+                    <a href="/" class="flex items-center shrink-0" aria-label="{{ $setting->shop_name ?? 'Kataloque' }} Beranda">
+                        @if($setting->shop_logo)
+                            <img src="{{ $setting->shop_logo }}"
+                                alt="{{ $setting->shop_name ?? 'Kataloque' }} Logo" class="h-9 w-auto">
+                        @else
+                            <span class="text-xl font-black text-primary">{{ $setting->shop_name ?? 'Kataloque' }}</span>
+                        @endif
                     </a>
 
                     {{-- SEARCH --}}
@@ -349,6 +353,17 @@
 
                 {{-- MOBILE HEADER (Visible on mobile only) --}}
                 <div class="flex md:hidden flex-col gap-2 w-full py-3">
+                    {{-- MOBILE BRANDING (LOGO) --}}
+                    <div class="flex items-center justify-between px-1 mb-1">
+                        <a href="/" class="flex items-center" aria-label="{{ $setting->shop_name ?? 'Kataloque' }} Beranda">
+                            @if($setting->shop_logo)
+                                <img src="{{ $setting->shop_logo }}" alt="{{ $setting->shop_name ?? 'Kataloque' }} Logo" class="h-7 w-auto">
+                            @else
+                                <span class="text-lg font-black text-primary">{{ $setting->shop_name ?? 'Kataloque' }}</span>
+                            @endif
+                        </a>
+                        <div class="text-[10px] font-black text-gray-300 uppercase tracking-widest">{{ $setting->shop_name ?? 'Kataloque' }}</div>
+                    </div>
                     {{-- COMPACT SINGLE ROW: Search | Notification --}}
                     <div class="flex items-center gap-3 w-full">
                         {{-- SEARCH (Flexible) --}}
@@ -451,7 +466,7 @@
                             <div class="swiper-wrapper !ease-linear">
                                 @foreach($trendingKeywords as $item)
                                     <div class="swiper-slide !w-auto">
-                                        <a href="{{ $item['url'] ?: route('katalog', ['q' => $item['keyword']]) }}"
+                                        <a href="{{ !empty($item['url']) ? $item['url'] : route('katalog', ['q' => $item['keyword']]) }}"
                                             class="block text-[9px] font-bold text-gray-400 px-2.5 py-1 bg-gray-50 border border-gray-100 rounded-lg whitespace-nowrap transition-colors hover:text-primary leading-none">{{ $item['keyword'] }}</a>
                                     </div>
                                 @endforeach
@@ -510,7 +525,7 @@
                     <div class="flex items-center gap-4 ml-6 text-[12px] font-medium text-gray-500 overflow-hidden">
                         <span class="hidden lg:block text-gray-300">|</span>
                         @foreach($trendingKeywords as $item)
-                            <a href="{{ $item['url'] ?: route('katalog', ['q' => $item['keyword']]) }}"
+                            <a href="{{ !empty($item['url']) ? $item['url'] : route('katalog', ['q' => $item['keyword']]) }}"
                                 class="hover:text-primary transition-colors whitespace-nowrap">{{ $item['keyword'] }}</a>
                             @if(!$loop->last)
                                 <span class="text-gray-200 font-light hidden lg:block">|</span>

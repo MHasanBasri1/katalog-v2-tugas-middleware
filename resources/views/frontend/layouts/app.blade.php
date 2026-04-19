@@ -219,6 +219,11 @@
         <noscript><img height="1" width="1" style="display:none"
                 src="https://www.facebook.com/tr?id={{ $setting->system_settings['facebook_pixel_id'] }}&ev=PageView&noscript=1" /></noscript>
     @endif
+
+    {{-- Custom Header Scripts --}}
+    @if($setting && !empty($setting->system_settings['custom_header_script']))
+        {!! $setting->system_settings['custom_header_script'] !!}
+    @endif
 </head>
 
 <body
@@ -469,6 +474,11 @@
         });
     </script>
     @stack('scripts')
+    
+    {{-- Custom Footer Scripts --}}
+    @if($setting && !empty($setting->system_settings['custom_footer_script']))
+        {!! $setting->system_settings['custom_footer_script'] !!}
+    @endif
 </body>
 
 </html>

@@ -88,9 +88,9 @@
                             <i class="ti ti-trash"></i>
                             <span x-text="`Hapus (${selectedIds.length})`"></span>
                         </button>
-                        <a href="{{ route('admin.voucher.create') }}" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all text-xs font-bold uppercase tracking-wider shadow-sm shadow-blue-200 dark:shadow-none">
+                        <a href="{{ route('admin.voucher.create') }}" class="px-6 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition shadow-sm flex items-center gap-2">
                             <i class="ti ti-plus"></i>
-                            Tambah Voucher
+                            Tambah
                         </a>
                     </div>
                 </div>
