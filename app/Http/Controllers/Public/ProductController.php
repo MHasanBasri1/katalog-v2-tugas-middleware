@@ -50,9 +50,18 @@ class ProductController extends Controller
 
         $settings = Setting::query()->first();
         $marketplaces = $settings?->marketplaces ?? ['Shopee', 'Tokopedia', 'Lazada', 'Blibli', 'Tiktok Shop'];
-        $activeLower = !empty($marketplaces) && !isset($marketplaces[0]) 
-            ? array_keys($marketplaces) 
-            : array_map(fn($m) => Str::lower($m), $marketplaces);
+        
+        $activeLower = [];
+        if (!empty($marketplaces)) {
+            if (!isset($marketplaces[0])) {
+                $activeLower = array_keys($marketplaces);
+            } else {
+                $activeLower = array_map(function($m) {
+                    return Str::lower(is_array($m) ? ($m['platform'] ?? '') : (string) $m);
+                }, $marketplaces);
+            }
+        }
+        $activeLower = array_filter($activeLower);
 
         // Normalize tiktok keys for better matching
         if (in_array('tiktok', $activeLower) && !in_array('tiktok shop', $activeLower)) $activeLower[] = 'tiktok shop';

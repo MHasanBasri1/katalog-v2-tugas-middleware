@@ -12,13 +12,9 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
-    // Strategy for navigate requests (HTML pages)
-    // We want to skip cache for pages when online to ensure fresh auth state
     if (event.request.mode === 'navigate') {
-        event.respondWith(
-            fetch(event.request)
-                .catch(() => caches.match(event.request))
-        );
+        // Let the browser handle the navigation naturally to preserve SameSite cookies
+        // and avoid auth middleware false-positives that cause redirect loops.
         return;
     }
 

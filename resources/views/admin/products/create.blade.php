@@ -256,13 +256,21 @@
                 <div class="p-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         @foreach ($marketplaceOptions as $index => $marketplace)
-                            <div>
-                                <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">{{ $marketplace }}</label>
-                                <input type="hidden" name="marketplace_links[{{ $index }}][marketplace]" value="{{ $marketplace }}">
-                                <input type="url" name="marketplace_links[{{ $index }}][url]" value="{{ old('marketplace_links.'.$index.'.url') }}" placeholder="https://..."
-                                    class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium"
+                            <div class="space-y-1">
+                                {{-- Ganti ->name menjadi ['name'] --}}
+                                <label class="...">{{ $marketplace['name'] ?? 'Marketplace' }}</label>
+
+                                {{-- Ganti ->id menjadi ['id'] --}}
+                                <input type="hidden" name="marketplace_links[{{ $index }}][marketplace_id]" value="{{ $marketplace['id'] ?? '' }}">
+                                
+                                <input type="url" 
+                                    name="marketplace_links[{{ $index }}][url]" 
+                                    {{-- Ganti ->url menjadi ['url'] --}}
+                                    value="{{ is_array($marketplace['url'] ?? '') ? '' : ($marketplace['url'] ?? '') }}"
+                                    class="..."
                                     :readonly="isSubmitting">
                             </div>
+
                         @endforeach
                     </div>
                 </div>

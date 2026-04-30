@@ -31,7 +31,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email:rfc,dns', 'regex:/^.+@.+\..+$/'],
+            'email' => ['required', 'string', 'email:rfc', 'regex:/^.+@.+\..+$/'],
             'password' => ['required', 'string'],
         ];
     }
@@ -51,6 +51,7 @@ class LoginRequest extends FormRequest
 
         if (! $user || ! Hash::check((string) $this->input('password'), (string) $user->password)) {
             RateLimiter::hit($this->throttleKey());
+            $this->ensureIsNotRateLimited(); // Langsung cek — pesan muncul tepat di percobaan ke-N
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
@@ -62,6 +63,7 @@ class LoginRequest extends FormRequest
         if ($user && $user->is_frozen) {
             Auth::logout();
             RateLimiter::hit($this->throttleKey());
+            $this->ensureIsNotRateLimited();
 
             throw ValidationException::withMessages([
                 'email' => 'Akun Anda sedang dibekukan. Silakan hubungi admin.',
@@ -70,9 +72,13 @@ class LoginRequest extends FormRequest
 
         $this->syncUserRole($user);
 
-        if ($this->is('admin/*') && $user && ! $user->hasRole('admin')) {
+        // Only block non-admin roles from accessing the admin panel
+        $userRole = $user->roles->first()->name ?? ($user->is_admin ? 'admin' : 'member');
+        $isAdminPanelRole = in_array($userRole, ['developer', 'super admin', 'admin']);
+        if ($this->is('admin/*') && $user && ! $isAdminPanelRole) {
             Auth::logout();
             RateLimiter::hit($this->throttleKey());
+            $this->ensureIsNotRateLimited();
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
@@ -96,20 +102,30 @@ class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        $roleName = $this->getRoleName();
+        $maxAttempts = in_array($roleName, ['developer', 'super admin']) ? 3 : 5;
+
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), $maxAttempts)) {
             return;
         }
 
         event(new Lockout($this));
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
+        $roleDisplay = Str::title($roleName);
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
+            'email' => "Terlalu banyak percobaan login. Untuk keamanan $roleDisplay, akun dikunci selama " . ceil($seconds / 60) . " menit.",
         ]);
+    }
+
+    private function getRoleName(): string
+    {
+        $user = User::query()->whereEmailInsensitive((string) $this->input('email'))->first();
+        if ($user) {
+            return $user->roles->first()->name ?? ($user->is_admin ? 'admin' : 'member');
+        }
+        return 'guest';
     }
 
     /**
@@ -130,11 +146,11 @@ class LoginRequest extends FormRequest
             return;
         }
 
-        Role::findOrCreate('admin', 'web');
-        Role::findOrCreate('member', 'web');
-
-        $expectedRole = $user->is_admin ? 'admin' : 'member';
-        if (! $user->hasRole($expectedRole)) {
+        // Only auto-assign role for users who have NO Spatie role yet.
+        // Never override an existing role (developer, super admin, etc.).
+        if ($user->roles->isEmpty()) {
+            $expectedRole = $user->is_admin ? 'admin' : 'member';
+            Role::findOrCreate($expectedRole, 'web');
             $user->syncRoles([$expectedRole]);
         }
     }

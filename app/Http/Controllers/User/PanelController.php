@@ -16,6 +16,20 @@ class PanelController extends Controller
 {
     public function index(): View
     {
+        $user = auth()->user();
+        $userRole = $user->roles->first()->name ?? ($user->is_admin ? 'admin' : 'member');
+        
+        if ($userRole === 'developer') {
+            $referer = request()->headers->get('referer', '');
+            if (str_contains($referer, '/admin')) {
+                \App\Models\ActivityLog::create([
+                    'username' => $user->username ?? $user->name ?? $user->email,
+                    'role' => 'developer',
+                    'activity' => 'Developer berpindah dari Dashboard Admin ke Dashboard Member',
+                    'ip_address' => request()->ip(),
+                ]);
+            }
+        }
         $favoriteProducts = Favorite::query()
             ->where('user_id', auth()->id())
             ->with([

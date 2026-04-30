@@ -42,19 +42,22 @@ class RolePermissionSeeder extends Seeder
             );
         }
 
-        $adminRole = Role::query()->updateOrCreate(
-            ['name' => 'admin', 'guard_name' => 'web']
-        );
-        $userRole = Role::query()->updateOrCreate(
-            ['name' => 'member', 'guard_name' => 'web']
-        );
+        $adminRole = Role::query()->updateOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        $userRole = Role::query()->updateOrCreate(['name' => 'member', 'guard_name' => 'web']);
+        $developerRole = Role::query()->updateOrCreate(['name' => 'developer', 'guard_name' => 'web']);
+        $superAdminRole = Role::query()->updateOrCreate(['name' => 'super admin', 'guard_name' => 'web']);
 
         $adminRole->syncPermissions($permissions);
+        $developerRole->syncPermissions($permissions);
+        $superAdminRole->syncPermissions($permissions);
         $userRole->syncPermissions([]);
 
         User::query()->each(function (User $user): void {
-            $role = $user->is_admin ? 'admin' : 'member';
-            $user->syncRoles([$role]);
+            // Jangan timpa role jika user adalah developer atau super admin
+            if (!$user->hasRole(['developer', 'super admin'])) {
+                $role = $user->is_admin ? 'admin' : 'member';
+                $user->syncRoles([$role]);
+            }
         });
     }
 }

@@ -55,9 +55,7 @@ class DashboardController extends Controller
         ];
 
         // Bottom section: Activity Logs
-        $activityLogs = ActivityLog::with('user')
-            ->whereNotNull('user_id')
-            ->latest()
+        $activityLogs = ActivityLog::latest()
             ->take(5)
             ->get();
 

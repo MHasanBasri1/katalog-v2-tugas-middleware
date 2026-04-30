@@ -22,11 +22,10 @@ class LogSuccessfulLogout
     {
         if ($event->user) {
             ActivityLog::create([
-                'user_id' => $event->user->id,
-                'description' => "{$event->user->name} telah logout dari sistem",
-                'activity_type' => 'auth',
-                'icon' => 'ti-logout',
-                'color' => 'orange',
+                'username' => $event->user->username ?? $event->user->name ?? $event->user->email,
+                'role' => $event->user->roles->first()->name ?? ($event->user->is_admin ? 'admin' : 'member'),
+                'activity' => "{$event->user->name} telah logout dari sistem",
+                'ip_address' => request()->ip(),
             ]);
         }
     }

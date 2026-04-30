@@ -318,7 +318,12 @@
                 <i class="fas fa-heart text-lg" aria-hidden="true"></i>
                 <span class="text-[10px] font-bold">Favorit</span>
             </a>
-            <a href="{{ auth()->check() ? (auth()->user()->hasRole('admin') ? '/admin' : '/dashboard') : '/masuk' }}"
+            @php
+                $userRole = auth()->check() ? (auth()->user()->roles->first()->name ?? (auth()->user()->is_admin ? 'admin' : 'member')) : 'guest';
+                $isAdminRole = in_array($userRole, ['admin', 'super admin', 'developer']);
+                $accountLink = auth()->check() ? ($isAdminRole ? '/admin/dashboard' : '/dashboard') : '/masuk';
+            @endphp
+            <a href="{{ $accountLink }}"
                 class="flex flex-col items-center gap-1 p-2 {{ (request()->is('dashboard*') && request()->query('tab') !== 'favorit') || request()->is('admin*') ? 'text-primary' : 'text-gray-500' }}"
                 aria-label="Profil Akun Saya">
                 @if(auth()->check())

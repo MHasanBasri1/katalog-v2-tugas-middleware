@@ -35,11 +35,10 @@ class LogActivity
                 
                 if ($description) {
                     ActivityLog::create([
-                        'user_id' => $user->id,
-                        'description' => $description,
-                        'activity_type' => $this->getActivityType($path),
-                        'icon' => $this->getIcon($method),
-                        'color' => $this->getColor($method),
+                        'username' => $user->username ?? $user->name ?? $user->email,
+                        'role' => $user->roles->first()->name ?? ($user->is_admin ? 'admin' : 'member'),
+                        'activity' => $description,
+                        'ip_address' => $request->ip(),
                     ]);
                 }
             }

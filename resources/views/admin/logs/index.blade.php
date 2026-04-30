@@ -104,10 +104,10 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    @if($log->user)
+                                    @if($log->role !== 'guest' && $log->role !== 'pengunjung')
                                         <div class="flex flex-col">
-                                            <span class="text-sm font-bold text-gray-900 dark:text-white">{{ $log->user->name }}</span>
-                                            <span class="text-[10px] font-black uppercase tracking-tighter text-blue-500">{{ $log->user->hasRole('admin') ? 'ADMIN' : 'USER' }}</span>
+                                            <span class="text-sm font-bold text-gray-900 dark:text-white">{{ $log->username }}</span>
+                                            <span class="text-[10px] font-black uppercase tracking-tighter text-blue-500">{{ $log->role }}</span>
                                         </div>
                                     @else
                                         <div class="flex flex-col">
@@ -117,11 +117,11 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $log->description }}</span>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $log->activity }}</span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-{{ $log->color }}-50 dark:bg-{{ $log->color }}-900/20 text-{{ $log->color }}-600 border border-{{ $log->color }}-100 dark:border-{{ $log->color }}-900/30">
-                                        {{ $log->activity_type ?: 'General' }}
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-blue-50 dark:bg-blue-900/20 text-blue-600 border border-blue-100 dark:border-blue-900/30">
+                                        {{ $log->ip_address ?: 'N/A' }}
                                     </span>
                                 </td>
                             </tr>

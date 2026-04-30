@@ -30,23 +30,16 @@ class UserAuthController extends Controller
         $request->session()->regenerate();
 
         $user = $request->user();
-        $isAdmin = $user && ($user->is_admin || $user->hasRole('admin'));
+        $userRole = $user->roles->first()->name ?? ($user->is_admin ? 'admin' : 'member');
+        $isAdminRole = in_array($userRole, ['developer', 'super admin', 'admin']);
 
-        if ($isAdmin) {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            return back()->withErrors([
-                'email' => trans('auth.failed'),
-            ])->onlyInput('email');
+        if ($isAdminRole) {
+            return redirect()->intended(route('admin.dashboard', absolute: false));
         }
-
-
 
         $defaultRedirect = $user && ! $user->hasVerifiedEmail()
             ? route('verification.notice', absolute: false)
-            : route('user.panel', absolute: false);
+            : route('home', absolute: false);
 
         $intended = $request->session()->get('url.intended');
         $intendedPath = is_string($intended) ? (parse_url($intended, PHP_URL_PATH) ?: '') : '';

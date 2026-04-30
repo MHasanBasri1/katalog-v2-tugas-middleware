@@ -269,6 +269,21 @@
                 <span x-show="$store.sidebar.isSidebarForceExpanded" x-cloak class="ml-3">Pengaturan</span>
             </a>
         @endif
+
+        @php
+            $isDeveloper = auth()->user()?->hasRole('developer');
+        @endphp
+
+        @if ($isDeveloper)
+            <div x-show="$store.sidebar.isSidebarForceExpanded" x-cloak class="px-3 pt-4 pb-1 text-[10px] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Developer Tools</div>
+            <a href="{{ route('user.panel') }}"
+               class="flex items-center rounded-2xl px-3 py-2.5 text-sm font-bold transition-all duration-300 group relative overflow-hidden mt-1 bg-[#2563EB]/10 dark:bg-[#2563EB]/20 text-[#2563EB] dark:text-[#2563EB] hover:bg-[#2563EB]/20 dark:hover:bg-[#2563EB]/30 hover:shadow-sm border border-[#2563EB]/30 dark:border-[#2563EB]/50"
+               :class="$store.sidebar.isSidebarForceExpanded ? '' : 'justify-center'"
+               title="Lihat Tampilan Member">
+                <i class="ti ti-external-link text-xl group-hover:scale-110 transition-transform"></i>
+                <span x-show="$store.sidebar.isSidebarForceExpanded" x-cloak class="ml-3">Tampilan Member</span>
+            </a>
+        @endif
     </nav>
 
     <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950">

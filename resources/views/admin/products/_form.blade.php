@@ -83,16 +83,34 @@
         <h4 class="text-xs font-bold text-gray-700 dark:text-gray-200 mb-2">Marketplace</h4>
         <div class="space-y-2">
             @foreach ($marketplaceOptions as $index => $marketplace)
-                @php $defaultUrl = $existingLinks->get($marketplace)?->url; @endphp
-                <input type="hidden" name="marketplace_links[{{ $index }}][marketplace]" value="{{ $marketplace }}">
-                <input
-                    type="url"
-                    name="marketplace_links[{{ $index }}][url]"
-                    value="{{ old("marketplace_links.$index.url", $defaultUrl) }}"
-                    placeholder="{{ $marketplace }} URL"
-                    class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100 text-sm"
-                >
+                @php
+                    // Ambil link yang sudah ada jika sedang mode edit
+                    $existing = $existingLinks->get($marketplace) ?? '';
+                    
+                    // Proteksi: Jika hasilnya array (karena format JSON di Supabase), ambil stringnya saja
+                    $defaultUrl = is_array($existing) ? ($existing['url'] ?? '') : (is_object($existing) ? $existing->url : $existing);
+                @endphp
+    
+                <div class="space-y-1">
+                    {{-- 1. Ubah ->name menjadi ['name'] --}}
+                    <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">
+                        {{ $marketplace['name'] ?? 'Marketplace' }}
+                    </label>
+
+                    {{-- 2. Ubah ->id menjadi ['id'] --}}
+                    <input type="hidden" name="marketplace_links[{{ $index }}][marketplace_id]" value="{{ $marketplace['id'] ?? '' }}">
+
+                    <input type="url" 
+                        name="marketplace_links[{{ $index }}][url]" 
+                        value="{{ old('marketplace_links.'.$index.'.url', $defaultUrl) }}"
+                        {{-- 3. Ubah ->name menjadi ['name'] --}}
+                        placeholder="{{ $marketplace['name'] ?? '' }} URL"
+                        class="w-full rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-800 text-sm">
+                </div>
+
+
             @endforeach
+
         </div>
     </div>
 

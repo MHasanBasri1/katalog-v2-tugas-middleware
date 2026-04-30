@@ -171,18 +171,18 @@
                                 <tr class="hover:bg-gray-50/80 dark:hover:bg-gray-700/20 transition-colors">
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-2">
-                                            <div class="w-1.5 h-1.5 rounded-full bg-{{ $log->color }}-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
-                                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">{{ $log->description }}</span>
+                                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">{{ $log->activity }}</span>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4">
-                                        @if($log->user)
+                                        @if($log->role !== 'guest' && $log->role !== 'pengunjung')
                                             <span @class([
                                                 'px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border',
-                                                'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-900/30' => $log->user->hasRole('admin'),
-                                                'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-900/30' => !$log->user->hasRole('admin')
+                                                'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-900/30' => $log->role === 'admin' || $log->role === 'developer' || $log->role === 'super admin',
+                                                'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-900/30' => $log->role !== 'admin' && $log->role !== 'developer' && $log->role !== 'super admin'
                                             ])>
-                                                {{ $log->user->hasRole('admin') ? 'ADMIN' : 'MEMBER' }}
+                                                {{ strtoupper($log->role) }}
                                             </span>
                                         @else
                                             <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest bg-gray-50 text-gray-500 border border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700">

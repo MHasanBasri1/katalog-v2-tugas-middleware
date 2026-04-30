@@ -33,14 +33,14 @@ use App\Http\Controllers\Admin\LogController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/admin/login', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('/admin/login', [AuthenticatedSessionController::class, 'store'])->middleware('throttle:5,1');
+    Route::post('/admin/login', [AuthenticatedSessionController::class, 'store']);
     Route::get('/admin/lupa-password', [AdminPasswordResetLinkController::class, 'create'])->name('admin.password.request');
     Route::post('/admin/lupa-password', [AdminPasswordResetLinkController::class, 'store'])->name('admin.password.email')->middleware('throttle:3,1');
     Route::get('/admin/reset-password/{token}', [AdminNewPasswordController::class, 'create'])->name('admin.password.reset');
     Route::post('/admin/reset-password', [AdminNewPasswordController::class, 'store'])->name('admin.password.store')->middleware('throttle:5,1');
 
     Route::get('/masuk', [UserAuthController::class, 'showLoginForm'])->name('user.login');
-    Route::post('/masuk', [UserAuthController::class, 'login'])->name('user.login.store')->middleware('throttle:5,1');
+    Route::post('/masuk', [UserAuthController::class, 'login'])->name('user.login.store');
     Route::get('/auth/google/redirect', [UserGoogleAuthController::class, 'redirect'])->name('user.google.redirect');
     Route::get('/auth/google/callback', [UserGoogleAuthController::class, 'callback'])->name('user.google.callback');
     Route::get('/verifikasi-device/{token}', UserDeviceVerificationController::class)
@@ -80,7 +80,7 @@ Route::middleware('auth')->group(function () {
     })->middleware('throttle:6,1')->name('verification.send');
 });
 
-Route::middleware(array_merge(['auth', 'role:member'], config('auth.verification.required') ? ['verified'] : []))->group(function () {
+Route::middleware(array_merge(['auth', 'secure_role:member,developer'], config('auth.verification.required') ? ['verified'] : []))->group(function () {
     Route::get('/dashboard', [PanelController::class, 'index'])->name('user.panel');
     Route::put('/dashboard/profil', [PanelController::class, 'updateProfile'])->name('user.profile.update');
     Route::put('/dashboard/password', [PanelController::class, 'updatePassword'])->name('user.password.update');
@@ -90,7 +90,7 @@ Route::middleware(array_merge(['auth', 'role:member'], config('auth.verification
     Route::delete('/dashboard/favorit/{productId}', [PanelController::class, 'destroyFavorite'])->name('user.favorite.destroy');
 });
 
-Route::middleware(['web', 'throttle:60,1'])->group(function () {
+Route::middleware(['web', 'throttle:60,1', 'secure_role:developer,super admin,admin,member,guest'])->group(function () {
     Route::get('/', [App\Http\Controllers\Public\HomeController::class, 'index'])->name('home');
 
     Route::get('/kategori', [App\Http\Controllers\Public\CategoryController::class, 'index'])->name('kategori');
@@ -208,7 +208,7 @@ Route::middleware(['web', 'throttle:60,1'])->group(function () {
     })->name('halaman.show');
 });
 
-Route::middleware(['auth', 'role:admin', 'log.activity'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'secure_role:developer,super admin,admin', 'log.activity', \App\Http\Middleware\RestrictAdminDelete::class])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->middleware('permission:dashboard.view')
         ->name('dashboard');

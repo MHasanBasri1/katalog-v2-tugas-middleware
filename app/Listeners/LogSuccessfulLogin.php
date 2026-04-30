@@ -24,14 +24,11 @@ class LogSuccessfulLogin
         
         // Only log for admin users (based on context of earlier logs)
         // or any authenticated user if desired.
-        // But the user said "hanya user dan admin aja" (guest gausah)
-        
         ActivityLog::create([
-            'user_id' => $user->id,
-            'description' => "{$user->name} berhasil login ke dalam sistem",
-            'activity_type' => 'auth',
-            'icon' => 'ti-login',
-            'color' => 'emerald',
+            'username' => $user->username ?? $user->name ?? $user->email,
+            'role' => $user->roles->first()->name ?? ($user->is_admin ? 'admin' : 'member'),
+            'activity' => "{$user->name} berhasil login ke dalam sistem",
+            'ip_address' => request()->ip(),
         ]);
     }
 }

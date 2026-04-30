@@ -11,24 +11,16 @@ class LogController extends Controller
 {
     public function index(Request $request)
     {
-        $query = ActivityLog::with('user')
-            ->whereNotNull('user_id')
-            ->latest();
+        $query = ActivityLog::query()->latest();
 
         // Search filter
         if ($request->filled('q')) {
-            $query->where('description', 'like', '%' . $request->q . '%');
+            $query->where('activity', 'like', '%' . $request->q . '%');
         }
 
         // Role filter
         if ($request->filled('role')) {
-            if ($request->role === 'pengunjung') {
-                $query->whereNull('user_id');
-            } else {
-                $query->whereHas('user', function($q) use ($request) {
-                    $q->role($request->role);
-                });
-            }
+            $query->where('role', $request->role);
         }
 
         $logs = $query->paginate(25)->withQueryString();

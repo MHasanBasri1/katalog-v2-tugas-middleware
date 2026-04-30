@@ -261,16 +261,28 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         @foreach ($marketplaceOptions as $index => $marketplace)
                             @php
-                                $link = $product->marketplaceLinks->firstWhere('marketplace', $marketplace);
+                                // Menggunakan format array ['id'] atau ['name'] karena Supabase/PostgreSQL
+                                $link = $product->marketplaceLinks->firstWhere('marketplace_id', $marketplace['id'] ?? null);
                             @endphp
                             <div>
-                                <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">{{ $marketplace }}</label>
-                                <input type="hidden" name="marketplace_links[{{ $index }}][marketplace]" value="{{ $marketplace }}">
-                                <input type="url" name="marketplace_links[{{ $index }}][url]" value="{{ old('marketplace_links.'.$index.'.url', $link?->url) }}" placeholder="https://..."
+                                {{-- 1. Perbaikan Label: Tambahkan ['name'] --}}
+                                <label class="block text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-widest">
+                                    {{ $marketplace['name'] ?? 'Marketplace' }}
+                                </label>
+
+                                {{-- 2. Perbaikan Hidden Input: Gunakan ['id'] --}}
+                                <input type="hidden" name="marketplace_links[{{ $index }}][marketplace_id]" value="{{ $marketplace['id'] ?? '' }}">
+                                
+                                {{-- 3. Perbaikan Input URL --}}
+                                <input type="url" 
+                                    name="marketplace_links[{{ $index }}][url]" 
+                                    value="{{ old('marketplace_links.'.$index.'.url', $link?->url) }}" 
+                                    placeholder="https://..."
                                     class="w-full bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 focus:bg-white dark:focus:bg-gray-900 rounded-xl outline-none transition-all duration-300 text-sm font-medium"
                                     :readonly="isSubmitting">
                             </div>
                         @endforeach
+
                     </div>
                 </div>
             </div>

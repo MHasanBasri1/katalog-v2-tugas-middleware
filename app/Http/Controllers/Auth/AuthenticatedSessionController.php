@@ -70,10 +70,14 @@ class AuthenticatedSessionController extends Controller
         $intended = $request->session()->get('url.intended');
         $intendedPath = is_string($intended) ? (parse_url($intended, PHP_URL_PATH) ?: '') : '';
 
-        // If intended path is NOT an admin path, clear it to avoid 403 Forbidden
-        // because admins typically don't have the 'user' role for member dashboards.
-        if ($intendedPath && ! str_starts_with($intendedPath, '/admin')) {
-            $request->session()->forget('url.intended');
+        $userRole = $user->roles->first()->name ?? ($user->is_admin ? 'admin' : 'member');
+        $isAdminRole = in_array($userRole, ['developer', 'super admin', 'admin']);
+
+        if (! $isAdminRole) {
+            if ($intendedPath && str_starts_with($intendedPath, '/admin')) {
+                $request->session()->forget('url.intended');
+            }
+            return redirect()->intended(route('home', absolute: false));
         }
 
         return redirect()->intended(route('admin.dashboard', absolute: false));

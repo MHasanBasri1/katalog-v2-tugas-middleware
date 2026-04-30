@@ -266,8 +266,11 @@
                         {{-- USER PROFILE DROPWDOWN --}}
                         @if(auth()->check())
                             @php
-                                $isAdmin = auth()->user()->hasRole('admin');
-                                $panelRoute = $isAdmin ? route('admin.dashboard') : route('user.panel');
+                                $userRole = auth()->user()->roles->first()->name ?? (auth()->user()->is_admin ? 'admin' : 'member');
+                                $isDeveloper = $userRole === 'developer';
+                                $isAdminRole = in_array($userRole, ['admin', 'super admin']);
+                                $isMember = $userRole === 'member';
+                                $hasAdminAccess = $isDeveloper || $isAdminRole;
                                 $userAvatar = auth()->user()->avatar_url;
                             @endphp
                             <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false"
@@ -275,12 +278,12 @@
                                 <button @click="open = !open"
                                     class="flex items-center gap-3 group focus:outline-none h-10 px-2 rounded-xl hover:bg-gray-50 transition-all duration-300">
                                     <div
-                                        class="w-9 h-9 rounded-full {{ $isAdmin ? 'bg-rose-500/10 border-rose-500/20' : 'bg-primary/10 border-primary/20' }} flex items-center justify-center border-2 overflow-hidden transition-all duration-300 group-hover:scale-105 group-hover:shadow-md">
+                                        class="w-9 h-9 rounded-full {{ $hasAdminAccess ? 'bg-rose-500/10 border-rose-500/20' : 'bg-primary/10 border-primary/20' }} flex items-center justify-center border-2 overflow-hidden transition-all duration-300 group-hover:scale-105 group-hover:shadow-md">
                                         @if($userAvatar)
                                             <img src="{{ $userAvatar }}" alt="Profile" class="w-full h-full object-cover">
                                         @else
                                             <i
-                                                class="fas {{ $isAdmin ? 'fa-user-shield text-rose-600' : 'fa-user text-primary' }} text-xs"></i>
+                                                class="fas {{ $hasAdminAccess ? 'fa-user-shield text-rose-600' : 'fa-user text-primary' }} text-xs"></i>
                                         @endif
                                     </div>
                                     <div class="hidden lg:flex flex-col items-start translate-y-[1px]">
@@ -290,13 +293,15 @@
                                             <i class="fas text-[9px] text-gray-400 group-hover:text-primary transition-all transition-colors"
                                                 :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
                                         </div>
-                                        @if($isAdmin)
+                                        @if($isDeveloper)
                                             <span
-                                                class="text-[8px] font-black text-rose-600 uppercase tracking-widest leading-none mt-0.5">ADMIN
-                                                PANEL</span>
+                                                class="text-[8px] font-black text-rose-600 uppercase tracking-widest leading-none mt-0.5">DEVELOPER</span>
+                                        @elseif($isAdminRole)
+                                            <span
+                                                class="text-[8px] font-black text-blue-600 uppercase tracking-widest leading-none mt-0.5">ADMIN PANEL</span>
                                         @else
                                             <span
-                                                class="text-[8px] font-black text-blue-600 uppercase tracking-widest leading-none mt-0.5">MEMBER</span>
+                                                class="text-[8px] font-black text-gray-500 uppercase tracking-widest leading-none mt-0.5">MEMBER</span>
                                         @endif
                                     </div>
                                 </button>
@@ -318,14 +323,16 @@
                                             class="text-[11px] font-bold text-gray-800 truncate">{{ auth()->user()->email }}</span>
                                     </div>
                                     <div class="p-1.5 space-y-0.5">
-                                        <a href="{{ $panelRoute }}"
-                                            class="flex items-center gap-3 px-4 py-2.5 text-[13px] font-bold text-gray-700 hover:bg-primary/5 hover:text-primary rounded-xl transition-all">
-                                            <i class="fas fa-user-circle text-gray-400 w-4 pl-0.5"></i> Dashboard
+                                        @if($isDeveloper)
+                                        <a href="{{ route('user.panel') }}"
+                                            class="flex items-center gap-3 px-4 py-2.5 text-[13px] font-bold text-gray-700 hover:bg-primary/5 hover:text-primary rounded-xl transition-all border-b border-gray-50">
+                                            <i class="fas fa-user-circle text-gray-400 w-4 pl-0.5"></i> Ke Dashboard Member
                                         </a>
-                                        @if($isAdmin)
+                                        @endif
+                                        @if($hasAdminAccess)
                                             <a href="{{ route('admin.dashboard') }}"
                                                 class="flex items-center gap-3 px-4 py-2.5 text-[13px] font-bold text-gray-700 hover:bg-rose-50 hover:text-rose-600 rounded-xl transition-all border-b border-gray-50">
-                                                <i class="fas fa-shield-halved text-gray-400 w-4"></i> Panel Admin
+                                                <i class="fas fa-shield-halved text-gray-400 w-4"></i> Ke Dashboard Admin
                                             </a>
                                         @endif
                                         <div class="pt-1.5 mt-1.5 border-t border-gray-50">

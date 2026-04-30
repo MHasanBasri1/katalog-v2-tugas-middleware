@@ -1,7 +1,5 @@
 @php
-    $notifications = \App\Models\ActivityLog::with('user')
-        ->whereNotNull('user_id')
-        ->latest()
+    $notifications = \App\Models\ActivityLog::latest()
         ->take(3)
         ->get();
 @endphp
@@ -70,7 +68,7 @@
                     <div class="divide-y divide-gray-50 dark:divide-gray-800">
                         @forelse($notifications as $log)
                             <div class="px-5 py-3.5 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition cursor-default">
-                                <p class="text-[11px] font-bold text-gray-900 dark:text-gray-100 leading-tight">{{ $log->description }}</p>
+                                <p class="text-[11px] font-bold text-gray-900 dark:text-gray-100 leading-tight">{{ $log->activity }}</p>
                                 <p class="mt-1 text-[9px] text-gray-400 font-medium tracking-wide uppercase">{{ $log->created_at->diffForHumans() }}</p>
                             </div>
                         @empty

@@ -30,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => RoleOrPermissionMiddleware::class,
             'api.token' => ApiTokenAuth::class,
             'log.activity' => \App\Http\Middleware\LogActivity::class,
+            'secure_role' => \App\Http\Middleware\ActivityGuard::class,
         ]);
 
         $middleware->redirectGuestsTo(function (Request $request): string {
