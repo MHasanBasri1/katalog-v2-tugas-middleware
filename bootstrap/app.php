@@ -24,13 +24,13 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\CheckMaintenanceMode::class,
         ]);
         $middleware->alias([
-            'admin' => EnsureAdmin::class,
-            'role' => RoleMiddleware::class,
-            'permission' => PermissionMiddleware::class,
-            'role_or_permission' => RoleOrPermissionMiddleware::class,
-            'api.token' => ApiTokenAuth::class,
-            'log.activity' => \App\Http\Middleware\LogActivity::class,
-            'secure_role' => \App\Http\Middleware\ActivityGuard::class,
+            'admin'               => EnsureAdmin::class,
+            'role'                => RoleMiddleware::class,
+            'permission'          => PermissionMiddleware::class,
+            'role_or_permission'  => RoleOrPermissionMiddleware::class,
+            'api.token'           => ApiTokenAuth::class,
+            'log.activity'        => \App\Http\Middleware\LogActivity::class,
+            'secure_role'         => \App\Http\Middleware\ActivityGuard::class,
         ]);
 
         $middleware->redirectGuestsTo(function (Request $request): string {
@@ -40,7 +40,10 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $middleware->redirectUsersTo(function (Request $request): string {
-            if ($request->user()?->hasRole('admin')) {
+            $role = $request->user()?->roles->first()?->name
+                ?? ($request->user()?->is_admin ? 'admin' : 'member');
+
+            if (in_array($role, ['developer', 'super admin', 'admin'])) {
                 return route('admin.dashboard');
             }
             return route('user.panel');
@@ -52,3 +55,4 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();
+
